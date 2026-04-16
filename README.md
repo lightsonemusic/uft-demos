@@ -21,7 +21,7 @@ Click any of 9 cosmic proto-words to hear its frequency in real-time.
 
 **Features:** Real-time Web Audio, frequency info, planetary associations, sequence playback
 
-**File:** `1-proto-word-sound-gallery.html`
+**[→ Open Proto-Word Sound Gallery](1-proto-word-sound-gallery.html)**
 
 ---
 
@@ -30,7 +30,7 @@ Input any Hz → instantly find the closest proto-word and its cosmic associatio
 
 **Features:** Frequency mapping, octave normalization, reference table, real-time audio playback
 
-**File:** `2-frequency-converter.html`
+**[→ Open Frequency Converter](2-frequency-converter.html)**
 
 ---
 
@@ -39,7 +39,7 @@ Visualize the animated cosmic geometry of each proto-word.
 
 **Features:** 9 unique geometries, real-time Canvas animation, interactive switching
 
-**File:** `3-cymatic-geometry-player.html`
+**[→ Open Cymatic Geometry Player](3-cymatic-geometry-player.html)**
 
 ---
 
