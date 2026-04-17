@@ -84,10 +84,45 @@
     
     .info-label { font-size: 10px; color: #888; }
     .info-value { font-size: 13px; font-weight: bold; margin-top: 4px; }
+    .nav-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+      align-items: center;
+    }
+    .nav-bar a {
+      display: inline-block;
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.04);
+      color: #aaa;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+    }
+    .nav-bar a:hover {
+      background: rgba(255,255,255,0.1);
+      color: #e8f4f8;
+    }
+    .nav-bar a.home {
+      color: #1abc9c;
+      border-color: rgba(26,188,156,0.3);
+    }
+    .nav-spacer { flex: 1; }
   </style>
 </head>
 <body>
   <div class="container">
+    <nav class="nav-bar">
+      <a class="home" href="index.html">← All Toys</a>
+      <span class="nav-spacer"></span>
+      <a href="1-proto-word-sound-gallery.html">🎵 Sound Gallery</a>
+      <a href="2-frequency-converter.html">🎼 Frequency Converter</a>
+    </nav>
     <h1>🌊 Cymatic Geometry Player</h1>
     <p class="subtitle">Visualize the cosmic geometry of proto-word frequencies</p>
     
