@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFT — Ayurveda · Water · Math Coherency</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#040608;
+    color:#d0d8e0;
+    font-family:'Courier New',monospace;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+    padding:20px 14px; gap:14px;
+  }
+  h1 { font-size:.9em; color:#60a5fa; letter-spacing:6px; text-transform:uppercase; }
+  .sub { font-size:.62em; color:#1a2030; letter-spacing:3px; }
+  button { padding:10px 36px; background:#040608; border:1px solid #60a5fa; color:#60a5fa; font-family:'Courier New',monospace; font-size:.85em; cursor:pointer; letter-spacing:2px; transition:.2s; }
+  button:hover { background:#0a1020; }
+  button.active { border-color:#4ade80; color:#4ade80; }
+
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:1100px; }
+  .card { background:#06080c; border:1px solid #0e1218; padding:14px; display:flex; flex-direction:column; gap:7px; }
+  .ct { font-size:.58em; color:#1a2030; letter-spacing:3px; text-transform:uppercase; border-bottom:1px solid #0e1218; padding-bottom:5px; }
+  .span2 { grid-column:span 2; }
+  .span3 { grid-column:span 3; }
+
+  #detHz   { font-size:2.6em; color:#4ade80; line-height:1; }
+  #detHz.w { color:#0e1218; }
+  #detNote { font-size:.95em; color:#888870; }
+  #sigLevel{ font-size:.65em; color:#1a2030; }
+
+  #centsVal { font-size:1.7em; text-align:center; }
+  .mbar { position:relative; height:12px; background:#060608; border:1px solid #0e1218; }
+  .mc   { position:absolute; left:50%; top:0; bottom:0; width:1px; background:#141418; }
+  #mf   { position:absolute; top:2px; bottom:2px; background:#4ade80; }
+  .ml   { display:flex; justify-content:space-between; font-size:.55em; color:#141418; }
+
+  .dosha-b { display:inline-block; padding:4px 14px; font-size:.8em; letter-spacing:2px; font-weight:bold; border-radius:2px; }
+  .vata     { background:#141022; color:#a78bfa; border:1px solid #a78bfa; }
+  .pitta    { background:#200e06; color:#fb923c; border:1px solid #fb923c; }
+  .kapha    { background:#081808; color:#4ade80; border:1px solid #4ade80; }
+  .tridosha { background:#101020; color:#facc15; border:1px solid #facc15; }
+
+  .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+  .gi { display:flex; flex-direction:column; gap:3px; padding:9px; background:#04050a; border:1px solid #0c0e12; }
+  .gl { font-size:.56em; color:#1a2030; letter-spacing:2px; text-transform:uppercase; }
+  .gv { font-size:.9em; line-height:1.3; }
+  .gs { font-size:.64em; color:#1e2028; }
+
+  /* MATH PANEL */
+  .math-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+  .math-eq { display:flex; flex-direction:column; gap:4px; padding:10px; background:#04050a; border:1px solid #0c1018; }
+  .math-label { font-size:.56em; color:#203040; letter-spacing:2px; text-transform:uppercase; }
+  .math-formula { font-size:.7em; color:#304050; }
+  .math-result { font-size:1.05em; }
+  .math-sub { font-size:.6em; color:#1e2828; }
+
+  /* SAP / TIDE sinusoidal bars */
+  .wave-container { position:relative; height:40px; overflow:hidden; background:#04050a; border:1px solid #0c0e12; }
+  .wave-canvas { display:block; width:100%; height:40px; }
+  .wave-cursor { position:absolute; top:0; bottom:0; width:2px; background:#facc15; opacity:.8; transition:left .15s; }
+
+  /* PHI convergence strip */
+  .phi-strip { display:flex; gap:4px; flex-wrap:wrap; }
+  .phi-box { padding:4px 8px; font-size:.62em; border:1px solid #0e1418; background:#04050a; white-space:nowrap; }
+  .phi-box.nearest { border-color:#facc15; color:#facc15; }
+
+  /* PHASE TRACK */
+  .phase-track { display:flex; gap:3px; height:24px; }
+  .phase-seg { flex:1; display:flex; align-items:center; justify-content:center; font-size:.5em; letter-spacing:1px; opacity:.2; border-radius:2px; transition:opacity .3s, border .3s; }
+  .phase-seg.active { opacity:1; border:1px solid currentColor; }
+
+  .flow-bar { height:7px; background:#040508; border:1px solid #0e1218; border-radius:3px; overflow:hidden; }
+  .flow-fill { height:100%; transition:width .15s, background .3s; border-radius:3px; }
+
+  .chakra-row { display:flex; gap:5px; flex-wrap:wrap; }
+  .cdot { width:9px; height:9px; border-radius:50%; border:1px solid currentColor; opacity:.2; transition:all .3s; }
+  .cdot.active { opacity:1; box-shadow:0 0 7px currentColor; }
+
+  .ib { padding:3px 10px; font-size:.75em; border:1px solid #141410; background:#040408; color:#404420; }
+  .ib.c { border-color:#4ade80; color:#4ade80; }
+  .ib.d { border-color:#f87171; color:#f87171; }
+
+  #geoCanvas { display:block; background:#020306; width:100%; height:280px; }
+  .geo-lbl { font-size:.6em; color:#1a2030; letter-spacing:2px; text-align:center; margin-top:3px; }
+  #spectrum  { display:block; background:#020306; width:100%; height:80px; }
+</style>
+</head>
+<body>
+
+<h1>UFT · Ayurveda · Water · Math Coherency</h1>
+<div class="sub">f = 256 × 2^(n/12) · sap = sin(π·pc/6) · tide = cos²(π·pc/6) · Fibonacci → 1/φ</div>
+<button id="startBtn" onclick="startAudio()">▶ START MIC INPUT</button>
+
+<div class="grid">
+
+  <!-- DETECTED -->
+  <div class="card">
+    <div class="ct">Detected Frequency</div>
+    <div id="detHz" class="w">— Hz</div>
+    <div id="detNote">No signal</div>
+    <div id="sigLevel">Signal: — dB</div>
+  </div>
+
+  <!-- CENTS -->
+  <div class="card">
+    <div class="ct">Tuning Deviation</div>
+    <div id="centsVal" style="color:#1a2030">— ¢</div>
+    <div class="mbar"><div class="mc"></div><div id="mf" style="left:50%;width:0"></div></div>
+    <div class="ml"><span>−50¢</span><span>in tune</span><span>+50¢</span></div>
+  </div>
+
+  <!-- DOSHA -->
+  <div class="card">
+    <div class="ct">Active Dosha</div>
+    <div id="doshaBadge"><span class="dosha-b tridosha">—</span></div>
+    <div id="doshaDesc" style="font-size:.68em;color:#303020">—</div>
+    <div class="ct" style="margin-top:5px">Prana Current</div>
+    <div class="flow-bar"><div id="pranaFill" class="flow-fill" style="width:0"></div></div>
+    <div id="pranaLabel" style="font-size:.58em;color:#1a2020">—</div>
+  </div>
+
+  <!-- MATH VERIFICATION PANEL — full row -->
+  <div class="card span3">
+    <div class="ct">Math Verification · f = 256 × 2^(n/12) · Ratio · Fibonacci φ · Interval</div>
+    <div class="math-grid" id="mathGrid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- FIBONACCI PHI CONVERGENCE -->
+  <div class="card span3">
+    <div class="ct">Fibonacci φ Convergence · F(n)/F(n−1) → 1/φ = 0.61803398…  (REFERENCE.md §VIII)</div>
+    <div class="phi-strip" id="phiStrip"></div>
+    <div id="phiActive" style="font-size:.7em;color:#facc15;margin-top:4px">—</div>
+  </div>
+
+  <!-- AYURVEDA -->
+  <div class="card span3">
+    <div class="ct">Ayurveda Coherencies · Classical Mapping → 432 Hz Lunar Scale</div>
+    <div class="g4" id="ayurGrid"></div>
+  </div>
+
+  <!-- CHAKRA -->
+  <div class="card span3">
+    <div class="ct">Chakra Activation · 7 Energy Centres</div>
+    <div class="chakra-row" id="chakraRow"></div>
+  </div>
+
+  <!-- WATER CYCLES — mathematically derived -->
+  <div class="card span3">
+    <div class="ct">Water Cycles · Computed from sin(π·pc/6) and cos²(π·pc/6)</div>
+
+    <!-- SAP wave -->
+    <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center">
+      <div style="font-size:.6em;color:#203040">Sap<br>sin(π·pc/6)</div>
+      <div class="wave-container">
+        <canvas id="sapWave" class="wave-canvas" height="40"></canvas>
+        <div class="wave-cursor" id="sapCursor" style="left:0"></div>
+      </div>
+    </div>
+
+    <!-- TIDAL wave -->
+    <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center">
+      <div style="font-size:.6em;color:#203040">Tide<br>cos²(π·pc/6)</div>
+      <div class="wave-container">
+        <canvas id="tideWave" class="wave-canvas" height="40"></canvas>
+        <div class="wave-cursor" id="tideCursor" style="left:0"></div>
+      </div>
+    </div>
+
+    <!-- Phase track -->
+    <div class="phase-track" id="phaseTrack"></div>
+
+    <!-- Tide/rain bars -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+      <div>
+        <div class="ct">Tidal Force · cos²(π·pc/6)</div>
+        <div class="flow-bar"><div id="tideFill" class="flow-fill" style="width:0;background:#60a5fa"></div></div>
+        <div id="tideLabel" style="font-size:.6em;color:#1e2028;margin-top:2px">—</div>
+      </div>
+      <div>
+        <div class="ct">Sap Height · |sin(π·pc/6)|</div>
+        <div class="flow-bar"><div id="sapFill" class="flow-fill" style="width:0;background:#4ade80"></div></div>
+        <div id="sapLabel" style="font-size:.6em;color:#1e2028;margin-top:2px">—</div>
+      </div>
+    </div>
+
+    <!-- Water grid -->
+    <div class="g4" id="waterGrid" style="margin-top:6px"></div>
+  </div>
+
+  <!-- GEOMETRY + INTERVAL -->
+  <div class="card span2">
+    <div class="ct">Sacred Geometry · Detuning Distortion</div>
+    <canvas id="geoCanvas"></canvas>
+    <div class="geo-lbl" id="geoLabel">awaiting signal</div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Harmonic Interval</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="intervalRow">—</div>
+    <div id="intervalDesc" style="font-size:.68em;color:#303018;margin-top:5px">—</div>
+    <div style="margin-top:8px;font-size:.58em;color:#141410">
+      Minor 3rd 6:5 = Kapha<br>
+      Perfect 5th 3:2 = Prana-Apana<br>
+      Minor 6th 8:13 = φ / Ophiuchus
+    </div>
+  </div>
+
+  <!-- SPECTRUM -->
+  <div class="card span3">
+    <div class="ct">Live Spectrum · 30–500 Hz · 432 Hz Grid · f = 256 × 2^(n/12)</div>
+    <canvas id="spectrum"></canvas>
+  </div>
+
+</div>
+
+<script>
+// ── UFT TUNING CONSTANTS (inlined from modules/tuning-constants.js) ──────────
+const TUNING_ROOTS = { '440': 261.6256, '432': 256.0000, 'moon': 210.4186 };
+const NOTE_NAMES   = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+const ROOT_432 = TUNING_ROOTS['432'];  // 256.0000 Hz exactly
+const PHI      = (1 + Math.sqrt(5)) / 2;   // 1.6180339887...
+const INV_PHI  = 1 / PHI;                   // 0.6180339887...
+const SQRT2    = Math.sqrt(2);              // 1.41421356...
+
+// ── CANONICAL FIBONACCI (REFERENCE.md §VIII) ─────────────────────────────────
+const FIB = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377];
+// FIB[0]=1(C), FIB[1]=1(unused), FIB[2]=2(C#), FIB[3]=3(D), ...
+// Scale: pc 0→12 maps to FIB[1..13]
+const SCALE_FIB = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377]; // pc 0..12
+
+// ── MATH-COMPUTED WATER FUNCTIONS ─────────────────────────────────────────────
+// Sap height: sin(π × pc / 6)  — zero at C and F# and C', peak at D#, trough at A
+function sapHeight(pc) { return Math.sin(Math.PI * pc / 6); }
+// Tidal spring force: cos²(π × pc / 6) — peaks at new moon (C) and full moon (F#)
+function tidalForce(pc) { const c = Math.cos(Math.PI * pc / 6); return c * c; }
+// Rain level: positive sap = precipitation, negative = evaporation
+function rainLevel(pc) { return Math.max(0, sapHeight(pc)); }
+
+// ── WATER DESCRIPTORS (qualitative layer on top of math) ─────────────────────
+const WATER_DESC = [
+  {sap:'Rising',    tide:'New Moon spring tide',   rain:'Pre-monsoon',   ocean:'Equatorial upwelling',   hydro:'Infiltration',     moon:'New Moon'},
+  {sap:'Rising',    tide:'Waxing crescent',        rain:'Light rain',    ocean:'Coastal current',         hydro:'Percolation',      moon:'Waxing crescent'},
+  {sap:'Rising',    tide:'First Quarter',          rain:'Steady rain',   ocean:'Tidal river flow',        hydro:'Surface runoff',   moon:'First Quarter'},
+  {sap:'Peak',      tide:'Waxing gibbous',         rain:'Heavy rain',    ocean:'Open ocean swell',        hydro:'Flood pulse',      moon:'Waxing gibbous'},
+  {sap:'Peak',      tide:'Near Full Moon',         rain:'Thunderstorm',  ocean:'Thermohaline peak',       hydro:'Peak discharge',   moon:'Waxing gibbous near full'},
+  {sap:'Peak',      tide:'Full Moon spring tide',  rain:'Peak storm',    ocean:'Tidal bore',              hydro:'Tidal crest',      moon:'Full Moon'},
+  {sap:'Zero Point',tide:'Slack water — reversal', rain:'Mist',          ocean:'Zero-velocity reversal',  hydro:'Slack tide',       moon:'Full Moon Zero Point F#=256×√2'},
+  {sap:'Descending',tide:'Waning gibbous ebb',     rain:'Post-storm',    ocean:'Ebb current seaward',     hydro:'Falling limb',     moon:'Waning gibbous'},
+  {sap:'Descending',tide:'φ-gate Ophiuchus',       rain:'Drizzle',       ocean:'Phi-spiral vortex',       hydro:'Transitional',     moon:'Last Quarter — G# φ-interval 8:13'},
+  {sap:'Descending',tide:'Waning crescent ebb',    rain:'Clear sky',     ocean:'Low tide rock pools',     hydro:'Base flow',        moon:'Waning crescent'},
+  {sap:'Dormant',   tide:'Pre-new neap tide',      rain:'Dew',           ocean:'Abyssal still',           hydro:'Dormant flow',     moon:'Old crescent — minimum tidal range'},
+  {sap:'Dormant',   tide:'Dark moon reset',        rain:'Snow / Ice',    ocean:'Thermocline stratify',    hydro:'Groundwater store',moon:'Dark moon — maximum earth storage'},
+  {sap:'Awakening', tide:'New Moon octave returns',rain:'First rain',    ocean:'Spring overturn bloom',   hydro:'Spring emergence', moon:"New Moon C' — tidal cycle complete 420.84 Hz"},
+];
+
+const WATER_PHASES  = ['Rising','Peak','Zero Point','Descending','Dormant','Awakening'];
+const PHASE_COLORS  = ['#60a5fa','#f472b6','#facc15','#fb923c','#34d399','#67e8f9'];
+const PC_TO_PHASE   = [0,0,0,1,1,1,2,3,3,3,4,4,5];
+
+// ── AYURVEDA DATA ─────────────────────────────────────────────────────────────
+const AYUR = [
+  {pc:0, note:'C', dosha:'Kapha', doshaClass:'kapha', desc:'Earth & Water — grounding, stability', dhatu:'Rasa', dhatuDesc:'Plasma/lymph — primary nourishment', mahabhuta:'Prithvi', mahabDesc:'Earth — density, structure', rasa:'Madhura', rasaDesc:'Sweet — builds tissue', vayu:'Apana Vayu', vayuDesc:'Downward — elimination, grounding', guna:'Sthira', chakra:0, nadi:'Ida', action:'Builds immunity · Stabilises nervous system', color:'#4ade80', pranaLevel:.70},
+  {pc:1, note:'C#', dosha:'Kapha-Vata', doshaClass:'kapha', desc:'Earth-Water — moistening, binding', dhatu:'Rasa', dhatuDesc:'Plasma enrichment — lymphatic', mahabhuta:'Jala', mahabDesc:'Water — cohesion, fluidity', rasa:'Lavana', rasaDesc:'Salty — retains water', vayu:'Apana Vayu', vayuDesc:'Downward — excretion', guna:'Snigdha', chakra:0, nadi:'Ida', action:'Lubricates joints · Soothes membranes', color:'#60a5fa', pranaLevel:.55},
+  {pc:2, note:'D', dosha:'Kapha', doshaClass:'kapha', desc:'Water — fluid, creative vitality', dhatu:'Rakta', dhatuDesc:'Blood — vitality, oxygenation', mahabhuta:'Jala', mahabDesc:'Water — flow, nourishment', rasa:'Kashaya', rasaDesc:'Astringent — toning, haemostatic', vayu:'Samana Vayu', vayuDesc:'Equalising — digestion', guna:'Guru', chakra:1, nadi:'Ida', action:'Purifies blood · Supports liver', color:'#a78bfa', pranaLevel:.65},
+  {pc:3, note:'D#', dosha:'Vata', doshaClass:'vata', desc:'Air & Space — movement, lightness', dhatu:'Mamsa', dhatuDesc:'Muscle — strength, locomotion', mahabhuta:'Vayu', mahabDesc:'Air — movement, breath', rasa:'Tikta', rasaDesc:'Bitter — detoxifying', vayu:'Vyana Vayu', vayuDesc:'Pervading — circulation', guna:'Laghu', chakra:1, nadi:'Sushumna', action:'Stimulates circulation · Awakens lymph', color:'#c084fc', pranaLevel:.80},
+  {pc:4, note:'E', dosha:'Pitta', doshaClass:'pitta', desc:'Fire & Water — transformation, will', dhatu:'Mamsa', dhatuDesc:'Muscle → strength & power', mahabhuta:'Agni', mahabDesc:'Fire — transformation, heat', rasa:'Katu', rasaDesc:'Pungent — stimulates Agni', vayu:'Samana Vayu', vayuDesc:'Equalising — Jatharagni', guna:'Ushna', chakra:2, nadi:'Pingala', action:'Ignites Jatharagni · Sharpens intellect', color:'#fb923c', pranaLevel:.75},
+  {pc:5, note:'F', dosha:'Pitta', doshaClass:'pitta', desc:'Fire — peak metabolic fire', dhatu:'Meda', dhatuDesc:'Adipose/fat — energy reserve', mahabhuta:'Agni', mahabDesc:'Fire — purification, light', rasa:'Amla', rasaDesc:'Sour — kindling Agni', vayu:'Prana Vayu', vayuDesc:'Inward — life force intake', guna:'Tikshna', chakra:2, nadi:'Pingala', action:'Purifies liver · Elevates Tejas', color:'#f472b6', pranaLevel:.85},
+  {pc:6, note:'F#', dosha:'Vata', doshaClass:'vata', desc:'Zero Point — √2 axis · Heart · F#=256×√2=362.04 Hz', dhatu:'Asthi', dhatuDesc:'Bone — structural foundation', mahabhuta:'Vayu', mahabDesc:'Air-Space Zero Point field', rasa:'Tikta', rasaDesc:'Bitter — Zero Point clarity', vayu:'Prana Vayu', vayuDesc:'Prana at Zero Point', guna:'Sukshma', chakra:3, nadi:'Sushumna', action:'Opens heart · Balances all Doshas', color:'#facc15', pranaLevel:1.0},
+  {pc:7, note:'G', dosha:'Vata', doshaClass:'vata', desc:'Ether & Air — spacious, expressive', dhatu:'Asthi', dhatuDesc:'Bone → Majja: structural to nervous', mahabhuta:'Akasha', mahabDesc:'Ether — container of all sound', rasa:'Kashaya', rasaDesc:'Astringent — toning inward', vayu:'Udana Vayu', vayuDesc:'Upward — speech, memory, will', guna:'Vishada', chakra:4, nadi:'Ida', action:'Clears throat · Supports speech', color:'#fb923c', pranaLevel:.90},
+  {pc:8, note:'G#', dosha:'Tridosha', doshaClass:'tridosha', desc:'Ophiuchus — Wound as Portal · φ = 8:13', dhatu:'Majja', dhatuDesc:'Marrow — consciousness carrier', mahabhuta:'Akasha', mahabDesc:'Pure Ether — void between forms', rasa:'Tikta', rasaDesc:'Bitter — deep marrow purification', vayu:'Vyana Vayu', vayuDesc:'Pervading — all Vayus unified', guna:'Vishada', chakra:5, nadi:'Sushumna', action:'Purifies marrow · Portal to Ojas', color:'#36D9B8', pranaLevel:1.0},
+  {pc:9, note:'A', dosha:'Vata-Pitta', doshaClass:'pitta', desc:'Fiery Air — blood intelligence, insight', dhatu:'Majja', dhatuDesc:'Marrow → Shukra: highest refinement', mahabhuta:'Vayu', mahabDesc:'Air ascending — Prana rising', rasa:'Katu', rasaDesc:'Pungent — kindles Tejas', vayu:'Udana Vayu', vayuDesc:'Upward — elevation, liberation', guna:'Laghu', chakra:5, nadi:'Pingala', action:'Elevates Prana · Sharpens Ajna', color:'#4ade80', pranaLevel:.85},
+  {pc:10, note:'A#', dosha:'Kapha-Pitta', doshaClass:'pitta', desc:'Earth-Fire — Ojas building', dhatu:'Shukra', dhatuDesc:'Reproductive essence — Ojas precursor', mahabhuta:'Jala', mahabDesc:'Water cooling Fire — Ojas reservoir', rasa:'Madhura', rasaDesc:'Sweet — builds Ojas', vayu:'Apana Vayu', vayuDesc:'Downward — reproductive current', guna:'Snigdha', chakra:6, nadi:'Ida', action:'Builds Ojas · Deepens recovery', color:'#34d399', pranaLevel:.70},
+  {pc:11, note:'B', dosha:'Kapha', doshaClass:'kapha', desc:'Water-Earth — cosmic seed, dissolution', dhatu:'Shukra', dhatuDesc:'Shukra — seed tissue quintessence', mahabhuta:'Prithvi', mahabDesc:'Earth closing the cycle — seed', rasa:'Madhura', rasaDesc:'Sweet — ultimate nourishment', vayu:'Apana Vayu', vayuDesc:'Descending — completion, return', guna:'Mridu', chakra:6, nadi:'Ida', action:'Completes cycle · Deepens Ojas to seed', color:'#22d3ee', pranaLevel:.60},
+  {pc:12, note:"C'", dosha:'Tridosha', doshaClass:'tridosha', desc:'Octave return — all Doshas in Prakruti', dhatu:'Ojas', dhatuDesc:'Ojas-Tejas-Prana — three subtle essences', mahabhuta:'All', mahabDesc:'Panchamahabhuta — five elements balanced', rasa:'Samana', rasaDesc:'All six Rasas in harmony', vayu:'All Vayus', vayuDesc:'Five Vayus unified at octave', guna:'Sattvic', chakra:6, nadi:'Sushumna', action:'Prakruti restoration · Samadhi support', color:'#67e8f9', pranaLevel:1.0},
+];
+
+const CHAKRAS = [
+  {name:'Muladhara',    color:'#ef4444', hz:'C  256 Hz'},
+  {name:'Svadhisthana', color:'#f97316', hz:'D  287 Hz'},
+  {name:'Manipura',     color:'#facc15', hz:'E  323 Hz'},
+  {name:'Anahata',      color:'#4ade80', hz:'F# 362 Hz · Zero Point'},
+  {name:'Vishuddha',    color:'#60a5fa', hz:'G  384 Hz'},
+  {name:'Ajna',         color:'#818cf8', hz:'A  431 Hz'},
+  {name:'Sahasrara',    color:'#c084fc', hz:"B/C' 484+"},
+];
+
+// Interval consonance & ratio (just intonation + 12-TET)
+const INTERVALS = [
+  {semi:0,  name:'Unison',      cons:true,  ratio:'1:1',    ratioVal:1.0000, sig:'Resonance — Dosha synchrony, tidal alignment'},
+  {semi:1,  name:'Minor 2nd',   cons:false, ratio:'16:15',  ratioVal:16/15,  sig:'Vata agitation — choppy water'},
+  {semi:2,  name:'Major 2nd',   cons:false, ratio:'9:8',    ratioVal:9/8,    sig:'Mild Vata — light rain, percolation'},
+  {semi:3,  name:'Minor 3rd',   cons:true,  ratio:'6:5',    ratioVal:6/5,    sig:'Centripetal Kapha interval 6:5 · steady rain (REFERENCE.md §VII)'},
+  {semi:4,  name:'Major 3rd',   cons:true,  ratio:'5:4',    ratioVal:5/4,    sig:'Pitta harmony — metabolic clarity, warm current'},
+  {semi:5,  name:'Perfect 4th', cons:true,  ratio:'4:3',    ratioVal:4/3,    sig:'Samana Vayu — digestive balance, tidal harmonic'},
+  {semi:6,  name:'Tritone',     cons:false, ratio:'√2:1',   ratioVal:SQRT2,  sig:'Zero Point F# — slack water reversal, diabolus'},
+  {semi:7,  name:'Perfect 5th', cons:true,  ratio:'3:2',    ratioVal:3/2,    sig:'Most stable 3:2 — Prana-Apana axis, ebb-flood'},
+  {semi:8,  name:'Minor 6th',   cons:true,  ratio:'8:13',   ratioVal:8/13,   sig:'Phi interval 8:13 = 0.6154 ≈ 1/φ — Ophiuchus vortex (REFERENCE.md §VIII)'},
+  {semi:9,  name:'Major 6th',   cons:true,  ratio:'5:3',    ratioVal:5/3,    sig:'Vata-Pitta — ascending vapour, clear sky'},
+  {semi:10, name:'Minor 7th',   cons:false, ratio:'16:9',   ratioVal:16/9,   sig:'Vata tension — turbulent air-water interface'},
+  {semi:11, name:'Major 7th',   cons:false, ratio:'15:8',   ratioVal:15/8,   sig:'Pitta sharpness — lightning before rain'},
+];
+
+// ── NOTE GEOMETRY — REFERENCE.md §F (Cymatic forms) + §IV (Proto-Words) ─────
+// Every entry is sourced directly from canonical UFT data. Nothing invented.
+const NOTE_GEOMETRY = [
+  {pc:0,  proto:'AH',  form:'expanding-circles', color:'#60a5fa', src:'§F: Expanding circles · Moon · torus root 210.42 Hz'},
+  {pc:1,  proto:'SA',  form:'figure-8',          color:'#818cf8', src:'§F: Figure-8 · Mercury · u↔v torus crossing 222.93 Hz'},
+  {pc:2,  proto:'LA',  form:'rose-3',            color:'#a78bfa', src:'§F: 3-petal triangle · Venus · φ geometry 236.19 Hz'},
+  {pc:3,  proto:'RA',  form:'radial-4',          color:'#c084fc', src:'§F: 4-point radial · Sun · fire · peak phase 250.23 Hz'},
+  {pc:4,  proto:'DA',  form:'star-5',            color:'#e879f9', src:'§F: 5-point star · Mars · will · φ boundary 265.11 Hz'},
+  {pc:5,  proto:'HA',  form:'rose-6',            color:'#f472b6', src:'§F: 6-petal hexagon · Jupiter · Seed of Life 280.88 Hz'},
+  {pc:6,  proto:'NA',  form:'standing-null',     color:'#facc15', src:'§F: Standing wave null · Zero Point · F#=256×√2 297.58 Hz'},
+  {pc:7,  proto:'KA',  form:'star-8',            color:'#fb923c', src:'§F+§IV: 8-point star · Holly/Tinne · Spine · P rank=8 · Fib=34 315.27 Hz'},
+  {pc:8,  proto:'OM',  form:'phi-spiral',        color:'#36D9B8', src:'§F: Phi spiral bloom · Ophiuchus · 8:13 restored 334.02 Hz'},
+  {pc:9,  proto:'AH',  form:'expanding-circles', color:'#4ade80', src:'§IV: AH echo · Vine/Muin · The blood · Descending 353.88 Hz'},
+  {pc:10, proto:'EE',  form:'star-11',           color:'#34d399', src:'§F+§IV: 11-point star · Ivy/Gort · Deep interior · P rank=11 · Fib=144 374.92 Hz'},
+  {pc:11, proto:'UH',  form:'star-12',           color:'#22d3ee', src:'§F+§IV: 12-point star · Elder/Ruis · The compost · P rank=12 · Fib=233 397.22 Hz'},
+  {pc:12, proto:'TAO', form:'burst-13',          color:'#67e8f9', src:"§F: 13-point burst · Yew · lunar octave ascends 420.84 Hz"},
+];
+
+function todayLunarPc(){const e=Math.floor((new Date()-new Date('2000-07-26'))/86400000);return Math.min(Math.floor((e%364)/28),12);}
+const TODAY_LUNAR_PC=todayLunarPc();
+
+// ── STATIC INIT: Phase track & Phi strip ─────────────────────────────────────
+document.getElementById('phaseTrack').innerHTML=WATER_PHASES.map((ph,i)=>
+  `<div class="phase-seg" id="phase-${i}" style="color:${PHASE_COLORS[i]};background:${PHASE_COLORS[i]}18">${ph}</div>`).join('');
+
+const phiStrip=document.getElementById('phiStrip');
+// Build pairs: (FIB[i], FIB[i+1]) for i=1..12
+for(let i=1;i<13;i++){
+  const a=FIB[i],b=FIB[i+1];const ratio=a/b;const dev=(ratio-INV_PHI).toFixed(6);
+  const div=document.createElement('div');div.className='phi-box';div.id=`phi-${i}`;
+  div.innerHTML=`${a}/${b}<br><span style="font-size:.85em">${ratio.toFixed(6)}</span>`;
+  phiStrip.appendChild(div);
+}
+// Also show the limit
+const limitDiv=document.createElement('div');limitDiv.className='phi-box';limitDiv.style.color='#facc15';
+limitDiv.innerHTML=`∞<br><span style="font-size:.85em">0.61803399</span>`;phiStrip.appendChild(limitDiv);
+
+// ── PRE-RENDER WAVE CANVASES ──────────────────────────────────────────────────
+function drawWave(canvasId, fn, color) {
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||800,H=40;
+  canvas.width=W;canvas.height=H;
+  ctx.fillStyle='#04050a';ctx.fillRect(0,0,W,H);
+  // zero line
+  ctx.strokeStyle='#0e1218';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+  // wave: plot fn across 0..12
+  ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.beginPath();
+  for(let i=0;i<=200;i++){const pc=i/200*12;const y=fn(pc);const px=i/200*W;const py=H/2-y*H*0.44;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+  ctx.stroke();
+  // tick marks at each integer pc
+  for(let pc=0;pc<=12;pc++){const x=pc/12*W;ctx.strokeStyle='#141820';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(x,H-5);ctx.lineTo(x,H);ctx.stroke();}
+}
+// Draw after DOM is ready
+requestAnimationFrame(()=>{
+  drawWave('sapWave', pc=>sapHeight(pc), '#4ade80');
+  drawWave('tideWave', pc=>tidalForce(pc)*2-1, '#60a5fa');
+});
+window.addEventListener('resize',()=>{
+  drawWave('sapWave', pc=>sapHeight(pc), '#4ade80');
+  drawWave('tideWave', pc=>tidalForce(pc)*2-1, '#60a5fa');
+});
+
+// ── PITCH HELPERS ─────────────────────────────────────────────────────────────
+function freqToNearest432(freq){
+  if(freq<=0)return null;
+  const n_raw=12*Math.log2(freq/ROOT_432),n=Math.round(n_raw),pc=((n%12)+12)%12;
+  const tf=ROOT_432*Math.pow(2,n/12);
+  return{n,pc,noteName:NOTE_NAMES[pc],octave:Math.floor(n/12)+4,targetFreq:tf,cents:1200*Math.log2(freq/tf),ratio:Math.pow(2,n/12)};
+}
+function parabolicPeak(data,k){if(k<=0||k>=data.length-1)return k;const y1=data[k-1],y2=data[k],y3=data[k+1],d=2*y2-y1-y3;return d===0?k:k+(y3-y1)/(2*d);}
+
+// ── RENDER MATH PANEL ─────────────────────────────────────────────────────────
+function renderMath(pc, n, freq, cents) {
+  const tf = ROOT_432*Math.pow(2,n/12);
+  const ratio = Math.pow(2, n/12);
+  const fibN  = SCALE_FIB[pc];
+  const fibPrev = pc>0?SCALE_FIB[pc-1]:null;
+  const phiRatio = fibPrev ? (fibPrev/fibN).toFixed(8) : '—';
+  const phiDev   = fibPrev ? Math.abs(fibPrev/fibN - INV_PHI).toExponential(3) : '—';
+  const sap = sapHeight(pc);
+  const tide = tidalForce(pc);
+  const zp_432 = ROOT_432 * SQRT2; // F# in 432 Hz tuning
+
+  const items=[
+    {label:'Frequency formula', formula:'f = 256 × 2^(n/12)', result:`${tf.toFixed(4)} Hz`, sub:`n = ${n>=0?'+':''}${n} · pc = ${pc}`, color:AYUR[pc].color},
+    {label:'Interval ratio',    formula:`2^(${pc}/12) = ratio from C`, result:ratio.toFixed(8), sub:`= ${NOTE_NAMES[pc]} in 432 Hz octave 4`, color:'#60a5fa'},
+    {label:'Fibonacci',         formula:'REFERENCE.md §VIII', result:`F(${pc+1}) = ${fibN}`, sub:`F(n)/F(n-1) = ${phiRatio}  Δ1/φ = ${phiDev}`, color:'#facc15'},
+    {label:'Sap height',        formula:'sin(π × pc / 6)', result:sap.toFixed(6), sub:`${sap>0.01?'↑ Rising':sap<-0.01?'↓ Descending':'⊙ Zero Point'}  |sap| = ${Math.abs(sap).toFixed(4)}`, color:'#4ade80'},
+    {label:'Tidal force',       formula:'cos²(π × pc / 6)', result:tide.toFixed(6), sub:`${tide>0.75?'Spring tide peak':tide>0.25?'Moderate tide':'Neap tide minimum'}  ${Math.round(tide*100)}%`, color:'#60a5fa'},
+    {label:'Zero Point verify', formula:'F# = 256 × √2', result:`${zp_432.toFixed(4)} Hz`, sub:`${pc===6?'✦ ZERO POINT ACTIVE':'active at F# (pc=6)'}  √2 = ${SQRT2.toFixed(8)}`, color:pc===6?'#facc15':'#1a2030'},
+  ];
+  document.getElementById('mathGrid').innerHTML=items.map(it=>`
+    <div class="math-eq">
+      <span class="math-label">${it.label}</span>
+      <span class="math-formula">${it.formula}</span>
+      <span class="math-result" style="color:${it.color}">${it.result}</span>
+      <span class="math-sub">${it.sub}</span>
+    </div>`).join('');
+
+  // Fibonacci phi strip: highlight current pc
+  for(let i=1;i<13;i++){
+    const el=document.getElementById(`phi-${i}`);
+    if(!el)continue;
+    el.classList.toggle('nearest',i===pc);
+  }
+  document.getElementById('phiActive').textContent=
+    pc>0 ? `pc=${pc}: F(${pc})/${pc>0?'F('+(pc+1)+')':''} = ${fibPrev}/${fibN} = ${phiRatio}  ·  Δ from 1/φ = ${phiDev}`
+         : `pc=0: F=1 — seed, no ratio yet  ·  1/φ = ${INV_PHI.toFixed(8)}`;
+}
+
+// ── RENDER AYURVEDA ───────────────────────────────────────────────────────────
+function renderAyurveda(pc){
+  const a=AYUR[pc],c=a.color;
+  document.getElementById('doshaBadge').innerHTML=`<span class="dosha-b ${a.doshaClass}">${a.dosha}</span>`;
+  document.getElementById('doshaDesc').textContent=a.desc;
+  const pColor=a.doshaClass==='vata'?'#a78bfa':a.doshaClass==='pitta'?'#fb923c':a.doshaClass==='kapha'?'#4ade80':'#facc15';
+  document.getElementById('pranaFill').style.width=(a.pranaLevel*100)+'%';document.getElementById('pranaFill').style.background=pColor;
+  document.getElementById('pranaLabel').textContent=`${a.vayu}  —  ${a.vayuDesc}`;
+  const items=[
+    {label:'Dhatu',val:a.dhatu,sub:a.dhatuDesc},{label:'Mahabhuta',val:a.mahabhuta,sub:a.mahabDesc},
+    {label:'Rasa',val:a.rasa,sub:a.rasaDesc},{label:'Guna',val:a.guna,sub:'Quality state'},
+    {label:'Nadi',val:a.nadi,sub:'Channel'},{label:'Vayu',val:a.vayu,sub:a.vayuDesc},
+    {label:'Chakra',val:CHAKRAS[a.chakra].name,sub:CHAKRAS[a.chakra].hz},
+    {label:'Action',val:a.action.split('·')[0].trim(),sub:a.action},
+  ];
+  document.getElementById('ayurGrid').innerHTML=items.map(it=>`<div class="gi"><span class="gl">${it.label}</span><span class="gv" style="color:${c}">${it.val}</span><span class="gs">${it.sub}</span></div>`).join('');
+  document.getElementById('chakraRow').innerHTML=CHAKRAS.map((ch,i)=>`
+    <div style="display:flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid ${i===a.chakra?ch.color:'#0e1218'};background:${i===a.chakra?'#060810':'transparent'};transition:all .3s">
+      <div class="cdot ${i===a.chakra?'active':''}" style="background:${i===a.chakra?ch.color:'transparent'};border-color:${ch.color}"></div>
+      <div><div style="font-size:.68em;color:${i===a.chakra?ch.color:'#1a2030'}">${ch.name}</div><div style="font-size:.54em;color:#0e1218">${ch.hz}</div></div>
+    </div>`).join('');
+}
+
+// ── RENDER WATER ─────────────────────────────────────────────────────────────
+function renderWater(pc){
+  const wd=WATER_DESC[pc];
+  const sap=sapHeight(pc);
+  const tide=tidalForce(pc);
+  const rain=rainLevel(pc);
+  const phaseIdx=PC_TO_PHASE[pc];
+  const c=PHASE_COLORS[phaseIdx];
+
+  // Phase track
+  for(let i=0;i<6;i++)document.getElementById('phase-'+i).classList.toggle('active',i===phaseIdx);
+
+  // Move cursors on wave canvases
+  const sapCanvas=document.getElementById('sapWave'),tideCanvas=document.getElementById('tideWave');
+  const pct=pc/12*100;
+  document.getElementById('sapCursor').style.left=pct+'%';
+  document.getElementById('tideCursor').style.left=pct+'%';
+
+  // Tide bar
+  document.getElementById('tideFill').style.width=(tide*100)+'%';
+  document.getElementById('tideFill').style.background=tide>0.75?'#f87171':tide>0.25?'#60a5fa':'#818cf8';
+  document.getElementById('tideLabel').textContent=`${wd.moon}  —  cos²(π×${pc}/6) = ${tide.toFixed(4)}`;
+
+  // Sap bar
+  document.getElementById('sapFill').style.width=(Math.abs(sap)*100)+'%';
+  document.getElementById('sapFill').style.background=sap>0?'#4ade80':sap<0?'#f87171':'#facc15';
+  document.getElementById('sapLabel').textContent=`${wd.sap}  —  sin(π×${pc}/6) = ${sap.toFixed(4)}`;
+
+  const items=[
+    {label:'Sap formula',  val:`sin(π×${pc}/6)`,    sub:`= ${sap.toFixed(6)}  ${wd.sap}`},
+    {label:'Tidal formula',val:`cos²(π×${pc}/6)`,   sub:`= ${tide.toFixed(6)}  ${Math.round(tide*100)}%`},
+    {label:'Rain level',   val:`max(0, sap)`,         sub:`= ${rain.toFixed(4)}  ${wd.rain}`},
+    {label:'Ocean',        val:wd.ocean,              sub:wd.hydro},
+    {label:'Moon phase',   val:wd.moon.split(' — ')[0], sub:wd.moon},
+    {label:'Hydro state',  val:wd.hydro,              sub:`Cycle: ${wd.sap}`},
+    {label:'Phase',        val:wd.sap,                sub:WATER_PHASES[phaseIdx]+' — pc='+pc},
+    {label:'Period',       val:`pc ${pc}/12`,         sub:`θ = π×${pc}/6 = ${(Math.PI*pc/6).toFixed(4)} rad`},
+  ];
+  document.getElementById('waterGrid').innerHTML=items.map(it=>`<div class="gi"><span class="gl">${it.label}</span><span class="gv" style="color:${c}">${it.val}</span><span class="gs">${it.sub}</span></div>`).join('');
+}
+
+// ── RENDER INTERVAL ───────────────────────────────────────────────────────────
+function renderInterval(pc){
+  const semi=((pc-TODAY_LUNAR_PC)+12)%12,iv=INTERVALS[semi];
+  const tet=Math.pow(2,semi/12);
+  document.getElementById('intervalRow').innerHTML=`
+    <span class="ib ${iv.cons?'c':'d'}">${iv.name}</span>
+    <span class="ib">${semi} st</span>
+    <span class="ib">${iv.ratio}</span>
+    <span class="ib">${iv.cons?'consonant':'dissonant'}</span>`;
+  document.getElementById('intervalDesc').textContent=`${iv.sig}  ·  JI ratio ${iv.ratio} = ${iv.ratioVal.toFixed(6)}  ·  12-TET = ${tet.toFixed(6)}`;
+}
+
+// ── GEOMETRY — cymatic renderers per canonical proto-word form ───────────────
+const geoCanvas=document.getElementById('geoCanvas'),geoCtx=geoCanvas.getContext('2d');
+let geoAngle=0,geoAlpha=0,prevPc=-1;
+function resizeGeo(){const r=geoCanvas.parentElement.getBoundingClientRect();geoCanvas.width=Math.floor(r.width-28);geoCanvas.height=280;}
+resizeGeo();window.addEventListener('resize',resizeGeo);
+function ha(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${a.toFixed(3)})`;}
+
+// AH — Expanding circles · Moon · torus root (pc=0, pc=9)
+function drawExpandingCircles(CX,CY,R,col,al,det){
+  const t=performance.now()/1000;
+  for(let i=0;i<5;i++){const ph=(t*0.3+i/5)%1;const r=ph*R*(1+det*0.3);const a=(1-ph)*al*0.9;
+    geoCtx.beginPath();geoCtx.arc(CX,CY,r,0,Math.PI*2);
+    geoCtx.strokeStyle=ha(col,a);geoCtx.lineWidth=1.5*(1-ph*0.7);geoCtx.stroke();}
+  geoCtx.beginPath();geoCtx.arc(CX,CY,3,0,Math.PI*2);geoCtx.fillStyle=ha(col,al*0.8);geoCtx.fill();}
+
+// SA — Figure-8 / Lemniscate · Mercury · u↔v torus crossing (pc=1)
+function drawFigure8(CX,CY,R,col,al,det){
+  const a2=R*(1+det*0.2);
+  geoCtx.beginPath();
+  for(let t=0;t<=Math.PI*2+0.01;t+=0.02){const x=CX+a2*Math.sin(t)*Math.cos(t);const y=CY+a2*0.6*Math.sin(t);t===0?geoCtx.moveTo(x,y):geoCtx.lineTo(x,y);}
+  geoCtx.strokeStyle=ha(col,al*0.85);geoCtx.lineWidth=1.5;geoCtx.stroke();
+  geoCtx.beginPath();
+  for(let t=0;t<=Math.PI*2+0.01;t+=0.02){const x=CX+a2*0.5*Math.sin(t)*Math.cos(t);const y=CY+a2*0.3*Math.sin(t);t===0?geoCtx.moveTo(x,y):geoCtx.lineTo(x,y);}
+  geoCtx.strokeStyle=ha(col,al*0.3);geoCtx.lineWidth=0.8;geoCtx.stroke();}
+
+// LA (3-petal) / HA (6-petal) — Rose curve r=R·cos(kθ) · Venus/Jupiter (pc=2, pc=5)
+function drawRose(CX,CY,R,col,al,det,petals){
+  const r=R*(1+det*0.15);
+  geoCtx.beginPath();
+  for(let t=0;t<=Math.PI*2+0.01;t+=0.01){
+    const rv=petals===6?Math.abs(Math.cos(3*t))*r:Math.cos(3*t)*r;
+    const x=CX+rv*Math.cos(t+geoAngle);const y=CY+rv*Math.sin(t+geoAngle);
+    t===0?geoCtx.moveTo(x,y):geoCtx.lineTo(x,y);}
+  geoCtx.strokeStyle=ha(col,al*0.85);geoCtx.lineWidth=1.5;geoCtx.stroke();
+  geoCtx.beginPath();geoCtx.arc(CX,CY,3,0,Math.PI*2);geoCtx.fillStyle=ha(col,al*0.8);geoCtx.fill();}
+
+// RA — 4-point radial · Sun · fire · peak phase (pc=3)
+function drawRadial4(CX,CY,R,col,al,det){
+  for(let i=0;i<4;i++){const angle=geoAngle+i*Math.PI/2;const len=R*(1+det*0.15);
+    geoCtx.beginPath();geoCtx.moveTo(CX,CY);geoCtx.lineTo(CX+len*Math.cos(angle),CY+len*Math.sin(angle));
+    geoCtx.strokeStyle=ha(col,al*0.85);geoCtx.lineWidth=1.5;geoCtx.stroke();
+    const tx=CX+len*Math.cos(angle),ty=CY+len*Math.sin(angle),ds=R*0.08;
+    geoCtx.beginPath();
+    geoCtx.moveTo(tx+ds*Math.cos(angle),ty+ds*Math.sin(angle));
+    geoCtx.lineTo(tx+ds*Math.cos(angle+Math.PI/2),ty+ds*Math.sin(angle+Math.PI/2));
+    geoCtx.lineTo(tx-ds*Math.cos(angle),ty-ds*Math.sin(angle));
+    geoCtx.lineTo(tx+ds*Math.cos(angle-Math.PI/2),ty+ds*Math.sin(angle-Math.PI/2));
+    geoCtx.closePath();geoCtx.strokeStyle=ha(col,al*0.45);geoCtx.lineWidth=0.8;geoCtx.stroke();}
+  geoCtx.beginPath();geoCtx.arc(CX,CY,R,0,Math.PI*2);geoCtx.strokeStyle=ha(col,al*0.15);geoCtx.lineWidth=0.5;geoCtx.stroke();}
+
+// DA/KA star · 5-point=Mars φ boundary, 7-point=Holly spine (pc=4, pc=7)
+function drawStar(CX,CY,R,col,al,det,points){
+  const outerR=R*(1+det*0.2);
+  const innerR=points===5?outerR/PHI/PHI:outerR*0.45;
+  geoCtx.beginPath();
+  for(let i=0;i<points*2;i++){const r2=i%2===0?outerR:innerR;const angle=geoAngle+(i/(points*2))*Math.PI*2-Math.PI/2;
+    const x=CX+r2*Math.cos(angle),y=CY+r2*Math.sin(angle);i===0?geoCtx.moveTo(x,y):geoCtx.lineTo(x,y);}
+  geoCtx.closePath();geoCtx.strokeStyle=ha(col,al*0.85);geoCtx.lineWidth=1.5;geoCtx.stroke();
+  geoCtx.beginPath();geoCtx.arc(CX,CY,innerR,0,Math.PI*2);geoCtx.strokeStyle=ha(col,al*0.2);geoCtx.lineWidth=0.5;geoCtx.stroke();
+  geoCtx.beginPath();geoCtx.arc(CX,CY,3,0,Math.PI*2);geoCtx.fillStyle=ha(col,al*0.8);geoCtx.fill();}
+
+// NA — Standing wave null · Zero Point · F#=256×√2 (pc=6)
+function drawStandingNull(CX,CY,R,col,al,det){
+  const W2=R*1.4;
+  geoCtx.beginPath();
+  for(let x=-W2;x<=W2;x+=2){const amp=Math.sin(Math.PI*x/W2)*R*0.35*(1+det*0.3);
+    const y=amp*(det<0.1?0.05:det*0.3);const px=CX+x,py=CY+y;
+    x===-W2?geoCtx.moveTo(px,py):geoCtx.lineTo(px,py);}
+  geoCtx.strokeStyle=ha(col,al*0.6);geoCtx.lineWidth=1;geoCtx.stroke();
+  for(const nx of [-W2,-W2/2,0,W2/2,W2]){
+    geoCtx.beginPath();geoCtx.arc(CX+nx,CY,3,0,Math.PI*2);
+    geoCtx.fillStyle=ha(col,al*0.8);geoCtx.fill();}
+  geoCtx.fillStyle=ha(col,al*0.55);geoCtx.font='9px Courier New';geoCtx.textAlign='center';
+  geoCtx.fillText('NA · F#=256×√2=362.04',CX,CY+22);geoCtx.textAlign='left';
+  // dual helix crossing — torus u↔v zero
+  for(let sign=0;sign<2;sign++){
+    geoCtx.beginPath();
+    for(let t=0;t<=Math.PI*3;t+=0.05){
+      const x=CX+W2*0.4*Math.cos(t+(sign?Math.PI:0)+geoAngle*0.3);
+      const y=CY+R*0.25*Math.sin(t*2);
+      t===0?geoCtx.moveTo(x,y):geoCtx.lineTo(x,y);}
+    geoCtx.strokeStyle=ha(col,al*0.2);geoCtx.lineWidth=0.6;geoCtx.stroke();}}
+
+// OM — Phi spiral bloom · Ophiuchus · 8:13 (pc=8)
+function drawPhiSpiral(CX,CY,R,col,al,det){
+  const b=Math.log(PHI)/Math.PI;
+  geoCtx.beginPath();
+  for(let t=0;t<=Math.PI*6;t+=0.02){
+    const r2=R*0.05*Math.exp(b*t)*(1+det*0.1);
+    if(r2>R*1.3)break;
+    const x=CX+r2*Math.cos(t+geoAngle),y=CY+r2*Math.sin(t+geoAngle);
+    t===0?geoCtx.moveTo(x,y):geoCtx.lineTo(x,y);}
+  geoCtx.strokeStyle=ha(col,al*0.85);geoCtx.lineWidth=1.5;geoCtx.stroke();
+  geoCtx.beginPath();
+  for(let t=0;t<=Math.PI*6;t+=0.02){
+    const r2=R*0.05*Math.exp(b*t)*(1+det*0.1);
+    if(r2>R*1.3)break;
+    const x=CX+r2*Math.cos(t+geoAngle+Math.PI),y=CY+r2*Math.sin(t+geoAngle+Math.PI);
+    t===0?geoCtx.moveTo(x,y):geoCtx.lineTo(x,y);}
+  geoCtx.strokeStyle=ha(col,al*0.35);geoCtx.lineWidth=0.8;geoCtx.stroke();
+  geoCtx.fillStyle=ha(col,al*0.5);geoCtx.font='9px Courier New';geoCtx.textAlign='center';
+  geoCtx.fillText('OM · φ=8:13',CX,CY-R*0.55);geoCtx.textAlign='left';}
+
+// EE — Standing wave / Lissajous · Ivy · deep interior (pc=10)
+function drawStandingWave(CX,CY,R,col,al,det){
+  const t=performance.now()/1000;
+  geoCtx.beginPath();
+  for(let i=0;i<=360;i++){const angle=i*Math.PI/180;
+    const x=CX+R*0.9*Math.sin(angle+det*0.2);const y=CY+R*0.4*Math.sin(2*angle+t*0.4);
+    i===0?geoCtx.moveTo(x,y):geoCtx.lineTo(x,y);}
+  geoCtx.strokeStyle=ha(col,al*0.7);geoCtx.lineWidth=1.2;geoCtx.stroke();}
+
+// UH — Dissolution · Elder · compost · return to earth (pc=11)
+function drawDissolution(CX,CY,R,col,al,det){
+  const t=performance.now()/1000;
+  for(let i=0;i<15;i++){const ph=(t*0.2+i/15)%1;const angle=i/15*Math.PI*2+geoAngle*0.3;
+    const dist=R*(0.3+ph*0.7);const x=CX+dist*Math.cos(angle);const y=CY+dist*Math.sin(angle)*0.7;
+    const sz=R*0.06*(1-ph*0.7);const a=al*(1-ph)*0.7;
+    geoCtx.beginPath();geoCtx.arc(x,y,sz,0,Math.PI*2);
+    geoCtx.strokeStyle=ha(col,a);geoCtx.lineWidth=0.8;geoCtx.stroke();}
+  geoCtx.beginPath();geoCtx.arc(CX,CY,R*(0.8+det*0.2),0,Math.PI*2);
+  geoCtx.strokeStyle=ha(col,al*0.12);geoCtx.lineWidth=0.5;geoCtx.setLineDash([2,4]);geoCtx.stroke();geoCtx.setLineDash([]);}
+
+// TAO — 13-point burst · Yew · lunar octave ascends not repeats (pc=12)
+function drawBurst13(CX,CY,R,col,al,det){
+  const N=13,outerR=R*(1+det*0.2),innerR=R*0.42;
+  geoCtx.beginPath();
+  for(let i=0;i<N*2;i++){const r2=i%2===0?outerR:innerR;const angle=geoAngle+(i/(N*2))*Math.PI*2-Math.PI/2;
+    const x=CX+r2*Math.cos(angle),y=CY+r2*Math.sin(angle);i===0?geoCtx.moveTo(x,y):geoCtx.lineTo(x,y);}
+  geoCtx.closePath();geoCtx.strokeStyle=ha(col,al*0.9);geoCtx.lineWidth=1.5;geoCtx.stroke();
+  geoCtx.beginPath();geoCtx.arc(CX,CY,innerR,0,Math.PI*2);geoCtx.strokeStyle=ha(col,al*0.2);geoCtx.lineWidth=0.5;geoCtx.stroke();
+  geoCtx.beginPath();geoCtx.arc(CX,CY,3,0,Math.PI*2);geoCtx.fillStyle=ha(col,al*0.8);geoCtx.fill();}
+
+function drawGeometry(pc,cents,ampNorm){
+  const W=geoCanvas.width,H=geoCanvas.height,CX=W/2,CY=H/2;
+  const geo=NOTE_GEOMETRY[pc];
+  const maxR=Math.min(W,H)*0.36,R=maxR*(0.45+ampNorm*0.55);
+  const det=Math.abs(cents)/50;
+  geoAlpha+=(ampNorm>0.04?1:-geoAlpha)*0.07;geoAlpha=Math.max(0,Math.min(1,geoAlpha));
+  geoAngle+=0.003+det*0.008;
+  geoCtx.fillStyle='rgba(2,3,6,0.22)';geoCtx.fillRect(0,0,W,H);
+  if(geoAlpha<0.02)return;
+  const col=geo.color,al=geoAlpha;
+  const glow=geoCtx.createRadialGradient(CX,CY,0,CX,CY,R*1.3);
+  glow.addColorStop(0,ha(col,0.08*al));glow.addColorStop(0.6,ha(col,0.04*al));glow.addColorStop(1,'transparent');
+  geoCtx.fillStyle=glow;geoCtx.beginPath();geoCtx.arc(CX,CY,R*1.3,0,Math.PI*2);geoCtx.fill();
+  switch(geo.form){
+    case 'expanding-circles': drawExpandingCircles(CX,CY,R,col,al,det); break;
+    case 'figure-8':          drawFigure8(CX,CY,R,col,al,det); break;
+    case 'rose-3':            drawRose(CX,CY,R,col,al,det,3); break;
+    case 'radial-4':          drawRadial4(CX,CY,R,col,al,det); break;
+    case 'star-5':            drawStar(CX,CY,R,col,al,det,5); break;
+    case 'rose-6':            drawRose(CX,CY,R,col,al,det,6); break;
+    case 'standing-null':     drawStandingNull(CX,CY,R,col,al,det); break;
+    case 'star-8':            drawStar(CX,CY,R,col,al,det,8); break;
+    case 'phi-spiral':        drawPhiSpiral(CX,CY,R,col,al,det); break;
+    case 'star-11':           drawStar(CX,CY,R,col,al,det,11); break;
+    case 'star-12':           drawStar(CX,CY,R,col,al,det,12); break;
+    case 'burst-13':          drawBurst13(CX,CY,R,col,al,det); break;
+  }
+  if(ampNorm>0.04){geoCtx.beginPath();geoCtx.arc(CX,CY,R*1.12,-Math.PI/2,-Math.PI/2+(cents/50)*Math.PI,cents<0);const cc=Math.abs(cents)<5?'#4ade80':Math.abs(cents)<20?'#facc15':'#f87171';geoCtx.strokeStyle=ha(cc,.7*al);geoCtx.lineWidth=2;geoCtx.stroke();}}
+
+// ── SPECTRUM ─────────────────────────────────────────────────────────────────
+const specCanvas=document.getElementById('spectrum'),specCtx=specCanvas.getContext('2d');
+const FREQ_MIN=30,FREQ_MAX=500,FFT_SIZE=4096,SAMPLE_RATE=48000,BIN_HZ=SAMPLE_RATE/FFT_SIZE;
+function freqToX(f,w){return w*Math.log2(f/FREQ_MIN)/Math.log2(FREQ_MAX/FREQ_MIN);}
+const MARKERS=(()=>{const m=[];for(let n=-36;n<=6;n++){const f=ROOT_432*Math.pow(2,n/12);if(f>=FREQ_MIN&&f<=FREQ_MAX)m.push({f,name:NOTE_NAMES[((n%12)+12)%12],n});}return m;})();
+function resizeSpec(){const r=specCanvas.parentElement.getBoundingClientRect();specCanvas.width=Math.floor(r.width-28);specCanvas.height=80;}
+resizeSpec();window.addEventListener('resize',resizeSpec);
+function drawSpectrum(dataArray,analyser,detFreq){
+  const W=specCanvas.width,H=specCanvas.height;
+  specCtx.clearRect(0,0,W,H);specCtx.fillStyle='#020306';specCtx.fillRect(0,0,W,H);
+  for(const m of MARKERS){const x=freqToX(m.f,W);specCtx.strokeStyle=m.name==='C'?'#141420':m.name==='F#'?'#141008':'#080c0a';specCtx.lineWidth=m.name==='C'||m.name==='F#'?1:.5;specCtx.beginPath();specCtx.moveTo(x,0);specCtx.lineTo(x,H-12);specCtx.stroke();if(m.name==='C'||m.name==='F#'){specCtx.fillStyle=m.name==='C'?'#14141e':'#141008';specCtx.font='8px Courier New';specCtx.fillText(m.name,x+2,H-2);}}
+  const grad=specCtx.createLinearGradient(0,0,0,H-14);grad.addColorStop(0,'#60a5fa');grad.addColorStop(.5,'#4ade80');grad.addColorStop(1,'#060a12');specCtx.fillStyle=grad;
+  for(let i=1;i<dataArray.length;i++){const f=i*BIN_HZ;if(f<FREQ_MIN||f>FREQ_MAX)continue;const x1=freqToX(f,W),x0=freqToX((i-1)*BIN_HZ||FREQ_MIN,W);const nH=Math.max(0,(dataArray[i]-analyser.minDecibels)/(analyser.maxDecibels-analyser.minDecibels));specCtx.fillRect(x0,H-14-nH*(H-14),Math.max(x1-x0,1),nH*(H-14));}
+  if(detFreq>FREQ_MIN&&detFreq<FREQ_MAX){const x=freqToX(detFreq,W);specCtx.strokeStyle='#facc15';specCtx.lineWidth=1.5;specCtx.setLineDash([3,3]);specCtx.beginPath();specCtx.moveTo(x,0);specCtx.lineTo(x,H-12);specCtx.stroke();specCtx.setLineDash([]);}
+}
+
+// ── AUDIO ─────────────────────────────────────────────────────────────────────
+let ctx,analyser,dataArray,animId;
+window.startAudio=async function(){
+  const btn=document.getElementById('startBtn');
+  if(ctx){ctx.close();ctx=null;cancelAnimationFrame(animId);btn.textContent='▶ START MIC INPUT';btn.classList.remove('active');return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    ctx=new AudioContext({sampleRate:SAMPLE_RATE});analyser=ctx.createAnalyser();
+    analyser.fftSize=FFT_SIZE;analyser.smoothingTimeConstant=.78;analyser.minDecibels=-90;analyser.maxDecibels=-10;
+    ctx.createMediaStreamSource(stream).connect(analyser);dataArray=new Float32Array(analyser.frequencyBinCount);
+    btn.textContent='■ STOP';btn.classList.add('active');loop();
+  }catch(e){btn.textContent='MIC ERROR — '+e.message;}
+};
+
+// ── MAIN LOOP ─────────────────────────────────────────────────────────────────
+const elHz=document.getElementById('detHz'),elNote=document.getElementById('detNote'),elSig=document.getElementById('sigLevel');
+const elCents=document.getElementById('centsVal'),elFill=document.getElementById('mf'),elGeoLbl=document.getElementById('geoLabel');
+const THRESH_DB=-55;let lastPc=0;
+
+function loop(){
+  animId=requestAnimationFrame(loop);if(!dataArray)return;
+  analyser.getFloatFrequencyData(dataArray);
+  const binMin=Math.ceil(FREQ_MIN/BIN_HZ),binMax=Math.floor(FREQ_MAX/BIN_HZ);
+  let peakBin=binMin,peakVal=-Infinity;
+  for(let i=binMin;i<=binMax;i++)if(dataArray[i]>peakVal){peakVal=dataArray[i];peakBin=i;}
+  elSig.textContent=`Signal: ${peakVal.toFixed(1)} dB`;let detFreq=0;
+  if(peakVal>THRESH_DB){
+    detFreq=parabolicPeak(dataArray,peakBin)*BIN_HZ;
+    const r=freqToNearest432(detFreq);
+    elHz.textContent=detFreq.toFixed(2)+' Hz';elHz.className='';
+    elNote.textContent=`${r.noteName}${r.octave}  ·  n=${r.n>=0?'+':''}${r.n}  ·  ratio = ${r.ratio.toFixed(6)}`;
+    const c=r.cents;elCents.textContent=`${c>=0?'+':''}${c.toFixed(1)} ¢`;
+    elCents.style.color=Math.abs(c)<5?'#4ade80':Math.abs(c)<20?'#facc15':'#f87171';
+    const pct=Math.max(0,Math.min(100,50+c));
+    elFill.style.left=(pct<50?pct:'50')+'%';elFill.style.width=Math.abs(pct-50)+'%';
+    elFill.style.background=Math.abs(c)<5?'#4ade80':Math.abs(c)<20?'#facc15':'#f87171';
+    const ampNorm=Math.max(0,Math.min(1,(peakVal-analyser.minDecibels)/(analyser.maxDecibels-analyser.minDecibels)));
+    drawGeometry(r.pc,c,ampNorm);
+    if(r.pc!==lastPc){renderAyurveda(r.pc);renderWater(r.pc);renderInterval(r.pc);lastPc=r.pc;}
+    renderMath(r.pc,r.n,detFreq,c);
+    const a=AYUR[r.pc],geo=NOTE_GEOMETRY[r.pc];
+    elGeoLbl.textContent=`${a.note}  ·  ${geo.proto}: ${geo.form}  ·  ${a.dosha}  ·  sap=${sapHeight(r.pc).toFixed(3)}  ·  ${Math.abs(c)<5?'✦ IN TUNE':c.toFixed(1)+'¢'}`;elGeoLbl.title=geo.src;
+    elGeoLbl.style.color=a.color;
+  }else{
+    elHz.textContent='— Hz';elHz.className='w';elNote.textContent='No signal above threshold';
+    elCents.textContent='— ¢';elCents.style.color='#1a2030';elFill.style.width='0';
+    drawGeometry(lastPc,0,0);elGeoLbl.textContent='awaiting signal';elGeoLbl.style.color='#1a2030';
+  }
+  drawSpectrum(dataArray,analyser,detFreq);
+}
+
+// Init
+renderMath(0,0,ROOT_432,0);renderAyurveda(0);renderWater(0);renderInterval(0);
+</script>
+</body>
+</html>

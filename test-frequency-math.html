@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>UFT v4.1 — Frequency Math Verification</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0f; color: #c8c8d0; font-family: 'Courier New', monospace; font-size: 13px; padding: 24px; }
+  h1 { color: #7eb8f7; font-size: 16px; margin-bottom: 4px; }
+  .subtitle { color: #555; font-size: 11px; margin-bottom: 24px; }
+  h2 { color: #a0c8f0; font-size: 13px; margin: 20px 0 8px; border-bottom: 1px solid #222; padding-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+  th { color: #7eb8f7; text-align: left; padding: 4px 8px; border-bottom: 1px solid #222; font-size: 11px; }
+  td { padding: 3px 8px; font-size: 12px; }
+  tr:nth-child(even) { background: #0e0e16; }
+  .pass { color: #4cde84; }
+  .fail { color: #f05050; font-weight: bold; }
+  .warn { color: #f0c040; }
+  .note { color: #888; }
+  .zp   { color: #c87ef0; }
+  .oph  { color: #36d9b8; }
+  .summary { margin-top: 24px; padding: 16px; border: 1px solid #222; background: #0d0d14; }
+  .summary-pass { color: #4cde84; font-size: 14px; }
+  .summary-fail { color: #f05050; font-size: 14px; }
+  .formula { color: #888; font-size: 11px; margin-bottom: 8px; padding: 6px 10px; background: #080810; border-left: 3px solid #7eb8f7; }
+  .section-result { float: right; font-size: 11px; margin-top: -20px; }
+</style>
+</head>
+<body>
+
+<h1>UFT v4.1 — Frequency Math Verification</h1>
+<p class="subtitle">Tests canonical Hz values from REFERENCE.md against live formula output. Tolerance: ±0.001 Hz.</p>
+
+<div id="output"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+// CANONICAL CONSTANTS (from REFERENCE.md §II, §III)
+// ─────────────────────────────────────────────────────────────────
+const LUNAR_ROOT  = 210.4186;   // 1 / 29.5306 days × 2²⁹
+const SOLAR_ROOT  = 256.0000;   // C in 432 Hz tuning = 2⁸
+const PHI         = 1.6180339887;
+const TOLERANCE   = 0.001;      // Hz — tight tolerance per REFERENCE.md
+
+// getFreq: core formula used by engine
+function getFreq(root, n) {
+  return root * Math.pow(2, n / 12);
+}
+
+// Zero Point: root × √2
+function getZeroPoint(root) {
+  return root * Math.sqrt(2);
+}
+
+// ─────────────────────────────────────────────────────────────────
+// CANONICAL TABLES (from REFERENCE.md §IV and §V)
+// ─────────────────────────────────────────────────────────────────
+const LUNAR_NIKKAL = [
+  { n:0,  note:'C',   hz:210.4186, fib:1,   proto:'AH',  tree:'Birch',    body:'Root',              sap:'Rising'     },
+  { n:1,  note:'C#',  hz:222.9307, fib:2,   proto:'SA',  tree:'Rowan',    body:'Throat',            sap:'Rising'     },
+  { n:2,  note:'D',   hz:236.1869, fib:3,   proto:'LA',  tree:'Ash',      body:'Hands & lungs',     sap:'Rising'     },
+  { n:3,  note:'D#',  hz:250.2313, fib:5,   proto:'RA',  tree:'Alder',    body:'Stomach',           sap:'Peak'       },
+  { n:4,  note:'E',   hz:265.1108, fib:8,   proto:'DA',  tree:'Willow',   body:'Solar plexus',      sap:'Peak'       },
+  { n:5,  note:'F',   hz:280.8751, fib:13,  proto:'HA',  tree:'Hawthorn', body:'Diaphragm',         sap:'Peak'       },
+  { n:6,  note:'F#',  hz:297.5768, fib:21,  proto:'NA',  tree:'Oak',      body:'Heart',             sap:'Zero Point', zp:true  },
+  { n:7,  note:'G',   hz:315.2717, fib:34,  proto:'KA',  tree:'Holly',    body:'Spine',             sap:'Descending' },
+  { n:8,  note:'G#',  hz:334.0187, fib:55,  proto:'OM',  tree:'Hazel',    body:'The wound',         sap:'Descending', oph:true },
+  { n:9,  note:'A',   hz:353.8805, fib:89,  proto:'AH',  tree:'Vine',     body:'The blood',         sap:'Descending' },
+  { n:10, note:'A#',  hz:374.9233, fib:144, proto:'EE',  tree:'Ivy',      body:'Deep interior',     sap:'Dormant'    },
+  { n:11, note:'B',   hz:397.2174, fib:233, proto:'UH',  tree:'Elder',    body:'The compost',       sap:'Dormant'    },
+  { n:12, note:"C'",  hz:420.8372, fib:377, proto:'TAO', tree:'Yew',      body:'The full system',   sap:'Awakening'  },
+];
+
+const SOLAR_KEYSERLING = [
+  { n:0,  note:'C',   hz:256.0000, zodiac:'Aries',       planet:'Sun',     proto:'RA',  fib:1   },
+  { n:1,  note:'C#',  hz:271.2226, zodiac:'Taurus',      planet:'Venus',   proto:'SA',  fib:2   },
+  { n:2,  note:'D',   hz:287.3503, zodiac:'Gemini',      planet:'Uranus',  proto:'LA',  fib:3   },
+  { n:3,  note:'D#',  hz:304.4370, zodiac:'Cancer',      planet:'Moon',    proto:'MA',  fib:5   },
+  { n:4,  note:'E',   hz:322.5398, zodiac:'Leo',         planet:'Sun',     proto:'DA',  fib:8   },
+  { n:5,  note:'F',   hz:341.7190, zodiac:'Virgo',       planet:'Mercury', proto:'HA',  fib:13  },
+  { n:6,  note:'F#',  hz:362.0387, zodiac:'Libra',       planet:'Neptune', proto:'NA',  fib:21,  zp:true  },
+  { n:7,  note:'G',   hz:383.5666, zodiac:'Scorpio',     planet:'Mars',    proto:'KA',  fib:34  },
+  { n:8,  note:'G#',  hz:406.3747, zodiac:'Ophiuchus',   planet:'—',       proto:'OM',  fib:55,  oph:true },
+  { n:9,  note:'A',   hz:430.5390, zodiac:'Sagittarius', planet:'Jupiter', proto:'AH',  fib:89  },
+  { n:10, note:'A#',  hz:456.1401, zodiac:'Capricorn',   planet:'Saturn',  proto:'EE',  fib:144 },
+  { n:11, note:'B',   hz:483.2636, zodiac:'Aquarius',    planet:'Neptune', proto:'UH',  fib:233 },
+];
+
+// ─────────────────────────────────────────────────────────────────
+// ADDITIONAL CHECKS
+// ─────────────────────────────────────────────────────────────────
+const DERIVED_CHECKS = [
+  { label: 'Lunar Zero Point (F#)',          expected: 297.5768,  got: () => getZeroPoint(LUNAR_ROOT) },
+  { label: 'Solar Zero Point (F#)',          expected: 362.0387,  got: () => getZeroPoint(SOLAR_ROOT) },
+  { label: "Lunar octave (C')",              expected: 420.8372,  got: () => LUNAR_ROOT * 2           },
+  { label: "Solar octave (C' — not in scale)",expected: 512.0000, got: () => SOLAR_ROOT * 2           },
+  { label: 'PHI × Lunar Root',              expected: 340.5219,  got: () => LUNAR_ROOT * PHI         },
+  { label: '8:13 ratio (phi approach)',      expected: 0.615384,  got: () => 8/13,      tol: 0.000001 },
+  { label: '13:21 ratio (phi approach)',     expected: 0.619047,  got: () => 13/21,     tol: 0.000001 },
+  { label: '1/PHI (limit)',                  expected: 0.618034,  got: () => 1/PHI,     tol: 0.000001 },
+  { label: 'Semitone ratio 2^(1/12)',        expected: 1.059463,  got: () => Math.pow(2,1/12), tol: 0.000001 },
+  { label: '(13,21) torus positions',        expected: 273,       got: () => 13 * 21               },
+  { label: 'Lunar year days (13×28)',        expected: 364,       got: () => 13 * 28               },
+  { label: '21 states × torus 13 notes',    expected: 273,       got: () => 21 * 13               },
+  { label: 'Total harmonic states (13×12×21)',expected: 3276,     got: () => 13 * 12 * 21          },
+];
+
+// ─────────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────────
+let totalPass = 0, totalFail = 0;
+const out = document.getElementById('output');
+
+function row(cells, cls) {
+  return `<tr class="${cls||''}">${cells.map(c=>`<td>${c}</td>`).join('')}</tr>`;
+}
+
+function runScaleTest(title, data, root, formula) {
+  let pass = 0, fail = 0;
+  let html = `<h2>${title} <span class="note">${formula}</span></h2>`;
+  html += `<table><thead><tr>`;
+  html += `<th>#</th><th>Note</th><th>Expected Hz</th><th>Computed Hz</th><th>Delta</th><th>Status</th><th>Flags</th>`;
+  html += `</tr></thead><tbody>`;
+
+  for (const entry of data) {
+    const computed = getFreq(root, entry.n);
+    const delta    = Math.abs(computed - entry.hz);
+    const ok       = delta <= TOLERANCE;
+    if (ok) pass++; else fail++;
+    totalPass += ok ? 1 : 0;
+    totalFail += ok ? 0 : 1;
+
+    const statusCell = ok
+      ? `<span class="pass">PASS</span>`
+      : `<span class="fail">FAIL Δ${delta.toFixed(4)}</span>`;
+
+    const flags = [];
+    if (entry.zp)  flags.push(`<span class="zp">ZP</span>`);
+    if (entry.oph) flags.push(`<span class="oph">OPH</span>`);
+
+    const noteClass = entry.zp ? 'zp' : entry.oph ? 'oph' : '';
+    html += row([
+      entry.n,
+      `<span class="${noteClass}">${entry.note}</span>`,
+      entry.hz.toFixed(4),
+      computed.toFixed(4),
+      delta < 0.00005 ? '<span class="pass">0.0000</span>' : delta.toFixed(4),
+      statusCell,
+      flags.join(' ') || '—'
+    ]);
+  }
+  html += `</tbody></table>`;
+  html += `<div class="section-result">${pass} pass / ${fail > 0 ? `<span class="fail">${fail} fail</span>` : '0 fail'}</div>`;
+  return html;
+}
+
+function runDerivedTests(title, checks) {
+  let pass = 0, fail = 0;
+  let html = `<h2>${title}</h2>`;
+  html += `<table><thead><tr><th>Check</th><th>Expected</th><th>Computed</th><th>Delta</th><th>Status</th></tr></thead><tbody>`;
+
+  for (const c of checks) {
+    const tol      = c.tol || TOLERANCE;
+    const computed = c.got();
+    const delta    = Math.abs(computed - c.expected);
+    const ok       = delta <= tol;
+    if (ok) pass++; else fail++;
+    totalPass += ok ? 1 : 0;
+    totalFail += ok ? 0 : 1;
+
+    const status = ok
+      ? `<span class="pass">PASS</span>`
+      : `<span class="fail">FAIL Δ${delta.toFixed(6)}</span>`;
+
+    html += row([
+      c.label,
+      c.expected,
+      typeof computed === 'number' ? computed.toFixed(6) : computed,
+      delta < 0.0000005 ? '<span class="pass">~0</span>' : delta.toFixed(6),
+      status
+    ]);
+  }
+  html += `</tbody></table>`;
+  html += `<div class="section-result">${pass} pass / ${fail > 0 ? `<span class="fail">${fail} fail</span>` : '0 fail'}</div>`;
+  return html;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// CROSS-REFERENCE: old file values vs canonical
+// ─────────────────────────────────────────────────────────────────
+const OLD_FILE_ERRORS = [
+  { label:'Lunar #2 old (En/236.5245)',  old:236.5245,  canonical:222.9307, root:LUNAR_ROOT, n:1 },
+  { label:'Lunar #3 old (Ki/265.3876)',  old:265.3876,  canonical:236.1869, root:LUNAR_ROOT, n:2 },
+  { label:'Lunar #7 old (La/421.2234)',  old:421.2234,  canonical:297.5768, root:LUNAR_ROOT, n:6 },
+  { label:'Solar Taurus old (271.63)',   old:271.63,    canonical:271.2226, root:SOLAR_ROOT, n:1 },
+  { label:'Solar Libra old (369.30)',    old:369.30,    canonical:362.0387, root:SOLAR_ROOT, n:6 },
+  { label:'Solar pos9 old (Sag/420.90)',old:420.90,    canonical:406.3747, root:SOLAR_ROOT, n:8 },
+  { label:'Solar pos12 old (Pisces/512.00)', old:512.00, canonical:483.2636, root:SOLAR_ROOT, n:11 },
+];
+
+function runErrorComparison(title, checks) {
+  let html = `<h2>${title}</h2>`;
+  html += `<table><thead><tr>`;
+  html += `<th>Entry</th><th>Old Hz</th><th>Canonical Hz</th><th>Error (old - canonical)</th><th>Semitone error</th>`;
+  html += `</tr></thead><tbody>`;
+  for (const c of checks) {
+    const err = c.old - c.canonical;
+    const stErr = (Math.log2(c.old / c.canonical) * 12).toFixed(3);
+    html += row([
+      c.label,
+      c.old.toFixed(4),
+      `<span class="pass">${c.canonical.toFixed(4)}</span>`,
+      `<span class="fail">${err > 0 ? '+' : ''}${err.toFixed(4)} Hz</span>`,
+      `<span class="${Math.abs(stErr) > 0.5 ? 'fail' : 'warn'}">${stErr} st</span>`
+    ]);
+  }
+  html += `</tbody></table>`;
+  return html;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// ASSEMBLE
+// ─────────────────────────────────────────────────────────────────
+let content = '';
+content += runScaleTest(
+  'Lunar Nikkal Scale — 13 tones (Moon tuning)',
+  LUNAR_NIKKAL,
+  LUNAR_ROOT,
+  'Hz = 210.4186 × 2^(n/12)'
+);
+content += runScaleTest(
+  'Solar Keyserling-Lambdoma — 12 tones (432 Hz tuning)',
+  SOLAR_KEYSERLING,
+  SOLAR_ROOT,
+  'Hz = 256.0000 × 2^(n/12)'
+);
+content += runDerivedTests(
+  'Derived Constants & Structural Checks',
+  DERIVED_CHECKS
+);
+content += runErrorComparison(
+  'Old File Errors — magnitude of corrections applied',
+  OLD_FILE_ERRORS
+);
+
+// Summary
+const allPass = totalFail === 0;
+content += `
+<div class="summary">
+  <div class="${allPass ? 'summary-pass' : 'summary-fail'}">
+    ${allPass ? '✓ ALL TESTS PASSED' : '✗ FAILURES DETECTED'}
+    &nbsp;&nbsp;${totalPass} passed / ${totalFail} failed
+  </div>
+  <div class="note" style="margin-top:8px;font-size:11px;">
+    Tolerance: ±${TOLERANCE} Hz (Lunar), ±${TOLERANCE} Hz (Solar) | 
+    Roots: Lunar ${LUNAR_ROOT} Hz · Solar ${SOLAR_ROOT} Hz | 
+    Formula: root × 2^(n/12) | 
+    Run: ${new Date().toISOString()}
+  </div>
+</div>`;
+
+out.innerHTML = content;
+</script>
+</body>
+</html>

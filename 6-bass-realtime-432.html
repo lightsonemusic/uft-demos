@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFT — Bass → 432 Hz Lunar Tuner</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a12;
+    color: #e0e0f0;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px;
+    gap: 20px;
+  }
+
+  h1 {
+    font-size: 1.1em;
+    color: #7b8cde;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  /* START BUTTON */
+  #startBtn {
+    padding: 12px 40px;
+    background: #1a1a2e;
+    border: 1px solid #7b8cde;
+    color: #7b8cde;
+    font-family: 'Courier New', monospace;
+    font-size: 1em;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: background 0.2s;
+  }
+  #startBtn:hover { background: #2a2a4e; }
+  #startBtn.active { border-color: #4ade80; color: #4ade80; }
+
+  /* MAIN GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .card {
+    background: #0f0f1e;
+    border: 1px solid #1e1e3a;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card-title {
+    font-size: 0.7em;
+    color: #555577;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #1e1e3a;
+    padding-bottom: 8px;
+  }
+
+  /* DETECTED FREQ */
+  #detectedHz {
+    font-size: 3.5em;
+    color: #4ade80;
+    line-height: 1;
+    letter-spacing: -1px;
+    transition: color 0.1s;
+  }
+  #detectedHz.weak { color: #444466; }
+  #detectedNote { font-size: 1.1em; color: #aaaacc; }
+
+  /* NOTE TARGET */
+  #targetNote {
+    font-size: 3em;
+    color: #7b8cde;
+    line-height: 1;
+  }
+  #targetHz { font-size: 1em; color: #555577; }
+
+  /* CENTS METER */
+  .cents-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #centsVal {
+    font-size: 2em;
+    text-align: center;
+  }
+  .meter-bar {
+    position: relative;
+    height: 16px;
+    background: #1a1a2e;
+    border: 1px solid #1e1e3a;
+  }
+  .meter-center {
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: #333355;
+  }
+  #meterFill {
+    position: absolute;
+    top: 2px; bottom: 2px;
+    background: #4ade80;
+    transition: left 0.05s, width 0.05s, background 0.1s;
+  }
+  .meter-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65em;
+    color: #333355;
+  }
+
+  /* LUNAR CONTEXT */
+  .lunar-card { grid-column: span 2; }
+  .lunar-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .lunar-item { display: flex; flex-direction: column; gap: 2px; }
+  .lunar-label { font-size: 0.65em; color: #444466; letter-spacing: 2px; }
+  .lunar-val { font-size: 1.1em; color: #c084fc; }
+
+  /* GEOMETRY CANVAS */
+  .geo-card { grid-column: span 2; }
+  #geoCanvas {
+    display: block;
+    background: #070710;
+    width: 100%;
+    height: 380px;
+  }
+  .geo-label {
+    text-align: center;
+    font-size: 0.75em;
+    color: #333355;
+    letter-spacing: 2px;
+    margin-top: 6px;
+  }
+
+  /* SPECTRUM CANVAS */
+  .canvas-card { grid-column: span 2; }
+  #spectrum {
+    width: 100%;
+    height: 120px;
+    display: block;
+    background: #070710;
+  }
+
+  /* SIGNAL INDICATOR */
+  #sigLevel {
+    font-size: 0.75em;
+    color: #444466;
+  }
+</style>
+</head>
+<body>
+<h1>UFT · Bass → 432 Hz Lunar Tuner</h1>
+<button id="startBtn" onclick="startAudio()">▶ START MIC INPUT</button>
+
+<div class="grid">
+
+  <!-- DETECTED -->
+  <div class="card">
+    <div class="card-title">Detected Input</div>
+    <div id="detectedHz" class="weak">— Hz</div>
+    <div id="detectedNote">No signal</div>
+    <div id="sigLevel">Signal: — dB</div>
+  </div>
+
+  <!-- TARGET NOTE IN 432 Hz -->
+  <div class="card">
+    <div class="card-title">432 Hz Target Note</div>
+    <div id="targetNote">—</div>
+    <div id="targetHz">— Hz (432 tuning)</div>
+  </div>
+
+  <!-- CENTS METER -->
+  <div class="card" style="grid-column:span 2">
+    <div class="card-title">Tuning Deviation (cents)</div>
+    <div class="cents-wrap">
+      <div id="centsVal" style="color:#555577">— ¢</div>
+      <div class="meter-bar">
+        <div class="meter-center"></div>
+        <div id="meterFill" style="left:50%;width:0"></div>
+      </div>
+      <div class="meter-labels"><span>−50¢</span><span>in tune</span><span>+50¢</span></div>
+    </div>
+  </div>
+
+  <!-- GEOMETRY -->
+  <div class="card geo-card">
+    <div class="card-title">Cymatic Geometry · Note → Form · 432 Hz Tuning</div>
+    <canvas id="geoCanvas"></canvas>
+    <div class="geo-label" id="geoLabel">awaiting signal</div>
+  </div>
+
+  <!-- SPECTRUM -->
+  <div class="card canvas-card">
+    <div class="card-title">Live Spectrum — Bass Range (30 – 500 Hz) · 432 Hz Scale Markers</div>
+    <canvas id="spectrum"></canvas>
+  </div>
+
+  <!-- LUNAR CONTEXT -->
+  <div class="card lunar-card">
+    <div class="card-title">Lunar Context · Today</div>
+    <div class="lunar-row" id="lunarRow"></div>
+  </div>
+
+</div>
+
+<script type="module">
+import {
+  TUNING_ROOTS,
+  CHROMATIC_SCALE_432,
+  NOTE_NAMES
+} from '../../UFT_Project/modules/tuning-constants.js';
+
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const ROOT_432   = TUNING_ROOTS['432'];   // 256.0000 Hz
+const FFT_SIZE   = 4096;                  // high resolution for bass
+const SAMPLE_RATE = 48000;
+const BIN_HZ     = SAMPLE_RATE / FFT_SIZE; // 11.71875 Hz/bin
+
+// LUNAR PROTO-WORDS (13 months, inline — lunar-module.js is CJS)
+const LUNAR_PROTO_WORDS = [
+  { month:1,  word:'OH',  freq:210.4186, quality:'Universal Heart' },
+  { month:2,  word:'AH',  freq:222.9307, quality:'Creative Expression' },
+  { month:3,  word:'EE',  freq:236.1869, quality:'Divine Wisdom' },
+  { month:4,  word:'OOH', freq:250.2313, quality:'Grounding Connection' },
+  { month:5,  word:'MM',  freq:265.1108, quality:'Inner Resonance' },
+  { month:6,  word:'NG',  freq:280.8751, quality:'Cosmic Flow' },
+  { month:7,  word:'AY',  freq:297.5768, quality:'Zero Point Threshold' },
+  { month:8,  word:'EH',  freq:315.2717, quality:'Balance & Harmony' },
+  { month:9,  word:'IA',  freq:334.0187, quality:'Transformation' },
+  { month:10, word:'AU',  freq:353.8805, quality:'Celestial Union' },
+  { month:11, word:'OE',  freq:374.9233, quality:'Quantum Bridging' },
+  { month:12, word:'UH',  freq:397.2174, quality:'Sacred Foundation' },
+  { month:13, word:'AR',  freq:420.8372, quality:'Cosmic Return' },
+];
+
+// ─── LUNAR CONTEXT FOR TODAY ─────────────────────────────────────────────────
+function dayOfYear(date) {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const diff  = date - start;
+  return Math.floor(diff / 86400000);
+}
+
+function getLunarContext() {
+  const today   = new Date();
+  const doy     = dayOfYear(today);
+  const LUNAR_YEAR = 364;
+  const DAYS_PER_MOON = 28;
+  const norm    = ((doy - 1) % LUNAR_YEAR) + 1;
+  const month   = Math.ceil(norm / DAYS_PER_MOON);
+  const dayInM  = ((norm - 1) % DAYS_PER_MOON) + 1;
+  const phase   = dayInM / DAYS_PER_MOON;           // 0→1
+  const pw      = LUNAR_PROTO_WORDS[Math.min(month - 1, 12)];
+  // Phase description
+  const phaseName = phase < 0.25 ? 'Waxing Crescent'
+                  : phase < 0.5  ? 'Waxing Gibbous'
+                  : phase < 0.75 ? 'Waning Gibbous'
+                                 : 'Waning Crescent';
+  return { month, dayInM, phase, pw, phaseName, doy };
+}
+
+// ─── PITCH HELPERS ───────────────────────────────────────────────────────────
+// Map any frequency to nearest 432 Hz semitone (any octave)
+function freqToNearest432(freq) {
+  if (freq <= 0) return null;
+  // n = semitones from 256 Hz (can be negative for bass)
+  const n_raw   = 12 * Math.log2(freq / ROOT_432);
+  const n       = Math.round(n_raw);
+  const pc      = ((n % 12) + 12) % 12;   // pitch class 0-11
+  const noteName = NOTE_NAMES[pc];
+  const octave  = Math.floor(n / 12) + 4; // 256Hz = C4 in this system
+  const targetFreq = ROOT_432 * Math.pow(2, n / 12);
+  const cents   = 1200 * Math.log2(freq / targetFreq);
+  return { n, pc, noteName, octave, targetFreq, cents };
+}
+
+// Parabolic interpolation for sub-bin peak
+function parabolicPeak(data, k) {
+  if (k <= 0 || k >= data.length - 1) return k;
+  const y1 = data[k - 1], y2 = data[k], y3 = data[k + 1];
+  const denom = 2 * y2 - y1 - y3;
+  if (denom === 0) return k;
+  return k + (y3 - y1) / (2 * denom);
+}
+
+// ─── GEOMETRY ────────────────────────────────────────────────────────────────
+// Pitch class → polygon sides + colour + label
+// F# (pc=6) = Zero Point — drawn as 12-pointed interference star
+const NOTE_GEOMETRY = [
+  { pc:0,  sides:3,   name:'Triangle',         color:'#60a5fa', label:'C  — Trinity' },
+  { pc:1,  sides:4,   name:'Square',            color:'#818cf8', label:'C# — Foundation' },
+  { pc:2,  sides:5,   name:'Pentagon',          color:'#a78bfa', label:'D  — Life / φ' },
+  { pc:3,  sides:6,   name:'Hexagon',           color:'#c084fc', label:'D# — Carbon / Harmony' },
+  { pc:4,  sides:7,   name:'Heptagon',          color:'#e879f9', label:'E  — Mystery' },
+  { pc:5,  sides:8,   name:'Octagon',           color:'#f472b6', label:'F  — Renewal' },
+  { pc:6,  sides:0,   name:'Zero Point Star',   color:'#facc15', label:'F# — Zero Point · LUNA × √2' },
+  { pc:7,  sides:9,   name:'Nonagon',           color:'#fb923c', label:'G  — Rhythm' },
+  { pc:8,  sides:10,  name:'Decagon',           color:'#f87171', label:'G# — Completion' },
+  { pc:9,  sides:11,  name:'Hendecagon',        color:'#4ade80', label:'A  — Resonance' },
+  { pc:10, sides:12,  name:'Dodecagon',         color:'#34d399', label:'A# — Solar Cycle' },
+  { pc:11, sides:13,  name:'Triskaidecagon',    color:'#22d3ee', label:'B  — Lunar Cycle' },
+];
+
+const geoCanvas = document.getElementById('geoCanvas');
+const geoCtx    = geoCanvas.getContext('2d');
+let   geoAngle  = 0;          // continuous rotation
+let   geoAlpha  = 0;          // fade-in amplitude
+let   prevPc    = -1;
+let   morphR    = [];         // per-vertex radius offsets for detuning distortion
+
+function resizeGeo() {
+  const rect = geoCanvas.parentElement.getBoundingClientRect();
+  geoCanvas.width  = Math.floor(rect.width - 40);
+  geoCanvas.height = 380;
+}
+resizeGeo();
+window.addEventListener('resize', resizeGeo);
+
+function drawGeometry(pc, cents, ampNorm) {
+  const W = geoCanvas.width, H = geoCanvas.height;
+  const CX = W / 2, CY = H / 2;
+  const geo = NOTE_GEOMETRY[pc];
+  const maxR = Math.min(W, H) * 0.38;
+  const R    = maxR * (0.5 + ampNorm * 0.5);   // size scales with amplitude
+
+  // Fade target alpha
+  geoAlpha += (ampNorm > 0.05 ? 1 : 0 - geoAlpha) * 0.08;
+  geoAlpha  = Math.max(0, Math.min(1, geoAlpha));
+
+  // Reset morph array on note change
+  if (pc !== prevPc) {
+    const sides = geo.sides || 12;
+    morphR = Array.from({length: sides}, () => 0);
+    prevPc = pc;
+  }
+
+  // Detuning distortion: cents drives random vertex jitter towards in/out
+  const detuneAmount = Math.abs(cents) / 50;   // 0=in-tune, 1=±50¢
+  if (geo.sides > 0) {
+    morphR = morphR.map(r => {
+      const target = (Math.random() - 0.5) * 2 * detuneAmount * 0.35;
+      return r + (target - r) * 0.12;
+    });
+  }
+
+  // Rotation speed: slow, slightly faster when detuned
+  geoAngle += 0.003 + detuneAmount * 0.01;
+
+  // === DRAW ===
+  // Fade trail
+  geoCtx.fillStyle = `rgba(7,7,16,0.25)`;
+  geoCtx.fillRect(0, 0, W, H);
+
+  if (geoAlpha < 0.02) return;
+
+  const color = geo.color;
+  const alpha = geoAlpha;
+
+  // ── GLOW ──
+  const glow = geoCtx.createRadialGradient(CX, CY, 0, CX, CY, R * 1.2);
+  glow.addColorStop(0,   hexAlpha(color, 0.08 * alpha));
+  glow.addColorStop(0.6, hexAlpha(color, 0.04 * alpha));
+  glow.addColorStop(1,   'transparent');
+  geoCtx.fillStyle = glow;
+  geoCtx.beginPath();
+  geoCtx.arc(CX, CY, R * 1.2, 0, Math.PI * 2);
+  geoCtx.fill();
+
+  if (geo.sides === 0) {
+    // ── F# ZERO POINT: 12-pointed interference star ──
+    drawInterferenceStar(CX, CY, R, color, alpha, cents);
+  } else {
+    // ── POLYGON with detuning distortion ──
+    const S = geo.sides;
+
+    // Outer polygon (main form)
+    geoCtx.beginPath();
+    for (let i = 0; i < S; i++) {
+      const a  = geoAngle + (i / S) * Math.PI * 2 - Math.PI / 2;
+      const r  = R * (1 + morphR[i]);
+      const x  = CX + r * Math.cos(a);
+      const y  = CY + r * Math.sin(a);
+      i === 0 ? geoCtx.moveTo(x, y) : geoCtx.lineTo(x, y);
+    }
+    geoCtx.closePath();
+    geoCtx.strokeStyle = hexAlpha(color, 0.85 * alpha);
+    geoCtx.lineWidth   = 1.5;
+    geoCtx.stroke();
+
+    // Inner polygon (smaller, counter-rotating)
+    const innerR = R * 0.5;
+    geoCtx.beginPath();
+    for (let i = 0; i < S; i++) {
+      const a  = -geoAngle * 0.7 + (i / S) * Math.PI * 2 - Math.PI / 2;
+      const r  = innerR * (1 + (morphR[i] || 0) * 0.5);
+      const x  = CX + r * Math.cos(a);
+      const y  = CY + r * Math.sin(a);
+      i === 0 ? geoCtx.moveTo(x, y) : geoCtx.lineTo(x, y);
+    }
+    geoCtx.closePath();
+    geoCtx.strokeStyle = hexAlpha(color, 0.3 * alpha);
+    geoCtx.lineWidth   = 0.8;
+    geoCtx.stroke();
+
+    // Connect outer to inner (sacred geometry lines)
+    for (let i = 0; i < S; i++) {
+      const ao = geoAngle + (i / S) * Math.PI * 2 - Math.PI / 2;
+      const ai = -geoAngle * 0.7 + (i / S) * Math.PI * 2 - Math.PI / 2;
+      geoCtx.beginPath();
+      geoCtx.moveTo(CX + R * (1 + morphR[i]) * Math.cos(ao),
+                    CY + R * (1 + morphR[i]) * Math.sin(ao));
+      geoCtx.lineTo(CX + innerR * (1 + (morphR[i]||0) * 0.5) * Math.cos(ai),
+                    CY + innerR * (1 + (morphR[i]||0) * 0.5) * Math.sin(ai));
+      geoCtx.strokeStyle = hexAlpha(color, 0.12 * alpha);
+      geoCtx.lineWidth   = 0.5;
+      geoCtx.stroke();
+    }
+
+    // Centre dot
+    geoCtx.beginPath();
+    geoCtx.arc(CX, CY, 3, 0, Math.PI * 2);
+    geoCtx.fillStyle = hexAlpha(color, 0.6 * alpha);
+    geoCtx.fill();
+  }
+
+  // Cents indicator ring
+  if (ampNorm > 0.05) {
+    const ringR = R * 1.15;
+    geoCtx.beginPath();
+    geoCtx.arc(CX, CY, ringR, -Math.PI / 2,
+               -Math.PI / 2 + (cents / 50) * Math.PI, cents < 0);
+    const cColor = Math.abs(cents) < 5 ? '#4ade80'
+                 : Math.abs(cents) < 20 ? '#facc15' : '#f87171';
+    geoCtx.strokeStyle = hexAlpha(cColor, 0.7 * alpha);
+    geoCtx.lineWidth   = 2;
+    geoCtx.stroke();
+  }
+}
+
+function drawInterferenceStar(cx, cy, R, color, alpha, cents) {
+  const detuneAmt = Math.abs(cents) / 50;
+  // Draw two counter-rotating hexagrams (12-pointed star)
+  for (let ring = 0; ring < 2; ring++) {
+    const rot = ring === 0 ? geoAngle : -geoAngle * 0.618;
+    for (let star = 0; star < 2; star++) {
+      const offset = star * (Math.PI / 6) * (1 + detuneAmt * 0.3);
+      geoCtx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a  = rot + offset + (i / 6) * Math.PI * 2;
+        const r  = R * (ring === 0 ? 1 : 0.618);
+        const x  = cx + r * Math.cos(a);
+        const y  = cy + r * Math.sin(a);
+        i === 0 ? geoCtx.moveTo(x, y) : geoCtx.lineTo(x, y);
+      }
+      geoCtx.closePath();
+      geoCtx.strokeStyle = hexAlpha(color, (ring === 0 ? 0.9 : 0.5) * alpha);
+      geoCtx.lineWidth   = ring === 0 ? 1.5 : 1;
+      geoCtx.stroke();
+    }
+  }
+  // Centre: √2 label
+  geoCtx.fillStyle = hexAlpha(color, 0.5 * alpha);
+  geoCtx.font = '11px Courier New';
+  geoCtx.textAlign = 'center';
+  geoCtx.fillText('× √2', cx, cy + 5);
+  geoCtx.textAlign = 'left';
+}
+
+function hexAlpha(hex, a) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a.toFixed(3)})`;
+}
+
+// ─── WEB AUDIO ───────────────────────────────────────────────────────────────
+let ctx, analyser, dataArray, animId;
+
+window.startAudio = async function() {
+  const btn = document.getElementById('startBtn');
+  if (ctx) {
+    ctx.close();
+    ctx = null;
+    cancelAnimationFrame(animId);
+    btn.textContent = '▶ START MIC INPUT';
+    btn.classList.remove('active');
+    document.getElementById('detectedHz').textContent = '— Hz';
+    document.getElementById('detectedHz').className = 'weak';
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+    });
+    ctx      = new AudioContext({ sampleRate: SAMPLE_RATE });
+    analyser = ctx.createAnalyser();
+    analyser.fftSize        = FFT_SIZE;
+    analyser.smoothingTimeConstant = 0.75;
+    analyser.minDecibels    = -90;
+    analyser.maxDecibels    = -10;
+
+    const src = ctx.createMediaStreamSource(stream);
+    src.connect(analyser);
+
+    dataArray = new Float32Array(analyser.frequencyBinCount);
+    btn.textContent = '■ STOP';
+    btn.classList.add('active');
+    drawLoop();
+  } catch(e) {
+    btn.textContent = 'MIC ERROR — ' + e.message;
+  }
+};
+
+// ─── SPECTRUM CANVAS ─────────────────────────────────────────────────────────
+const canvas  = document.getElementById('spectrum');
+const canCtx  = canvas.getContext('2d');
+
+// Build 432 Hz note markers for bass range (30–500 Hz)
+function build432Markers() {
+  const markers = [];
+  // n from ~-30 (sub-bass) to +5 (above bass)
+  for (let n = -36; n <= 6; n++) {
+    const f = ROOT_432 * Math.pow(2, n / 12);
+    if (f >= 30 && f <= 520) {
+      const pc = ((n % 12) + 12) % 12;
+      markers.push({ f, name: NOTE_NAMES[pc], n });
+    }
+  }
+  return markers;
+}
+const MARKERS_432 = build432Markers();
+
+const FREQ_MIN = 30, FREQ_MAX = 500;
+
+function freqToX(f, w) {
+  // log scale 30–500 Hz
+  return w * Math.log2(f / FREQ_MIN) / Math.log2(FREQ_MAX / FREQ_MIN);
+}
+
+function drawSpectrum(detectedFreq) {
+  const W = canvas.width, H = canvas.height;
+  canCtx.clearRect(0, 0, W, H);
+  canCtx.fillStyle = '#070710';
+  canCtx.fillRect(0, 0, W, H);
+
+  if (!dataArray) return;
+  analyser.getFloatFrequencyData(dataArray);
+
+  // Draw 432 Hz grid lines
+  for (const m of MARKERS_432) {
+    const x = freqToX(m.f, W);
+    const isC  = m.name === 'C';
+    const isFsh = m.name === 'F#';
+    canCtx.strokeStyle = isC ? '#1e1e4a' : isFsh ? '#2a1a3a' : '#111122';
+    canCtx.lineWidth = isC || isFsh ? 1.5 : 0.5;
+    canCtx.beginPath();
+    canCtx.moveTo(x, 0); canCtx.lineTo(x, H - 16);
+    canCtx.stroke();
+    if (isC || isFsh || m.name === 'A') {
+      canCtx.fillStyle = isC ? '#2a2a6a' : isFsh ? '#3a1a4a' : '#222244';
+      canCtx.font = '9px Courier New';
+      canCtx.fillText(m.name, x + 2, H - 4);
+    }
+  }
+
+  // Draw spectrum bars
+  const binCount = dataArray.length;
+  const gradient = canCtx.createLinearGradient(0, 0, 0, H - 20);
+  gradient.addColorStop(0, '#4ade80');
+  gradient.addColorStop(0.5, '#7b8cde');
+  gradient.addColorStop(1, '#1e1e3a');
+  canCtx.fillStyle = gradient;
+
+  for (let i = 1; i < binCount; i++) {
+    const f = i * BIN_HZ;
+    if (f < FREQ_MIN || f > FREQ_MAX) continue;
+    const x1 = freqToX(f, W);
+    const x0 = freqToX((i - 1) * BIN_HZ || FREQ_MIN, W);
+    const dB  = dataArray[i];
+    const normH = Math.max(0, (dB - analyser.minDecibels) /
+                              (analyser.maxDecibels - analyser.minDecibels));
+    const barH = normH * (H - 20);
+    canCtx.fillRect(x0, H - 20 - barH, Math.max(x1 - x0, 1), barH);
+  }
+
+  // Detected frequency marker
+  if (detectedFreq > FREQ_MIN && detectedFreq < FREQ_MAX) {
+    const x = freqToX(detectedFreq, W);
+    canCtx.strokeStyle = '#facc15';
+    canCtx.lineWidth = 2;
+    canCtx.setLineDash([4, 3]);
+    canCtx.beginPath();
+    canCtx.moveTo(x, 0); canCtx.lineTo(x, H - 16);
+    canCtx.stroke();
+    canCtx.setLineDash([]);
+    canCtx.fillStyle = '#facc15';
+    canCtx.font = '10px Courier New';
+    canCtx.fillText(detectedFreq.toFixed(1) + 'Hz', x + 4, 14);
+  }
+}
+
+// ─── MAIN LOOP ────────────────────────────────────────────────────────────────
+const elHz      = document.getElementById('detectedHz');
+const elNote    = document.getElementById('detectedNote');
+const elSig     = document.getElementById('sigLevel');
+const elTarget  = document.getElementById('targetNote');
+const elTargHz  = document.getElementById('targetHz');
+const elCents   = document.getElementById('centsVal');
+const elFill    = document.getElementById('meterFill');
+const elGeoLbl  = document.getElementById('geoLabel');
+
+// Canvas sizing
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width  = Math.floor(rect.width - 40);
+  canvas.height = 160;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function drawLoop() {
+  animId = requestAnimationFrame(drawLoop);
+
+  if (!dataArray) return;
+  analyser.getFloatFrequencyData(dataArray);
+
+  // Find peak in bass range (bins for 30–500 Hz)
+  const binMin = Math.ceil(FREQ_MIN / BIN_HZ);
+  const binMax = Math.floor(FREQ_MAX / BIN_HZ);
+  let peakBin = binMin, peakVal = -Infinity;
+  for (let i = binMin; i <= binMax; i++) {
+    if (dataArray[i] > peakVal) { peakVal = dataArray[i]; peakBin = i; }
+  }
+
+  const dB = peakVal;
+  elSig.textContent = `Signal: ${dB.toFixed(1)} dB`;
+
+  // Threshold — ignore noise floor
+  const THRESH_DB = -55;
+  let detectedFreq = 0;
+
+  if (dB > THRESH_DB) {
+    const refinedBin = parabolicPeak(dataArray, peakBin);
+    detectedFreq = refinedBin * BIN_HZ;
+
+    const r = freqToNearest432(detectedFreq);
+
+    elHz.textContent = detectedFreq.toFixed(2) + ' Hz';
+    elHz.className = '';
+
+    const octLabel = r.octave > 0 ? r.octave : '';
+    elNote.textContent = `${r.noteName}${octLabel}  ·  n=${r.n >= 0 ? '+' : ''}${r.n} from C4`;
+
+    elTarget.textContent = `${r.noteName}${octLabel}`;
+    elTargHz.textContent = `${r.targetFreq.toFixed(4)} Hz  (432 tuning)`;
+
+    const c = r.cents;
+    elCents.textContent = `${c >= 0 ? '+' : ''}${c.toFixed(1)} ¢`;
+    elCents.style.color = Math.abs(c) < 5 ? '#4ade80'
+                        : Math.abs(c) < 20 ? '#facc15' : '#f87171';
+
+    // Meter: map -50..+50 cents → 0..100%
+    const pct = Math.max(0, Math.min(100, 50 + c));
+    const fillW = Math.abs(pct - 50) + '%';
+    const fillL = pct < 50 ? pct + '%' : '50%';
+    elFill.style.left  = fillL;
+    elFill.style.width = fillW;
+    elFill.style.background = Math.abs(c) < 5 ? '#4ade80'
+                            : Math.abs(c) < 20 ? '#facc15' : '#f87171';
+
+    // Amplitude 0-1 from dB
+    const ampNorm = Math.max(0, Math.min(1, (dB - analyser.minDecibels) /
+                                            (analyser.maxDecibels - analyser.minDecibels)));
+    drawGeometry(r.pc, c, ampNorm);
+    const geo = NOTE_GEOMETRY[r.pc];
+    elGeoLbl.textContent = `${geo.label}  ·  ${geo.name}  ·  ${Math.abs(c) < 5 ? '✦ IN TUNE' : c.toFixed(1) + '¢'}`;
+  } else {
+    elHz.textContent = '— Hz';
+    elHz.className = 'weak';
+    elNote.textContent = 'No signal above threshold';
+    elTarget.textContent = '—';
+    elTargHz.textContent = '— Hz (432 tuning)';
+    elCents.textContent = '— ¢';
+    elCents.style.color = '#555577';
+    elFill.style.width = '0';
+    drawGeometry(prevPc >= 0 ? prevPc : 0, 0, 0);  // fade out
+    elGeoLbl.textContent = 'awaiting signal';
+  }
+
+  drawSpectrum(detectedFreq);
+}
+
+// ─── LUNAR CONTEXT (static — computed once from today's date) ────────────────
+(function renderLunar() {
+  const lc  = getLunarContext();
+  const row = document.getElementById('lunarRow');
+  const items = [
+    { label: 'Day of Year',   val: lc.doy },
+    { label: 'Lunar Month',   val: `${lc.month} / 13` },
+    { label: 'Day in Moon',   val: `${lc.dayInM} / 28` },
+    { label: 'Phase',         val: lc.phaseName },
+    { label: 'Proto-Word',    val: lc.pw.word },
+    { label: 'Freq',          val: `${lc.pw.freq} Hz` },
+    { label: 'Quality',       val: lc.pw.quality },
+  ];
+  row.innerHTML = items.map(i =>
+    `<div class="lunar-item">
+       <span class="lunar-label">${i.label}</span>
+       <span class="lunar-val">${i.val}</span>
+     </div>`
+  ).join('');
+})();
+</script>
+</body>
+</html>

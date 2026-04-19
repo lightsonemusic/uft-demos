@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFT · Solar Calendar · Bass · 432 Hz</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:#02030a;color:#c8d0d8;
+  font-family:'Courier New',monospace;
+  min-height:100vh;overflow:hidden;
+}
+/* Full-canvas immersive portal behind everything */
+#portalCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;}
+/* HUD overlay */
+#hud{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;
+  display:grid;
+  grid-template-columns:290px 1fr 290px;
+  grid-template-rows:auto 1fr auto;
+  gap:0;pointer-events:none;
+}
+.panel{pointer-events:all;background:rgba(4,8,20,0.88);border:1px solid rgba(255,255,255,0.10);padding:14px;backdrop-filter:blur(6px);}
+.ct{font-size:.62em;color:#4a6080;letter-spacing:3px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,0.10);padding-bottom:5px;margin-bottom:9px;}
+
+/* TOP BAR */
+#topBar{
+  grid-column:1/4;grid-row:1;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 18px;background:rgba(2,3,10,0.85);border-bottom:1px solid rgba(255,255,255,0.05);
+}
+#topTitle{font-size:.78em;color:#7ec8ff;letter-spacing:5px;text-transform:uppercase;}
+#topFreq{font-size:1.8em;color:#4ade80;letter-spacing:2px;min-width:180px;text-align:center;}
+#topNote{font-size:.82em;color:#8aabcc;min-width:160px;text-align:right;}
+button{
+  pointer-events:all;padding:7px 22px;background:rgba(2,3,10,0.9);
+  border:1px solid #60a5fa;color:#60a5fa;font-family:'Courier New',monospace;
+  font-size:.75em;cursor:pointer;letter-spacing:2px;transition:.2s;
+}
+button:hover{background:rgba(10,20,40,0.9);}
+button.active{border-color:#4ade80;color:#4ade80;}
+
+/* LEFT PANEL */
+#leftPanel{grid-column:1;grid-row:2;display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:calc(100vh - 80px - 60px);min-width:280px;}
+
+/* RIGHT PANEL */
+#rightPanel{grid-column:3;grid-row:2;display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:calc(100vh - 80px - 60px);min-width:280px;}
+
+/* CENTER — transparent, portal shows through */
+#center{grid-column:2;grid-row:2;pointer-events:none;}
+
+/* BOTTOM BAR */
+#bottomBar{
+  grid-column:1/4;grid-row:3;
+  padding:8px 14px;background:rgba(2,3,10,0.85);border-top:1px solid rgba(255,255,255,0.05);
+  display:flex;flex-direction:column;gap:4px;
+}
+#spectrumCanvas{display:block;width:100%;height:60px;}
+
+/* Zodiac wheel overlay */
+#zodiacRing{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;pointer-events:none;}
+
+/* Data rows */
+.drow{display:flex;flex-direction:column;gap:3px;padding:9px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);}
+.dl{font-size:.6em;color:#5a8090;letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+.dv{font-size:.92em;line-height:1.4;color:#d0dce8;}
+.ds{font-size:.68em;color:#6a8898;line-height:1.4;}
+
+/* Sign ring dots */
+.sign-ring{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;padding:4px 0;}
+.sdot{width:10px;height:10px;border-radius:50%;border:1px solid currentColor;opacity:.28;transition:all .4s;}
+.sdot.active{opacity:1;box-shadow:0 0 10px currentColor;}
+
+/* Cents meter */
+.cbar{position:relative;height:10px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.12);border-radius:4px;}
+.cmc{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.20);}
+#cFill{position:absolute;top:1px;bottom:1px;border-radius:3px;transition:left .05s,width .05s,background .2s;}
+.clbl{display:flex;justify-content:space-between;font-size:.6em;color:#5a7080;margin-top:3px;}
+
+/* Faculty bar */
+.fac-bar{display:flex;gap:4px;flex-wrap:wrap;}
+.fac-tag{font-size:.68em;padding:3px 8px;border:1px solid rgba(255,255,255,0.10);opacity:.28;transition:all .3s;color:#8aabcc;}
+.fac-tag.active{opacity:1;border-color:currentColor;}
+
+/* Interval badge */
+.ibadge{display:inline-block;padding:4px 12px;font-size:.82em;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.5);color:#c0d0e0;}
+.ibadge.cons{border-color:#4ade80;color:#4ade80;background:rgba(74,222,128,0.08);}
+.ibadge.diss{border-color:#f87171;color:#f87171;background:rgba(248,113,113,0.08);}
+</style>
+</head>
+<body>
+
+<!-- IMMERSIVE PORTAL -->
+<canvas id="portalCanvas"></canvas>
+
+<!-- ZODIAC RING (SVG, sits above portal, below HUD) -->
+<svg id="zodiacRing" width="420" height="420" viewBox="-210 -210 420 420" opacity="0.18">
+  <!-- drawn by JS -->
+</svg>
+
+<!-- HUD -->
+<div id="hud">
+
+  <!-- TOP BAR -->
+  <div id="topBar">
+    <span id="topTitle">UFT · Solar Calendar · 432 Hz</span>
+    <span id="topFreq" class="dim">— Hz</span>
+    <span id="topNote">No signal</span>
+    <button id="startBtn" onclick="startAudio()">▶ START</button>
+  </div>
+
+  <!-- LEFT PANEL: Solar sign + faculty -->
+  <div id="leftPanel" class="panel">
+
+    <div class="ct">Today · Solar Position</div>
+    <div class="drow" id="todaySolar">
+      <span class="dl">Sign</span><span class="dv" id="todaySign">—</span>
+      <span class="dl">Planet</span><span class="dv" id="todayPlanet">—</span>
+      <span class="dl">Element</span><span class="dv" id="todayEl">—</span>
+      <span class="dl">Day in sign</span><span class="dv" id="todayDis">—</span>
+    </div>
+
+    <div class="ct">Detected Note</div>
+    <div class="drow">
+      <span class="dl">Note · Hz</span><span class="dv" id="detNote">—</span>
+      <span class="dl">Zodiac Sign</span><span class="dv" id="detSign">—</span>
+      <span class="dl">Planet</span><span class="dv" id="detPlanet">—</span>
+      <span class="dl">Element</span><span class="dv" id="detEl">—</span>
+      <span class="dl">Faculty (DE)</span><span class="dv" id="detFacDE">—</span>
+      <span class="dl">Faculty (EN)</span><span class="dv" id="detFacEN">—</span>
+      <span class="dl">Proto-Word</span><span class="dv" id="detProto">—</span>
+      <span class="dl">Fibonacci</span><span class="dv" id="detFib">—</span>
+    </div>
+
+    <div class="ct">Tuning · f = 256 × 2^(n/12)</div>
+    <div class="drow">
+      <span class="dl">Deviation</span><span class="dv" id="centsVal">— ¢</span>
+      <div class="cbar"><div class="cmc"></div><div id="cFill"></div></div>
+      <div class="clbl"><span>−50¢</span><span>in tune</span><span>+50¢</span></div>
+      <span class="dl" style="margin-top:4px">Formula</span>
+      <span class="ds" id="freqFormula">—</span>
+    </div>
+
+  </div>
+
+  <!-- CENTER: transparent — portal shows through -->
+  <div id="center"></div>
+
+  <!-- RIGHT PANEL: Interval + Ophiuchus + Faculty ring -->
+  <div id="rightPanel" class="panel">
+
+    <div class="ct">Solar Sign Ring · 12 Signs</div>
+    <div class="sign-ring" id="signRing"></div>
+
+    <div class="ct">Harmonic Interval · Today vs Detected</div>
+    <div class="drow">
+      <span class="dv" id="intName">—</span>
+      <span class="ds" id="intSig">—</span>
+      <span class="dl" style="margin-top:4px">Ratio · Significance</span>
+      <span class="ds" id="intRatio">—</span>
+    </div>
+
+    <div class="ct">Faculty Resonance</div>
+    <div class="fac-bar" id="facBar"></div>
+
+    <div class="ct" id="ophTitle" style="color:#2a4050">Ophiuchus</div>
+    <div class="drow" id="ophPanel" style="opacity:.25">
+      <span class="dv" style="color:#36D9B8">OM · G# · 334.02 Hz</span>
+      <span class="ds">Phi spiral bloom · 8:13 · The wound as portal</span>
+      <span class="ds">Hidden 13th · Solar calendar has no voice for G#</span>
+      <span class="ds">Playing G# reveals what solar time-grammar hides</span>
+    </div>
+
+    <div class="ct">Convergency Flags</div>
+    <div class="drow" id="convFlags">
+      <span class="ds" id="flagDZP" style="color:#3a5060">— Double Zero Point</span>
+      <span class="ds" id="flagLZP" style="color:#3a5060">— Lunar Zero Point</span>
+      <span class="ds" id="flagSZP" style="color:#3a5060">— Solar Zero Point</span>
+      <span class="ds" id="flagOph" style="color:#3a5060">— Ophiuchus</span>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM: spectrum -->
+  <div id="bottomBar">
+    <div style="font-size:.62em;color:#4a6070;letter-spacing:3px">SPECTRUM · 30–500 Hz · 432 Hz GRID · f=256×2^(n/12)</div>
+    <canvas id="spectrumCanvas"></canvas>
+  </div>
+
+</div>
+
+<script>
+// ── UFT CONSTANTS (inlined from tuning-constants.js) ──────────────────────────
+const ROOT_432    = 256.0000;   // C = 2^8 exactly (432 Hz system)
+const SQRT2       = Math.sqrt(2);
+const PHI         = (1 + Math.sqrt(5)) / 2;
+const NOTE_NAMES  = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+// ── SOLAR CALENDAR — REFERENCE.md §V ─────────────────────────────────────────
+// getSolarNow(): pi = floor((dayElapsed % 365.25) / 30.4375) % 12
+// Anchor: March 20 (vernal equinox)
+// 12 signs · closed zodiac loop · C=root
+const SOLAR = [
+  {pc:0,  note:'C',  zodiac:'Aries',      facDE:'Seelisches Wollen',    facEN:'Soul Will',        el:'Fire',  planet:'Sun',     proto:'RA',  fib:1,   color:'#ef4444'},
+  {pc:1,  note:'C#', zodiac:'Taurus',     facDE:'Körperl. Empfinden',   facEN:'Body Sensation',   el:'Earth', planet:'Venus',   proto:'SA',  fib:2,   color:'#f97316'},
+  {pc:2,  note:'D',  zodiac:'Gemini',     facDE:'Geistiges Denken',     facEN:'Spirit Thinking',  el:'Air',   planet:'Uranus',  proto:'LA',  fib:3,   color:'#facc15'},
+  {pc:3,  note:'D#', zodiac:'Cancer',     facDE:'Seelisches Fühlen',    facEN:'Soul Feeling',     el:'Water', planet:'Moon',    proto:'MA',  fib:5,   color:'#4ade80'},
+  {pc:4,  note:'E',  zodiac:'Leo',        facDE:'Körperl. Wollen',      facEN:'Body Will',        el:'Fire',  planet:'Sun',     proto:'DA',  fib:8,   color:'#facc15'},
+  {pc:5,  note:'F',  zodiac:'Virgo',      facDE:'Geistiges Empfinden',  facEN:'Spirit Sensation', el:'Earth', planet:'Mercury', proto:'HA',  fib:13,  color:'#a3e635'},
+  {pc:6,  note:'F#', zodiac:'Libra',      facDE:'Seelisches Denken',    facEN:'Soul Thinking',    el:'Air',   planet:'Neptune', proto:'NA',  fib:21,  color:'#facc15'},
+  {pc:7,  note:'G',  zodiac:'Scorpio',    facDE:'Körperl. Fühlen',      facEN:'Body Feeling',     el:'Water', planet:'Mars',    proto:'KA',  fib:34,  color:'#f87171'},
+  {pc:8,  note:'G#', zodiac:'Ophiuchus',  facDE:'LIMINAL',              facEN:'Liminal Threshold',el:'Ether', planet:'—',       proto:'OM',  fib:55,  color:'#36D9B8'},
+  {pc:9,  note:'A',  zodiac:'Sagittarius',facDE:'Geistiges Wollen',     facEN:'Spirit Will',      el:'Fire',  planet:'Jupiter', proto:'AH',  fib:89,  color:'#fb923c'},
+  {pc:10, note:'A#', zodiac:'Capricorn',  facDE:'Seelisches Empfinden', facEN:'Soul Sensation',   el:'Earth', planet:'Saturn',  proto:'EE',  fib:144, color:'#818cf8'},
+  {pc:11, note:'B',  zodiac:'Aquarius',   facDE:'Körperl. Denken',      facEN:'Body Thinking',    el:'Air',   planet:'Neptune', proto:'UH',  fib:233, color:'#c084fc'},
+];
+
+// Ophiuchus flag — REFERENCE.md §IX: pc=8 (G#), suppressed from solar zodiac, visible in musical layer
+const OPH_PC = 8;
+
+// ── INTERVALS — REFERENCE.md §VII ────────────────────────────────────────────
+const INTERVALS = [
+  {semi:0,  name:'Unison',      cons:true,  ratio:'1:1',   sig:'Resonance — both grammars on same note'},
+  {semi:1,  name:'Minor 2nd',   cons:false, ratio:'16:15', sig:'Adjacent scale steps — maximum tension'},
+  {semi:2,  name:'Major 2nd',   cons:false, ratio:'9:8',   sig:'Two semitones apart'},
+  {semi:3,  name:'Minor 3rd',   cons:true,  ratio:'6:5',   sig:'Centripetal Kapha interval 6:5'},
+  {semi:4,  name:'Major 3rd',   cons:true,  ratio:'5:4',   sig:'Four semitones apart'},
+  {semi:5,  name:'Perfect 4th', cons:true,  ratio:'4:3',   sig:'Five semitones apart'},
+  {semi:6,  name:'Tritone',     cons:false, ratio:'√2:1',  sig:'Zero Point — maximum tension F# axis diabolus'},
+  {semi:7,  name:'Perfect 5th', cons:true,  ratio:'3:2',   sig:'Most stable Circle of 5ths 3:2'},
+  {semi:8,  name:'Minor 6th',   cons:true,  ratio:'8:13',  sig:'8:13 — phi interval · Ophiuchus closest to golden ratio'},
+  {semi:9,  name:'Major 6th',   cons:true,  ratio:'5:3',   sig:'Nine semitones'},
+  {semi:10, name:'Minor 7th',   cons:false, ratio:'16:9',  sig:'Ten semitones'},
+  {semi:11, name:'Major 7th',   cons:false, ratio:'15:8',  sig:'Leading tone — strong tension'},
+];
+
+// ── ELEMENT COLORS (canonical from SOLAR table) ───────────────────────────────
+const EL_COLOR = {Fire:'#ef4444', Earth:'#a3e635', Air:'#facc15', Water:'#60a5fa', Ether:'#36D9B8'};
+
+// ── FACULTY RESONANCE TYPES — 3 levels × 3 modes = 9 faculties from §V ───────
+const FACULTIES = [
+  {key:'Soul Will',         el:'Fire',  planet:'Sun',     color:'#ef4444'},
+  {key:'Body Sensation',    el:'Earth', planet:'Venus',   color:'#f97316'},
+  {key:'Spirit Thinking',   el:'Air',   planet:'Uranus',  color:'#facc15'},
+  {key:'Soul Feeling',      el:'Water', planet:'Moon',    color:'#4ade80'},
+  {key:'Body Will',         el:'Fire',  planet:'Sun',     color:'#facc15'},
+  {key:'Spirit Sensation',  el:'Earth', planet:'Mercury', color:'#a3e635'},
+  {key:'Soul Thinking',     el:'Air',   planet:'Neptune', color:'#60a5fa'},
+  {key:'Body Feeling',      el:'Water', planet:'Mars',    color:'#f87171'},
+  {key:'Spirit Will',       el:'Fire',  planet:'Jupiter', color:'#fb923c'},
+  {key:'Soul Sensation',    el:'Earth', planet:'Saturn',  color:'#818cf8'},
+  {key:'Body Thinking',     el:'Air',   planet:'Neptune', color:'#c084fc'},
+];
+
+// ── CALENDAR ENGINE — REFERENCE.md §VI ───────────────────────────────────────
+// getSolarNow(): anchor March 20 (vernal equinox)
+function getSolarNow() {
+  const anchor = new Date('2026-03-20');
+  const now    = new Date();
+  const dayElapsed = Math.floor((now - anchor) / 86400000);
+  const pi  = Math.floor((((dayElapsed % 365) + 365) % 365) / 30.4375) % 12;
+  const dis = Math.floor((((dayElapsed % 365) + 365) % 365) % 30.4375) + 1;
+  return { pi, dis, sign: SOLAR[pi] };
+}
+
+// ── STATIC: Build sign ring & faculty bar ─────────────────────────────────────
+const todaySOLAR = getSolarNow();
+
+document.getElementById('signRing').innerHTML = SOLAR.map((s,i) =>
+  `<div class="sdot ${i===todaySOLAR.pi?'active':''}" id="sd-${i}"
+    style="color:${s.color};background:${i===todaySOLAR.pi?s.color:'transparent'}"
+    title="${s.zodiac}"></div>`).join('');
+
+document.getElementById('facBar').innerHTML = FACULTIES.map((f,i) =>
+  `<div class="fac-tag" id="fac-${i}" style="color:${f.color};border-color:${f.color}33">${f.key}</div>`).join('');
+
+// Today solar info
+document.getElementById('todaySign').textContent   = `${todaySOLAR.sign.zodiac} (${todaySOLAR.sign.note})`;
+document.getElementById('todaySign').style.color   = todaySOLAR.sign.color;
+document.getElementById('todayPlanet').textContent = todaySOLAR.sign.planet;
+document.getElementById('todayEl').textContent     = todaySOLAR.sign.el;
+document.getElementById('todayDis').textContent    = `Day ${todaySOLAR.dis} of 30`;
+
+// ── ZODIAC SVG RING ───────────────────────────────────────────────────────────
+(function buildZodiacSVG() {
+  const svg = document.getElementById('zodiacRing');
+  let inner = '';
+  const R = 190, r = 160;
+  SOLAR.forEach((s, i) => {
+    const a1 = (i / 12) * Math.PI * 2 - Math.PI / 2;
+    const a2 = ((i + 1) / 12) * Math.PI * 2 - Math.PI / 2;
+    const x1 = Math.cos(a1), y1 = Math.sin(a1);
+    const x2 = Math.cos(a2), y2 = Math.sin(a2);
+    inner += `<path d="M${R*x1},${R*y1} A${R},${R} 0 0,1 ${R*x2},${R*y2} L${r*x2},${r*y2} A${r},${r} 0 0,0 ${r*x1},${r*y1} Z"
+      fill="${s.color}15" stroke="${s.color}40" stroke-width="0.5" id="seg-${i}"/>`;
+    const am = (a1 + a2) / 2, rm = (R + r) / 2 + 8;
+    inner += `<text x="${rm*Math.cos(am)}" y="${rm*Math.sin(am)}" text-anchor="middle" dominant-baseline="middle"
+      fill="${s.color}60" font-size="9" font-family="Courier New">${s.zodiac.slice(0,3).toUpperCase()}</text>`;
+  });
+  svg.innerHTML = inner;
+})();
+
+// ── PORTAL CANVAS ─────────────────────────────────────────────────────────────
+const portalCanvas = document.getElementById('portalCanvas');
+const pCtx = portalCanvas.getContext('2d');
+let portalW, portalH, CX, CY;
+function resizePortal() {
+  portalW = portalCanvas.width  = window.innerWidth;
+  portalH = portalCanvas.height = window.innerHeight;
+  CX = portalW / 2; CY = portalH / 2;
+}
+resizePortal(); window.addEventListener('resize', resizePortal);
+
+function ha(hex, a) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a.toFixed(3)})`;
+}
+
+// Portal state
+let portalAngle = 0, portalAlpha = 0, portalPc = 0, portalCents = 0, portalAmp = 0;
+let torusT = 0;
+
+function drawPortal() {
+  const s = SOLAR[portalPc];
+  const col = s.color;
+  const det = Math.abs(portalCents) / 50;
+
+  pCtx.fillStyle = 'rgba(2,3,10,0.18)';
+  pCtx.fillRect(0, 0, portalW, portalH);
+
+  if (portalAlpha < 0.02) return;
+
+  const R = Math.min(portalW, portalH) * 0.32 * (0.5 + portalAmp * 0.5);
+  const al = portalAlpha;
+  portalAngle += 0.004 + det * 0.01;
+  torusT      += 0.012 + det * 0.005;
+
+  // Radial glow
+  const glow = pCtx.createRadialGradient(CX, CY, 0, CX, CY, R * 1.8);
+  glow.addColorStop(0, ha(col, 0.12 * al));
+  glow.addColorStop(0.5, ha(col, 0.05 * al));
+  glow.addColorStop(1, 'transparent');
+  pCtx.fillStyle = glow;
+  pCtx.beginPath(); pCtx.arc(CX, CY, R * 1.8, 0, Math.PI * 2); pCtx.fill();
+
+  // ── ELEMENT PORTAL FORM ───────────────────────────────────────────────────
+  // Form is driven by Element (§V canonical), not invented:
+  // Fire  → solar radial burst (4-point RA + sun halo)
+  // Earth → torus cross-section rings (HA hexagon seed)
+  // Air   → lemniscate / figure-8 rotating (SA form)
+  // Water → concentric waves (AH expanding circles)
+  // Ether → phi spiral bloom (OM Ophiuchus)
+
+  const el = s.el;
+
+  if (el === 'Fire') {
+    // RA form: 4-point radial + sun halo rings
+    for (let ring = 0; ring < 3; ring++) {
+      const rr = R * (0.4 + ring * 0.3);
+      pCtx.beginPath(); pCtx.arc(CX, CY, rr, 0, Math.PI * 2);
+      pCtx.strokeStyle = ha(col, (0.5 - ring * 0.15) * al);
+      pCtx.lineWidth = 1; pCtx.stroke();
+    }
+    for (let i = 0; i < 4; i++) {
+      const a = portalAngle + i * Math.PI / 2;
+      pCtx.beginPath(); pCtx.moveTo(CX, CY);
+      pCtx.lineTo(CX + R * 1.3 * Math.cos(a), CY + R * 1.3 * Math.sin(a));
+      pCtx.strokeStyle = ha(col, 0.6 * al); pCtx.lineWidth = 1.5; pCtx.stroke();
+      // flame tip
+      pCtx.beginPath(); pCtx.arc(CX + R * 1.3 * Math.cos(a), CY + R * 1.3 * Math.sin(a), R * 0.07, 0, Math.PI * 2);
+      pCtx.fillStyle = ha(col, 0.5 * al); pCtx.fill();
+    }
+    // Detuning distorts rays
+    if (det > 0.05) {
+      for (let i = 0; i < 8; i++) {
+        const a = portalAngle * 1.3 + i * Math.PI / 4;
+        const r2 = R * (0.5 + (Math.sin(torusT + i) * 0.5 + 0.5) * 0.5 * det);
+        pCtx.beginPath(); pCtx.moveTo(CX, CY);
+        pCtx.lineTo(CX + r2 * Math.cos(a), CY + r2 * Math.sin(a));
+        pCtx.strokeStyle = ha(col, 0.2 * al * det); pCtx.lineWidth = 0.8; pCtx.stroke();
+      }
+    }
+  }
+
+  else if (el === 'Earth') {
+    // HA form: 6-petal hexagon / Seed of Life — torus cross-section rings
+    const petals = 6;
+    pCtx.beginPath();
+    for (let t = 0; t <= Math.PI * 2 + 0.01; t += 0.01) {
+      const rv = Math.abs(Math.cos(petals / 2 * t)) * R;
+      pCtx.lineTo(CX + rv * Math.cos(t + portalAngle), CY + rv * Math.sin(t + portalAngle));
+    }
+    pCtx.strokeStyle = ha(col, 0.8 * al); pCtx.lineWidth = 1.5; pCtx.stroke();
+    // Inner seed of life — 6 circles at 1 radius
+    for (let i = 0; i < 6; i++) {
+      const a = portalAngle * 0.3 + i / 6 * Math.PI * 2;
+      const cx2 = CX + R * 0.5 * Math.cos(a), cy2 = CY + R * 0.5 * Math.sin(a);
+      pCtx.beginPath(); pCtx.arc(cx2, cy2, R * 0.45, 0, Math.PI * 2);
+      pCtx.strokeStyle = ha(col, 0.15 * al); pCtx.lineWidth = 0.7; pCtx.stroke();
+    }
+  }
+
+  else if (el === 'Air') {
+    // SA form: Figure-8 / Lemniscate rotating
+    for (let layer = 0; layer < 3; layer++) {
+      const scale = 1 - layer * 0.25;
+      const rot = portalAngle * (1 + layer * 0.4);
+      pCtx.save(); pCtx.translate(CX, CY); pCtx.rotate(rot);
+      pCtx.beginPath();
+      for (let t = 0; t <= Math.PI * 2 + 0.01; t += 0.02) {
+        const x = R * scale * Math.sin(t) * Math.cos(t);
+        const y = R * scale * 0.6 * Math.sin(t);
+        t === 0 ? pCtx.moveTo(x, y) : pCtx.lineTo(x, y);
+      }
+      pCtx.strokeStyle = ha(col, (0.7 - layer * 0.2) * al); pCtx.lineWidth = 1.2 - layer * 0.3; pCtx.stroke();
+      pCtx.restore();
+    }
+  }
+
+  else if (el === 'Water') {
+    // AH form: Expanding concentric circles — torus root frequency
+    for (let i = 0; i < 6; i++) {
+      const phase = (torusT * 0.4 + i / 6) % 1;
+      const r2 = phase * R * 1.4;
+      const a2 = (1 - phase) * al * 0.9;
+      pCtx.beginPath(); pCtx.arc(CX, CY, r2, 0, Math.PI * 2);
+      pCtx.strokeStyle = ha(col, a2); pCtx.lineWidth = 1.5 * (1 - phase * 0.7); pCtx.stroke();
+    }
+    // Detuning ripples
+    if (det > 0.05) {
+      pCtx.beginPath();
+      for (let t = 0; t <= Math.PI * 2 + 0.01; t += 0.02) {
+        const r2 = R * 0.9 + R * 0.15 * Math.sin(t * 8 + torusT * 3) * det;
+        pCtx.lineTo(CX + r2 * Math.cos(t), CY + r2 * Math.sin(t));
+      }
+      pCtx.strokeStyle = ha(col, 0.3 * al * det); pCtx.lineWidth = 0.8; pCtx.stroke();
+    }
+  }
+
+  else if (el === 'Ether') {
+    // OM form: Phi spiral bloom (Ophiuchus §IX)
+    const b = Math.log(PHI) / Math.PI;
+    pCtx.beginPath();
+    for (let t = 0; t <= Math.PI * 8; t += 0.02) {
+      const r2 = R * 0.03 * Math.exp(b * t);
+      if (r2 > R * 1.4) break;
+      const x = CX + r2 * Math.cos(t + portalAngle);
+      const y = CY + r2 * Math.sin(t + portalAngle);
+      t === 0 ? pCtx.moveTo(x, y) : pCtx.lineTo(x, y);
+    }
+    pCtx.strokeStyle = ha(col, 0.85 * al); pCtx.lineWidth = 1.5; pCtx.stroke();
+    // Mirror spiral
+    pCtx.beginPath();
+    for (let t = 0; t <= Math.PI * 8; t += 0.02) {
+      const r2 = R * 0.03 * Math.exp(b * t);
+      if (r2 > R * 1.4) break;
+      const x = CX + r2 * Math.cos(t + portalAngle + Math.PI);
+      const y = CY + r2 * Math.sin(t + portalAngle + Math.PI);
+      t === 0 ? pCtx.moveTo(x, y) : pCtx.lineTo(x, y);
+    }
+    pCtx.strokeStyle = ha(col, 0.3 * al); pCtx.lineWidth = 0.8; pCtx.stroke();
+    // 13-star ring — Ophiuchus hidden 13 (§IX)
+    for (let i = 0; i < 13; i++) {
+      const a = portalAngle * 0.5 + (i / 13) * Math.PI * 2;
+      pCtx.beginPath(); pCtx.arc(CX + R * Math.cos(a), CY + R * Math.sin(a), R * 0.04, 0, Math.PI * 2);
+      pCtx.fillStyle = ha(col, 0.6 * al); pCtx.fill();
+    }
+  }
+
+  // Zodiac ring pulse on today's segment
+  const segEl = document.getElementById('seg-' + todaySOLAR.pi);
+  if (segEl) segEl.setAttribute('opacity', (0.3 + portalAmp * 0.7).toFixed(2));
+
+  // Tuning arc (detuning shown as arc deviation)
+  if (portalAmp > 0.04) {
+    pCtx.beginPath();
+    pCtx.arc(CX, CY, R * 1.15, -Math.PI / 2, -Math.PI / 2 + (portalCents / 50) * Math.PI, portalCents < 0);
+    const cc = Math.abs(portalCents) < 5 ? '#4ade80' : Math.abs(portalCents) < 20 ? '#facc15' : '#f87171';
+    pCtx.strokeStyle = ha(cc, 0.75 * al); pCtx.lineWidth = 2; pCtx.stroke();
+  }
+
+  // Centre dot
+  pCtx.beginPath(); pCtx.arc(CX, CY, 3, 0, Math.PI * 2);
+  pCtx.fillStyle = ha(col, 0.7 * al); pCtx.fill();
+}
+
+// ── SPECTRUM ──────────────────────────────────────────────────────────────────
+const specCanvas = document.getElementById('spectrumCanvas');
+const specCtx = specCanvas.getContext('2d');
+const FREQ_MIN = 30, FREQ_MAX = 500, FFT_SIZE = 4096, SAMPLE_RATE = 48000;
+const BIN_HZ = SAMPLE_RATE / FFT_SIZE;
+function freqToX(f, w) { return w * Math.log2(f / FREQ_MIN) / Math.log2(FREQ_MAX / FREQ_MIN); }
+function resizeSpec() { const r = specCanvas.parentElement.getBoundingClientRect(); specCanvas.width = Math.floor(r.width); specCanvas.height = 60; }
+resizeSpec(); window.addEventListener('resize', resizeSpec);
+
+const SPEC_MARKERS = (() => {
+  const m = [];
+  for (let n = -36; n <= 6; n++) {
+    const f = ROOT_432 * Math.pow(2, n / 12);
+    if (f >= FREQ_MIN && f <= FREQ_MAX) m.push({ f, name: NOTE_NAMES[((n % 12) + 12) % 12] });
+  }
+  return m;
+})();
+
+function drawSpectrum(dataArray, analyser, detFreq) {
+  const W = specCanvas.width, H = specCanvas.height;
+  specCtx.clearRect(0,0,W,H); specCtx.fillStyle='#02030a'; specCtx.fillRect(0,0,W,H);
+  for (const m of SPEC_MARKERS) {
+    const x = freqToX(m.f, W);
+    specCtx.strokeStyle = m.name === 'C' ? '#141430' : m.name === 'F#' ? '#141010' : '#08100a';
+    specCtx.lineWidth = (m.name === 'C' || m.name === 'F#') ? 1 : 0.5;
+    specCtx.beginPath(); specCtx.moveTo(x, 0); specCtx.lineTo(x, H - 10); specCtx.stroke();
+    if (m.name === 'C' || m.name === 'F#') {
+      specCtx.fillStyle = m.name === 'C' ? '#14143a' : '#141014';
+      specCtx.font = '7px Courier New'; specCtx.fillText(m.name, x + 2, H - 1);
+    }
+  }
+  const grad = specCtx.createLinearGradient(0, 0, 0, H - 12);
+  grad.addColorStop(0, SOLAR[portalPc].color); grad.addColorStop(1, '#060a12');
+  specCtx.fillStyle = grad;
+  for (let i = 1; i < dataArray.length; i++) {
+    const f = i * BIN_HZ;
+    if (f < FREQ_MIN || f > FREQ_MAX) continue;
+    const x1 = freqToX(f, W), x0 = freqToX((i - 1) * BIN_HZ || FREQ_MIN, W);
+    const nH = Math.max(0, (dataArray[i] - analyser.minDecibels) / (analyser.maxDecibels - analyser.minDecibels));
+    specCtx.fillRect(x0, H - 12 - nH * (H - 12), Math.max(x1 - x0, 1), nH * (H - 12));
+  }
+  if (detFreq > FREQ_MIN && detFreq < FREQ_MAX) {
+    const x = freqToX(detFreq, W);
+    specCtx.strokeStyle = '#facc15'; specCtx.lineWidth = 1.5;
+    specCtx.setLineDash([3, 3]); specCtx.beginPath(); specCtx.moveTo(x, 0); specCtx.lineTo(x, H - 10); specCtx.stroke();
+    specCtx.setLineDash([]);
+  }
+}
+
+// ── PITCH HELPERS ─────────────────────────────────────────────────────────────
+function freqToNearest432(freq) {
+  if (freq <= 0) return null;
+  const n_raw = 12 * Math.log2(freq / ROOT_432), n = Math.round(n_raw), pc = ((n % 12) + 12) % 12;
+  const tf = ROOT_432 * Math.pow(2, n / 12);
+  return { n, pc, noteName: NOTE_NAMES[pc], octave: Math.floor(n / 12) + 4, targetFreq: tf, cents: 1200 * Math.log2(freq / tf), ratio: Math.pow(2, n / 12) };
+}
+function parabolicPeak(data, k) {
+  if (k <= 0 || k >= data.length - 1) return k;
+  const y1 = data[k-1], y2 = data[k], y3 = data[k+1], d = 2*y2-y1-y3;
+  return d === 0 ? k : k + (y3 - y1) / (2 * d);
+}
+
+// ── HUD RENDER ────────────────────────────────────────────────────────────────
+function renderHUD(pc, detFreq, n, cents) {
+  const s = SOLAR[pc];
+  const c = s.color;
+
+  // Detected info
+  document.getElementById('topFreq').textContent   = detFreq.toFixed(2) + ' Hz';
+  document.getElementById('topFreq').style.color   = c;
+  document.getElementById('topNote').textContent   = `${s.note} · ${s.zodiac} · ${s.planet}`;
+  document.getElementById('topNote').style.color   = c;
+  document.getElementById('detNote').textContent   = `${s.note}  ·  ${detFreq.toFixed(2)} Hz`;
+  document.getElementById('detNote').style.color   = c;
+  document.getElementById('detSign').textContent   = s.zodiac;   document.getElementById('detSign').style.color   = c;
+  document.getElementById('detPlanet').textContent = s.planet;   document.getElementById('detPlanet').style.color = c;
+  document.getElementById('detEl').textContent     = s.el;       document.getElementById('detEl').style.color     = EL_COLOR[s.el]||c;
+  document.getElementById('detFacDE').textContent  = s.facDE;    document.getElementById('detFacDE').style.color  = c;
+  document.getElementById('detFacEN').textContent  = s.facEN;    document.getElementById('detFacEN').style.color  = c;
+  document.getElementById('detProto').textContent  = s.proto;    document.getElementById('detProto').style.color  = c;
+  document.getElementById('detFib').textContent    = `F = ${s.fib}`;
+
+  // Tuning
+  const absC = Math.abs(cents);
+  const cc2 = absC < 5 ? '#4ade80' : absC < 20 ? '#facc15' : '#f87171';
+  document.getElementById('centsVal').textContent  = `${cents >= 0 ? '+' : ''}${cents.toFixed(1)} ¢`;
+  document.getElementById('centsVal').style.color  = cc2;
+  document.getElementById('freqFormula').style.color = '#7aaccc';
+  document.getElementById('freqFormula').textContent = `f = 256 × 2^(${n>=0?'+':''}${n}/12) = ${(ROOT_432 * Math.pow(2, n/12)).toFixed(4)} Hz  ·  ratio = ${Math.pow(2,n/12).toFixed(6)}`;
+  const pct = Math.max(0, Math.min(100, 50 + cents));
+  const fill = document.getElementById('cFill');
+  fill.style.left = (pct < 50 ? pct : 50) + '%';
+  fill.style.width = Math.abs(pct - 50) + '%';
+  fill.style.background = cc2;
+
+  // Sign ring: highlight detected + today
+  SOLAR.forEach((_, i) => {
+    const el = document.getElementById('sd-' + i);
+    if (!el) return;
+    el.classList.toggle('active', i === pc || i === todaySOLAR.pi);
+    el.style.background = (i === pc) ? SOLAR[i].color : (i === todaySOLAR.pi ? SOLAR[i].color + '60' : 'transparent');
+  });
+
+  // Zodiac SVG segment highlight
+  SOLAR.forEach((_, i) => {
+    const seg = document.getElementById('seg-' + i);
+    if (!seg) return;
+    seg.setAttribute('fill', i === pc ? SOLAR[i].color + '30' : SOLAR[i].color + '15');
+    seg.setAttribute('stroke', i === pc ? SOLAR[i].color + '90' : SOLAR[i].color + '40');
+  });
+
+  // Interval: today's solar pc vs detected pc
+  const semi = ((pc - todaySOLAR.pi) + 12) % 12;
+  const iv = INTERVALS[semi];
+  document.getElementById('intName').innerHTML = `<span class="ibadge ${iv.cons?'cons':'diss'}">${iv.name}</span>  <span style="font-size:.7em;color:#304050">${semi} semitones</span>`;
+  document.getElementById('intSig').textContent  = iv.sig;
+  document.getElementById('intRatio').textContent = `${iv.ratio}  ·  12-TET = ${Math.pow(2,semi/12).toFixed(6)}`;
+
+  // Faculty highlight
+  FACULTIES.forEach((f, i) => {
+    const el = document.getElementById('fac-' + i);
+    if (!el) return;
+    el.classList.toggle('active', f.key === s.facEN);
+  });
+
+  // Ophiuchus — §IX: G# suppressed from solar zodiac, revealed by playing it
+  const isOph = pc === OPH_PC;
+  document.getElementById('ophPanel').style.opacity  = isOph ? '1' : '0.28';
+  document.getElementById('ophTitle').style.color    = isOph ? '#36D9B8' : '#2a4050';
+
+  // Convergency flags — §VII
+  const todayPc = todaySOLAR.pi;
+  const isLZP = pc === 6;
+  const isSZP = todayPc === 6;
+  const isDZP = isLZP && isSZP;
+  document.getElementById('flagDZP').style.color = isDZP ? '#ffffff' : '#3a5060';
+  document.getElementById('flagLZP').style.color = isLZP ? '#a78bfa' : '#3a5060';
+  document.getElementById('flagSZP').style.color = isSZP ? '#facc15' : '#3a5060';
+  document.getElementById('flagOph').style.color = isOph ? '#36D9B8' : '#3a5060';
+  document.getElementById('flagDZP').textContent = isDZP ? '✦ DOUBLE ZERO POINT F# × F#' : '— Double Zero Point';
+  document.getElementById('flagLZP').textContent = isLZP ? '✦ ZERO POINT ACTIVE — F#=256×√2' : '— Zero Point F#';
+  document.getElementById('flagSZP').textContent = isSZP ? `✦ SOLAR ZERO POINT — Today Libra F#` : '— Solar Zero Point';
+  document.getElementById('flagOph').textContent = isOph ? '✦ OPHIUCHUS — Hidden 13th revealed' : '— Ophiuchus';
+}
+
+// ── AUDIO ─────────────────────────────────────────────────────────────────────
+let audioCtx, analyser, dataArray, animId;
+const THRESH_DB = -55;
+let lastPc = 0;
+
+window.startAudio = async function () {
+  const btn = document.getElementById('startBtn');
+  if (audioCtx) { audioCtx.close(); audioCtx = null; cancelAnimationFrame(animId); btn.textContent = '▶ START'; btn.classList.remove('active'); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    audioCtx = new AudioContext({ sampleRate: SAMPLE_RATE });
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = FFT_SIZE; analyser.smoothingTimeConstant = 0.78;
+    analyser.minDecibels = -90; analyser.maxDecibels = -10;
+    audioCtx.createMediaStreamSource(stream).connect(analyser);
+    dataArray = new Float32Array(analyser.frequencyBinCount);
+    btn.textContent = '■ STOP'; btn.classList.add('active');
+    loop();
+  } catch (e) { btn.textContent = 'MIC ERROR — ' + e.message; }
+};
+
+// ── MAIN LOOP ─────────────────────────────────────────────────────────────────
+function loop() {
+  animId = requestAnimationFrame(loop);
+  if (!dataArray) { drawPortal(); return; }
+
+  analyser.getFloatFrequencyData(dataArray);
+  const binMin = Math.ceil(FREQ_MIN / BIN_HZ), binMax = Math.floor(FREQ_MAX / BIN_HZ);
+  let peakBin = binMin, peakVal = -Infinity;
+  for (let i = binMin; i <= binMax; i++) if (dataArray[i] > peakVal) { peakVal = dataArray[i]; peakBin = i; }
+
+  let detFreq = 0;
+  if (peakVal > THRESH_DB) {
+    detFreq = parabolicPeak(dataArray, peakBin) * BIN_HZ;
+    const r = freqToNearest432(detFreq);
+    const ampNorm = Math.max(0, Math.min(1, (peakVal - analyser.minDecibels) / (analyser.maxDecibels - analyser.minDecibels)));
+    portalPc    = r.pc;
+    portalCents = r.cents;
+    portalAmp   = ampNorm;
+    portalAlpha += (1 - portalAlpha) * 0.07;
+    if (r.pc !== lastPc) { renderHUD(r.pc, detFreq, r.n, r.cents); lastPc = r.pc; }
+    else { renderHUD(r.pc, detFreq, r.n, r.cents); }
+  } else {
+    portalAlpha += (-portalAlpha) * 0.04;
+    document.getElementById('topFreq').textContent  = '— Hz';
+    document.getElementById('topFreq').style.color  = '#1a2030';
+    document.getElementById('topNote').textContent  = 'No signal';
+    document.getElementById('topNote').style.color  = '#1a2030';
+  }
+
+  drawPortal();
+  drawSpectrum(dataArray, analyser, detFreq);
+}
+
+// Start animation loop even before mic is active
+loop();
+</script>
+</body>
+</html>
