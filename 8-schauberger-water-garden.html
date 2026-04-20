@@ -279,6 +279,45 @@ header .sub { color: #2e5c40; font-size: 0.85em; }
 .coherency-ok   { color: #33ff88; }
 .coherency-info { color: #7788aa; }
 
+/* ── WATER OUTCOME BLOCKS ── */
+.outcome-hz {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #52c77e;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+  padding: 8px;
+  border: 1px solid #1a3d2a;
+  border-radius: 4px;
+  background: #030a06;
+}
+.outcome-block {
+  background: #030a06;
+  border: 1px solid #1a3d2a;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.outcome-limit { border-color: #3d1a1a; }
+.outcome-rec   { border-color: #1a5c30; background: #051208; }
+.outcome-label {
+  font-size: 0.68em;
+  letter-spacing: 2px;
+  color: #2e7a4a;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+.outcome-limit .outcome-label { color: #7a3a2e; }
+.outcome-rec   .outcome-label { color: #52c77e; }
+.outcome-text {
+  font-size: 0.8em;
+  color: #7ab88a;
+  line-height: 1.65;
+}
+.outcome-limit .outcome-text { color: #aa7066; }
+.outcome-rec   .outcome-text { color: #a0d8b0; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 760px) {
   .grid { grid-template-columns: 1fr; }
@@ -360,6 +399,28 @@ header .sub { color: #2e5c40; font-size: 0.85em; }
       </div>
     </div>
 
+    <!-- WATER TREATMENT OUTCOMES -->
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-title">Water Treatment at Today's Frequency — What Could Happen?</div>
+      <div class="outcome-hz" id="outcomeHz">—</div>
+      <div class="outcome-block">
+        <div class="outcome-label">PHYSICAL BASIS</div>
+        <div class="outcome-text" id="outcomePhysicsText">—</div>
+      </div>
+      <div class="outcome-block">
+        <div class="outcome-label">SCHAUBERGER OBSERVATION</div>
+        <div class="outcome-text" id="outcomeSchaubergerText">—</div>
+      </div>
+      <div class="outcome-block outcome-limit">
+        <div class="outcome-label">HONEST LIMIT — CANNOT BE CLAIMED</div>
+        <div class="outcome-text" id="outcomeLimitText">—</div>
+      </div>
+      <div class="outcome-block outcome-rec">
+        <div class="outcome-label">RECOMMENDATION FOR TODAY</div>
+        <div class="outcome-text" id="outcomeRecText">—</div>
+      </div>
+    </div>
+
     <div class="panel">
       <div class="panel-title">Session Log</div>
 
@@ -436,6 +497,13 @@ const PROTOCOLS = {
   'Rising': {
     action: 'IRRIGATE',
     intensity: 'Deep root irrigation',
+    waterOutcome: {
+      hz: 'RISING PHASE · 210–236 Hz · Birch → Ash',
+      physics: 'Piezo treatment at Rising frequencies (210–236 Hz) produces low-amplitude acoustic cavitation. Micro-bubble formation is gentle — consistent with the band where water cluster size is most responsive to acoustic pressure. Surface tension measurably decreases (~1–3 mN/m), increasing capillary penetration into soil and root hair surfaces. This is reproducible with a refractometer and surface tension meter.',
+      schauberger: 'Rising phase was Schauberger\'s primary irrigation window. He observed that sap pressure follows the ascending moon and that water applied during this phase is pulled upward by the plant\'s own vascular momentum rather than pushed by irrigation pressure. He described this water as being in its most "willing" state — flowing toward life rather than away from it.',
+      limit: 'No specific growth percentage or yield increase can be claimed from this treatment alone. The acoustic effect on water clustering is real but short-lived (minutes to hours after the transducer stops). Whether the plant detects the difference at root-uptake level has not been measured under controlled conditions.',
+      recommendation: 'Treat water at current lunar frequency for 20–30 min immediately before irrigating — minimise time between treatment and application. Apply directly to root zone. Log the session: date, moon position, frequency, volume, plant species, observations at 7 and 14 days. That data is the experiment.',
+    },
     steps: [
       { text: 'Pre-treat water: place piezo transducer in reservoir, play current lunar frequency for 20 min before irrigating.', freq: true },
       { text: 'Irrigate in the evening or before sunrise (Schauberger: water is most alive at night, below 4°C differential from soil).', freq: false },
@@ -448,6 +516,13 @@ const PROTOCOLS = {
   'Peak': {
     action: 'IRRIGATE',
     intensity: 'Full irrigation + optional foliar',
+    waterOutcome: {
+      hz: 'PEAK PHASE · 250–280 Hz · Alder → Hawthorn',
+      physics: 'Peak frequencies (250–280 Hz) fall where acoustic standing waves in a reservoir create organised pressure nodes. Water exposed here shows increased dissolved oxygen retention under some lab conditions. The Fibonacci positions at Peak (5, 8, 13) correspond to natural plant growth ratios — whether this correlation produces measurable uptake difference is an open experimental question.',
+      schauberger: 'Schauberger\'s peak-phase water was collected from mountain springs at pre-dawn — the coldest, highest-pressure moment of the spring cycle. He described it as having maximum "formative force." Treating reservoir water at Peak lunar frequency is the closest analogue available without a mountain spring: applying the frequency of maximum vascular pressure to water before delivery.',
+      limit: 'No claim about foliar absorption rates, cell division acceleration, or essential oil content can be made from frequency treatment alone. These would require double-blind trials with untreated control plants of identical genetics, soil, and environment.',
+      recommendation: 'Treat water at current frequency 20 min before dawn irrigation. For foliar: fine mist sprayer, applied at first light when stomata open. Log water temperature at treatment and at application — Schauberger\'s temperature differential (water cooler than soil) is as important as the frequency.',
+    },
     steps: [
       { text: 'Pre-treat water at current lunar frequency — minimum 20 min in vortex reservoir.', freq: true },
       { text: 'Apply full irrigation volume: roots AND optional light foliar mist at dawn (leaves absorb during stomata opening).', freq: false },
@@ -460,6 +535,13 @@ const PROTOCOLS = {
   'Zero Point': {
     action: 'REST',
     intensity: 'No irrigation — reversal threshold',
+    waterOutcome: {
+      hz: 'ZERO POINT · 297.58 Hz · Oak / NA — LUNAR_ROOT × √2',
+      physics: '297.58 Hz = LUNAR_ROOT × √2 — the tritone axis. Piezo treatment at this frequency creates maximum tension in the water column. Micro-bubble formation is at its most energetically unstable: bubbles form and immediately collapse (inertial cavitation threshold). Water is structurally in reversal — neither ascending nor descending cluster configuration. Surface tension is at a local maximum. This is the most specific and unusual frequency in the 13-position cycle.',
+      schauberger: 'Zero Point was the moment Schauberger paused all river interventions. He observed that at flow-reversal moments, water resisted all external direction. Forcing it at this threshold produced turbulence and destruction of water quality. Farmers who irrigated during the zero-point transition reported poor uptake and surface runoff regardless of soil moisture.',
+      limit: 'The hypothesis that storing Zero Point-treated water and releasing it at Rising produces superior results has not been tested. The sequence is logically coherent with Schauberger\'s principles — it is not validated data. Do not make claims to others about this treatment until you have your own observed records.',
+      recommendation: 'Do NOT irrigate today. Fill a sealed dark vessel with water, treat at 297.58 Hz for 30 min, seal it, store cool and dark. Label it with today\'s date and moon position. Irrigate with this water when Moon returns to position 0 (Rising / Birch / AH / 210.42 Hz) in approximately 15 days. Log both events and compare plant response to untreated-water days.',
+    },
     steps: [
       { text: 'DO NOT irrigate at Zero Point (F# / Oak / 297.58 Hz). Schauberger documented this as the water reversal threshold.', freq: false },
       { text: 'This is the heart position (NA proto-word) — the sap transition. Introducing water disrupts the reversal.', freq: false },
@@ -472,6 +554,13 @@ const PROTOCOLS = {
   'Descending': {
     action: 'MINIMAL',
     intensity: 'Reduce irrigation — harvest phase',
+    waterOutcome: {
+      hz: 'DESCENDING PHASE · 315–353 Hz · Holly → Vine',
+      physics: 'Descending frequencies (315–353 Hz) are in the upper third of the lunar octave. Acoustic treatment here produces smaller, more stable micro-bubbles — consistent with a consolidating pressure state. Water treated here may carry dissolved nutrients in slightly higher concentration per unit volume. No peer-reviewed study has confirmed this specifically at lunar-derived frequencies.',
+      schauberger: 'Descending moon was Schauberger\'s harvest window, not his primary irrigation window. He observed that water absorbed during descending phase moved preferentially downward — toward roots and storage organs. Above-ground plants show reduced stomatal opening during this phase, so foliar absorption is poor. Root irrigation remains effective but at lower volumes.',
+      limit: 'The claim that descending-phase irrigation concentrates sugars or essential oils in harvested produce is a traditional biodynamic observation, not a controlled UFT measurement. It may be true. It has not been tested with UFT-frequency water specifically.',
+      recommendation: 'Reduce irrigation volume to 30–50% of normal. Treat water at current frequency, apply root zone only — no foliar. If harvesting today: harvest in the morning before irrigation. The combination of descending phase + cool morning + root-only water creates conditions Schauberger considered optimal for post-harvest preservation.',
+    },
     steps: [
       { text: 'Reduce irrigation to 30–50% of normal volume. Sap is descending — plants are consolidating, not growing.', freq: false },
       { text: 'If irrigating, pre-treat water at current frequency and apply to root zone only — no foliar.', freq: true },
@@ -484,6 +573,13 @@ const PROTOCOLS = {
   'Dormant': {
     action: 'REST',
     intensity: 'No routine irrigation — deep rest',
+    waterOutcome: {
+      hz: 'DORMANT PHASE · 374–397 Hz · Ivy → Elder',
+      physics: 'Dormant frequencies (374–397 Hz) are the highest in the lunar octave before Awakening. Acoustic treatment at these Hz produces high-frequency micro-agitation — the opposite of the gentle structuring at Rising frequencies. Water treated here is energetically active but without biological context to direct it. Applied to dormant soil, it risks disrupting anaerobic microbial processes that digest organic matter during the rest phase.',
+      schauberger: 'Schauberger considered dormant-phase water intervention the most damaging error a farmer could make. He documented cases where forced irrigation during lunar dormancy produced surface crust formation, loss of soil tilth, and reduced germination in the following season. The soil microbiome — which he called the "living skin of the Earth" — is most vulnerable during this phase.',
+      limit: 'Whether UFT-frequency water treatment during Dormant phase is neutral, harmful, or beneficial to specific crops in specific climates is unknown. The Schauberger observation is general and qualitative. Treat it as a working hypothesis, not a rule.',
+      recommendation: 'No irrigation and no water treatment for crop delivery today. However: treat compost tea at Dormant frequencies and apply it as a soil drench — not irrigation, but microbial inoculation. Log observations on soil structure and earthworm activity 7 days after application.',
+    },
     steps: [
       { text: 'NO routine irrigation during Dormant phase (Ivy/Elder). Soil and root systems are in rest and microbial digestion mode.', freq: false },
       { text: 'Exception only: extreme drought (wilting, soil cracking). Apply minimum survival water at root zone.', freq: false },
@@ -496,6 +592,13 @@ const PROTOCOLS = {
   'Awakening': {
     action: 'PREPARE',
     intensity: 'Light pre-irrigation — charge system',
+    waterOutcome: {
+      hz: 'AWAKENING PHASE · 420.84 Hz · Yew / TAO — LUNAR_ROOT × 2',
+      physics: '420.84 Hz = LUNAR_ROOT × 2 — the octave return. Acoustic treatment at this frequency produces the same nodal geometry as 210.42 Hz but one octave higher: half the wavelength, twice the pressure node density in the same water volume. If the Rising-phase structuring effect is real, Awakening treatment would be the most concentrated version of it. Seed soaking at 420.84 Hz followed by germination in 210.42 Hz-treated water is a fully testable sequence.',
+      schauberger: 'Schauberger\'s Awakening analogue was the spring thaw — when mountain snow-melt water, cold and dark, first reached the valley soil after months of dormancy. He considered this water the most energetically charged of the year: it had passed through the full winter stillness and emerged ready for maximum biological uptake. Treating reservoir water at TAO/420.84 Hz is the closest available analogue.',
+      limit: 'The seed-soaking protocol (treat at Awakening frequency, soak seeds 8–12 hours, plant at Rising phase) is a hypothesis derived from coherent application of Schauberger\'s principles to UFT positions. It has not been tested. Germination rate comparison (treated vs untreated seeds, same batch, same conditions) is the minimum experiment needed before any claim can be made.',
+      recommendation: 'Fill two identical vessels from the same water source. Treat one at 420.84 Hz for 30 min — the other is your untreated control. Soak identical seed batches in each for 8 hours. Plant both in identical conditions. Count germination rate and sprouting time at days 5, 7, and 10. This is a real experiment you can run this cycle. Log everything.',
+    },
     steps: [
       { text: 'Light irrigation: 20–30% of normal volume. Awaken the vortex pipe system — flush with frequency-treated water.', freq: true },
       { text: 'Charge reservoir: run 210.42 Hz (LUNAR_ROOT / Birch / AH) for 30 min. This is the seed frequency for the new cycle.', freq: false },
@@ -692,6 +795,14 @@ function update() {
 
   document.getElementById('sapPrinciple').innerHTML    = protocol.sapPrinciple;
   document.getElementById('timingPrinciple').innerHTML = protocol.timingPrinciple;
+
+  // Water outcome panel
+  const wo = protocol.waterOutcome;
+  document.getElementById('outcomeHz').textContent          = wo.hz;
+  document.getElementById('outcomePhysicsText').textContent    = wo.physics;
+  document.getElementById('outcomeSchaubergerText').textContent = wo.schauberger;
+  document.getElementById('outcomeLimitText').textContent    = wo.limit;
+  document.getElementById('outcomeRecText').textContent      = wo.recommendation;
 
   // Coherency banner
   const isCoherent = true; // UFT positions are always internally coherent — this is the neutral translation
