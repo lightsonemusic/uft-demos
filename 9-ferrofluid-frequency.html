@@ -362,12 +362,28 @@ function ensureCtx() {
 }
 
 function stopAll() {
-  activeOscs.forEach(o => { try { o.stop(); } catch(e){} });
+  if (!audioCtx) return; // no context yet
+  
+  // Stop all oscillators
+  activeOscs.forEach(o => { 
+    try { 
+      o.stop(); 
+    } catch(e){ /* already stopped */ }
+  });
   activeOscs.length = 0;
+  
+  // Disconnect any remaining nodes from destination
+  try {
+    audioCtx.close();
+    audioCtx = null;
+  } catch(e){}
+  
+  // Clear active button states
   ['btnHACont','btnTAOCont','btnNACont','btnAnti'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
+  
   setStatus('stopped · all oscillators off');
   drawGeom('HA', 0); // idle
 }
