@@ -747,8 +747,6 @@ let haGroup = null;
 let naGroup = null;
 let taoGroup = null;
 let currentGroup = null;
-let mouseX = 0;
-let mouseY = 0;
 let currentKey = 'HA';
 let currentIntensity = 0;
 
@@ -774,12 +772,6 @@ function initThreeJS() {
   const pointLight = new THREE.PointLight(0xffffff, 1, 100);
   pointLight.position.set(5, 5, 5);
   scene.add(pointLight);
-  
-  // Mouse controls
-  document.addEventListener('mousemove', (e) => {
-    mouseX = (e.clientX / w) * 2 - 1;
-    mouseY = -(e.clientY / h) * 2 + 1;
-  });
   
   // Create geometry groups
   createHAGeometry();
@@ -937,13 +929,6 @@ function animateThreeJS() {
   // TAO: rotating burst
   if (taoGroup && taoGroup.visible) {
     taoGroup.rotation.z -= 0.015;
-  }
-  
-  // Camera follows mouse (subtle)
-  if (camera && currentGroup) {
-    camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
-    camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
-    camera.lookAt(0, 0, 0);
   }
   
   // Render
