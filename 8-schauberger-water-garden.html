@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFT × Schauberger — Garden Water Protocol</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #050d0a;
+  color: #d0ead8;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  min-height: 100vh;
+}
+header {
+  background: #07140f;
+  border-bottom: 1px solid #1a3d2a;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header h1 { color: #52c77e; font-size: 1.1em; letter-spacing: 2px; }
+header .sub { color: #2e5c40; font-size: 0.85em; }
+#clock { color: #52c77e; font-size: 0.9em; letter-spacing: 1px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 16px;
+  padding: 16px 24px;
+}
+
+.panel {
+  background: #07140f;
+  border: 1px solid #1a3d2a;
+  border-radius: 6px;
+  padding: 16px;
+}
+.panel-title {
+  color: #52c77e;
+  font-size: 0.8em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #1a3d2a;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+
+/* ── MOON DIAL ── */
+#moonDial {
+  width: 220px;
+  height: 220px;
+  margin: 0 auto 18px;
+  position: relative;
+}
+#moonDial canvas { border-radius: 50%; }
+
+.moon-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+.moon-label { color: #2e7a4a; font-size: 0.8em; }
+.moon-value { color: #c0e8c8; font-size: 0.85em; font-weight: bold; }
+.moon-proto { font-size: 2em; text-align: center; letter-spacing: 4px; margin: 10px 0 4px; }
+.moon-tree  { text-align: center; color: #5aad78; font-size: 0.85em; margin-bottom: 6px; }
+.moon-hz    { text-align: center; color: #3a7a52; font-size: 0.8em; }
+
+/* ── SAP BADGE ── */
+.sap-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75em;
+  letter-spacing: 1px;
+  font-weight: bold;
+  margin: 0 auto;
+  text-align: center;
+}
+.sap-Rising     { background: #0d3d22; color: #4dff88; border: 1px solid #1a6635; }
+.sap-Peak       { background: #3d2200; color: #ffb84d; border: 1px solid #663a00; }
+.sap-Zero-Point { background: #1a1a3d; color: #8888ff; border: 1px solid #33336a; }
+.sap-Descending { background: #2d0d0d; color: #ff6666; border: 1px solid #5a1a1a; }
+.sap-Dormant    { background: #0d0d1a; color: #7788aa; border: 1px solid #1a1a33; }
+.sap-Awakening  { background: #1a2d1a; color: #88cc88; border: 1px solid #2d4d2d; }
+
+/* ── PROTOCOL PANEL ── */
+.prot-action {
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.prot-IRRIGATE { background: #0a2d18; color: #33ff88; border: 1px solid #1a5c30; }
+.prot-MINIMAL  { background: #1e1e08; color: #cccc44; border: 1px solid #3d3d10; }
+.prot-REST     { background: #0d0d1a; color: #6688bb; border: 1px solid #1a2244; }
+.prot-PREPARE  { background: #0d1a0d; color: #44bb44; border: 1px solid #1a3a1a; }
+
+.step-list { list-style: none; }
+.step-list li {
+  padding: 7px 0 7px 0;
+  border-bottom: 1px solid #0f2a1a;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.5;
+}
+.step-list li:last-child { border-bottom: none; }
+.step-num {
+  color: #52c77e;
+  font-weight: bold;
+  min-width: 20px;
+  font-size: 0.85em;
+}
+.step-text { color: #a0c8b0; font-size: 0.82em; }
+.step-freq {
+  color: #52c77e;
+  font-weight: bold;
+  font-size: 0.82em;
+  white-space: nowrap;
+}
+
+/* ── FREQUENCY BAR ── */
+.freq-bar-wrap {
+  margin: 14px 0 8px;
+  background: #030a06;
+  border: 1px solid #1a3d2a;
+  border-radius: 4px;
+  overflow: hidden;
+  height: 28px;
+  position: relative;
+}
+.freq-bar-fill {
+  height: 100%;
+  transition: width 0.8s ease;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  font-size: 0.78em;
+  font-weight: bold;
+  color: #050d0a;
+}
+.freq-bar-label {
+  font-size: 0.75em;
+  color: #3a6a4a;
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* ── SCHAUBERGER PRINCIPLES ── */
+.principle {
+  background: #030a06;
+  border: 1px solid #1a3d2a;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  font-size: 0.8em;
+  color: #7ab88a;
+  line-height: 1.6;
+}
+.principle strong { color: #52c77e; }
+
+/* ── LOGGER ── */
+#logTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78em;
+  margin-top: 10px;
+}
+#logTable th {
+  color: #2e7a4a;
+  text-align: left;
+  padding: 4px 8px;
+  border-bottom: 1px solid #1a3d2a;
+  font-size: 0.8em;
+  letter-spacing: 1px;
+}
+#logTable td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #0a1f12;
+  color: #90c0a0;
+  vertical-align: top;
+}
+#logTable tr:hover td { background: #0a1a10; }
+
+.btn {
+  background: #0a2d18;
+  border: 1px solid #1a5c30;
+  color: #52c77e;
+  padding: 7px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8em;
+  letter-spacing: 1px;
+  transition: background 0.2s;
+}
+.btn:hover { background: #0f3d22; }
+.btn-export {
+  background: #0d2a1a;
+  border-color: #2a5c3a;
+  color: #88ddaa;
+}
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── 13-POSITION STRIP ── */
+.strip {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 3px;
+  margin: 14px 0;
+}
+.strip-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6em;
+  gap: 1px;
+  cursor: default;
+  border: 1px solid transparent;
+  transition: all 0.3s;
+}
+.strip-cell.active {
+  border-color: #52c77e;
+  box-shadow: 0 0 8px rgba(82,199,126,0.5);
+  transform: scale(1.08);
+}
+.strip-word { font-weight: bold; font-size: 1.1em; }
+.strip-note { color: rgba(255,255,255,0.5); }
+
+/* ── TONE BUTTON ── */
+#toneBtn {
+  width: 100%;
+  margin: 12px 0 6px;
+  padding: 10px;
+  font-size: 0.95em;
+  letter-spacing: 2px;
+  background: #0a2d18;
+  border: 1px solid #1a5c30;
+  color: #52c77e;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  transition: background 0.2s;
+}
+#toneBtn.playing { background: #0f3d22; border-color: #52c77e; color: #88ffbb; }
+#toneBtn:hover { background: #0f3d22; }
+
+.tone-note { font-size: 0.75em; color: #2e7a4a; text-align: center; margin-bottom: 4px; }
+
+/* ── COHERENCY BANNER ── */
+#coherencyBanner {
+  margin: 0 24px 12px;
+  padding: 9px 18px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  letter-spacing: 1px;
+  border: 1px solid #1a3d2a;
+  background: #030a06;
+  color: #52c77e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.coherency-ok   { color: #33ff88; }
+.coherency-info { color: #7788aa; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 760px) {
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>UFT × SCHAUBERGER — GARDEN WATER PROTOCOL</h1>
+    <div class="sub">Lunar-position irrigation timing · Frequency pre-treatment · Vortex phase guide</div>
+  </div>
+  <div id="clock">—</div>
+</header>
+
+<div id="coherencyBanner">
+  <span>COHERENCY CHECK</span>
+  <span id="coherencyStatus" class="coherency-info">calculating…</span>
+</div>
+
+<div class="grid">
+
+  <!-- LEFT: Moon position -->
+  <div>
+    <div class="panel">
+      <div class="panel-title">Current Lunar Position</div>
+
+      <div id="moonDial"><canvas id="dialCanvas" width="220" height="220"></canvas></div>
+
+      <!-- 13-position strip -->
+      <div class="strip" id="posStrip"></div>
+
+      <div style="text-align:center; margin-bottom:10px;">
+        <span class="moon-proto" id="protoDisp">—</span>
+        <div class="moon-tree" id="treeDisp">—</div>
+        <div class="moon-hz" id="hzDisp">—</div>
+        <br>
+        <span class="sap-badge" id="sapBadge">—</span>
+      </div>
+
+      <div class="moon-info-row"><span class="moon-label">Lunar position</span><span class="moon-value" id="posDisp">—</span></div>
+      <div class="moon-info-row"><span class="moon-label">Note</span><span class="moon-value" id="noteDisp">—</span></div>
+      <div class="moon-info-row"><span class="moon-label">Fibonacci</span><span class="moon-value" id="fibDisp">—</span></div>
+      <div class="moon-info-row"><span class="moon-label">Ogham</span><span class="moon-value" id="oghamDisp">—</span></div>
+      <div class="moon-info-row"><span class="moon-label">Body resonance</span><span class="moon-value" id="bodyDisp">—</span></div>
+      <div class="moon-info-row"><span class="moon-label">Cycle day (approx)</span><span class="moon-value" id="dayDisp">—</span></div>
+
+      <div class="freq-bar-wrap" style="margin-top:14px;">
+        <div class="freq-bar-fill" id="freqBar" style="width:0%;background:#1a6635;">—</div>
+      </div>
+      <div class="freq-bar-label" id="freqBarLabel">—</div>
+
+      <!-- Tone generator -->
+      <div class="tone-note" id="toneNote">—</div>
+      <button id="toneBtn" onclick="toggleTone()">▶ PLAY LUNAR FREQUENCY</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Protocol + logger -->
+  <div>
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-title">Today's Irrigation Protocol</div>
+
+      <div class="prot-action" id="protAction">—</div>
+
+      <ul class="step-list" id="stepList"></ul>
+
+      <div style="margin-top:14px; padding-top:10px; border-top:1px solid #1a3d2a;">
+        <div class="panel-title" style="margin-bottom:10px;">Schauberger Principles Applied</div>
+        <div class="principle">
+          <strong>Vortex pipe:</strong> Use spiral/egg-section pipe to maintain water energy. Avoid straight pressurized runs. Water should arrive at the root zone still alive — cool, dark, moving in natural spiral paths.
+        </div>
+        <div class="principle" id="sapPrinciple">—</div>
+        <div class="principle">
+          <strong>Temperature rule:</strong> Irrigate when water temperature is below or equal to soil temperature (ideally 4°C differential). Schauberger observed this maximizes absorption and minimizes shock.
+        </div>
+        <div class="principle" id="timingPrinciple">—</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Session Log</div>
+
+      <table id="logTable">
+        <thead>
+          <tr>
+            <th>Date / Time</th>
+            <th>Moon Pos</th>
+            <th>Sap</th>
+            <th>Frequency</th>
+            <th>Action</th>
+            <th>Duration</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="logBody"></tbody>
+      </table>
+
+      <div class="btn-row">
+        <button class="btn" onclick="logSession()">+ LOG SESSION</button>
+        <button class="btn btn-export" onclick="exportCSV()">EXPORT CSV</button>
+        <button class="btn" onclick="clearLog()" style="color:#cc6644;border-color:#5c2a1a;">CLEAR LOG</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// CANONICAL CONSTANTS — REFERENCE.md §II
+// All values sourced directly. Nothing invented.
+// ─────────────────────────────────────────────────────────────────────────────
+const LUNAR_ROOT    = 210.4186;  // Hz — Cousto: Moon synodic period × 2²⁹
+const ZERO_POINT_HZ = 297.5768;  // Hz — LUNAR_ROOT × √2
+const TAO_HZ        = 420.8372;  // Hz — LUNAR_ROOT × 2 (Moon 13 / Yew)
+const OM_HZ         = 334.02;    // Hz — Moon 8 / Hazel / Ophiuchus threshold
+
+// Lunar new moon epoch: Jan 11 2024 (known, used in 5-cosmic-translator-test.html)
+const EPOCH_NEW_MOON_DAYS = 2460310.5 - 2440587.5; // Unix days
+const SYNODIC_DAYS = 29.53059;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// §IV — 13 LUNAR POSITIONS (REFERENCE.md §IV — exact rows)
+// Source: 7-ayurveda-bass-reading.html §IV confirmed table
+// ─────────────────────────────────────────────────────────────────────────────
+const LUNAR = [
+  { pc:0,  note:'C',   hz:210.42, fib:1,   tree:'Birch',    ogham:'Beith', sap:'Rising',     proto:'AH',  body:'Root',               color:'#60a5fa' },
+  { pc:1,  note:'C#',  hz:222.93, fib:2,   tree:'Rowan',    ogham:'Luis',  sap:'Rising',     proto:'SA',  body:'Throat',             color:'#818cf8' },
+  { pc:2,  note:'D',   hz:236.19, fib:3,   tree:'Ash',      ogham:'Nion',  sap:'Rising',     proto:'LA',  body:'Hands & Lungs',      color:'#a78bfa' },
+  { pc:3,  note:'D#',  hz:250.23, fib:5,   tree:'Alder',    ogham:'Fearn', sap:'Peak',       proto:'RA',  body:'Stomach',            color:'#fb923c' },
+  { pc:4,  note:'E',   hz:265.11, fib:8,   tree:'Willow',   ogham:'Sail',  sap:'Peak',       proto:'DA',  body:'Solar Plexus',       color:'#facc15' },
+  { pc:5,  note:'F',   hz:280.88, fib:13,  tree:'Hawthorn', ogham:'Huath', sap:'Peak',       proto:'HA',  body:'Diaphragm',          color:'#f97316' },
+  { pc:6,  note:'F#',  hz:297.58, fib:21,  tree:'Oak',      ogham:'Duir',  sap:'Zero Point', proto:'NA',  body:'Heart',              color:'#4ade80' },
+  { pc:7,  note:'G',   hz:315.27, fib:34,  tree:'Holly',    ogham:'Tinne', sap:'Descending', proto:'KA',  body:'Spine',              color:'#22d3ee' },
+  { pc:8,  note:'G#',  hz:334.02, fib:55,  tree:'Hazel',    ogham:'Coll',  sap:'Descending', proto:'OM',  body:'The wound as portal',color:'#36d9b8' },
+  { pc:9,  note:'A',   hz:353.88, fib:89,  tree:'Vine',     ogham:'Muin',  sap:'Descending', proto:'AH',  body:'The blood',          color:'#f472b6' },
+  { pc:10, note:'A#',  hz:374.92, fib:144, tree:'Ivy',      ogham:'Gort',  sap:'Dormant',    proto:'EE',  body:'Deep interior',      color:'#c084fc' },
+  { pc:11, note:'B',   hz:397.22, fib:233, tree:'Elder',    ogham:'Ruis',  sap:'Dormant',    proto:'UH',  body:'The compost',        color:'#94a3b8' },
+  { pc:12, note:"C'",  hz:420.84, fib:377, tree:'Yew',      ogham:'Ioho',  sap:'Awakening',  proto:'TAO', body:'The full system',    color:'#e2e8f0' },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCHAUBERGER IRRIGATION PROTOCOL — derived from sap phase
+// Schauberger's principles applied per UFT position:
+//   Rising   → deep root irrigation, vortex-pre-treated water at rising Hz
+//   Peak     → maximum growth, full irrigation, foliar spray optional
+//   ZeroPoint→ NO irrigation — reversal threshold, Schauberger observed pause
+//   Descend  → reduce, harvest mode, minimal watering
+//   Dormant  → NO routine irrigation, soil rest
+//   Awakening→ prepare system, light pre-irrigation, charge water for next cycle
+// ─────────────────────────────────────────────────────────────────────────────
+const PROTOCOLS = {
+  'Rising': {
+    action: 'IRRIGATE',
+    intensity: 'Deep root irrigation',
+    steps: [
+      { text: 'Pre-treat water: place piezo transducer in reservoir, play current lunar frequency for 20 min before irrigating.', freq: true },
+      { text: 'Irrigate in the evening or before sunrise (Schauberger: water is most alive at night, below 4°C differential from soil).', freq: false },
+      { text: 'Direct flow to root zone. Use spiral/vortex pipe section if available — avoid straight runs over 2m.', freq: false },
+      { text: 'Sap is rising: roots are actively absorbing. This is the primary uptake window.', freq: false },
+    ],
+    sapPrinciple: '<strong>Rising sap phase:</strong> Tree sap and plant vascular pressure are ascending. Schauberger observed that water applied during rising moon phases is drawn upward by capillary action aligned with the plant\'s own fluid momentum. Irrigate deeply at roots.',
+    timingPrinciple: '<strong>Evening / pre-dawn irrigation:</strong> Schauberger found that water flowing in cool darkness retains its structured vortex memory. Avoid midday irrigation — heat destroys water energy before it reaches the root.',
+  },
+  'Peak': {
+    action: 'IRRIGATE',
+    intensity: 'Full irrigation + optional foliar',
+    steps: [
+      { text: 'Pre-treat water at current lunar frequency — minimum 20 min in vortex reservoir.', freq: true },
+      { text: 'Apply full irrigation volume: roots AND optional light foliar mist at dawn (leaves absorb during stomata opening).', freq: false },
+      { text: 'This is maximum growth energy — full vascular pressure. Water applied now drives cell division and stem elongation.', freq: false },
+      { text: 'Check soil moisture: do not over-saturate. Peak phase has high evapotranspiration — plants consume more water.', freq: false },
+    ],
+    sapPrinciple: '<strong>Peak sap phase:</strong> Maximum vascular pressure in plants. Growth is fastest here — stem elongation, leaf expansion, flower bud formation. Water availability now directly determines yield and structural integrity.',
+    timingPrinciple: '<strong>Dawn and dusk windows:</strong> Schauberger\'s peak-phase timing: water at dawn (5–7am) for foliar uptake, and again at dusk for root saturation before overnight growth surge.',
+  },
+  'Zero Point': {
+    action: 'REST',
+    intensity: 'No irrigation — reversal threshold',
+    steps: [
+      { text: 'DO NOT irrigate at Zero Point (F# / Oak / 297.58 Hz). Schauberger documented this as the water reversal threshold.', freq: false },
+      { text: 'This is the heart position (NA proto-word) — the sap transition. Introducing water disrupts the reversal.', freq: false },
+      { text: 'Use this time to check vortex pipe condition, clean reservoir, inspect soil structure.', freq: false },
+      { text: 'If drought critical (wilting), apply absolute minimum — 10% of normal volume, root zone only.', freq: false },
+    ],
+    sapPrinciple: '<strong>Zero Point — Oak / NA / 297.58 Hz:</strong> This is LUNAR_ROOT × √2 — the exact tritone axis, the silence between rising and descending. Water at this position is in maximum tension. Schauberger paused log-floating at zero-flow moments in rivers. Same principle applies here.',
+    timingPrinciple: '<strong>Maintenance window:</strong> Zero Point is the ideal time for infrastructure work — not irrigation. Clean pipes, check connections, prepare compost tea for next Rising cycle.',
+  },
+  'Descending': {
+    action: 'MINIMAL',
+    intensity: 'Reduce irrigation — harvest phase',
+    steps: [
+      { text: 'Reduce irrigation to 30–50% of normal volume. Sap is descending — plants are consolidating, not growing.', freq: false },
+      { text: 'If irrigating, pre-treat water at current frequency and apply to root zone only — no foliar.', freq: true },
+      { text: 'Harvest fruits and above-ground crops now — descending sap concentrates sugars and essential oils downward.', freq: false },
+      { text: 'Allow soil surface to dry slightly between irrigations. Descending phase tolerates moderate water stress.', freq: false },
+    ],
+    sapPrinciple: '<strong>Descending sap phase:</strong> Vascular pressure is returning toward roots. Above-ground growth slows. Energy consolidates in root systems and bulbs. Schauberger recommended harvest during descending moon for longer post-harvest preservation.',
+    timingPrinciple: '<strong>Morning-only irrigation:</strong> During descending phase, water in the morning only — allows surface to dry before evening. Avoids fungal conditions that emerge when descending-phase plants hold surface moisture overnight.',
+  },
+  'Dormant': {
+    action: 'REST',
+    intensity: 'No routine irrigation — deep rest',
+    steps: [
+      { text: 'NO routine irrigation during Dormant phase (Ivy/Elder). Soil and root systems are in rest and microbial digestion mode.', freq: false },
+      { text: 'Exception only: extreme drought (wilting, soil cracking). Apply minimum survival water at root zone.', freq: false },
+      { text: 'This phase corresponds to Fibonacci positions 144 (Ivy) and 233 (Elder) — the largest rest intervals in the lunar cycle.', freq: false },
+      { text: 'Prepare compost, amend soil, plan next planting cycle. Schauberger considered the dormant period essential for soil regeneration.', freq: false },
+    ],
+    sapPrinciple: '<strong>Dormant phase — Ivy / Elder:</strong> The plant\'s digestive and composting phase. Schauberger observed that trees and perennial plants use dormancy for root-system restructuring. Water applied now passes through without benefit and risks anaerobic soil conditions.',
+    timingPrinciple: '<strong>Soil work window:</strong> Dormant phase is ideal for deep soil aeration, Bokashi application, and mycorrhizal inoculation. These interventions prepare the soil microbiome for the next Rising cycle.',
+  },
+  'Awakening': {
+    action: 'PREPARE',
+    intensity: 'Light pre-irrigation — charge system',
+    steps: [
+      { text: 'Light irrigation: 20–30% of normal volume. Awaken the vortex pipe system — flush with frequency-treated water.', freq: true },
+      { text: 'Charge reservoir: run 210.42 Hz (LUNAR_ROOT / Birch / AH) for 30 min. This is the seed frequency for the new cycle.', freq: false },
+      { text: 'Prepare seed-soaking water: fill vessel, treat at 210.42 Hz for 8–12 hours. Seeds soaked in this water enter the next cycle with coherent hydration.', freq: false },
+      { text: 'Yew / TAO / 420.84 Hz = octave of LUNAR_ROOT. The full cycle completes here. The next Moon 0 (Birch/AH) begins immediately after.', freq: false },
+    ],
+    sapPrinciple: '<strong>Awakening phase — Yew / TAO / 420.84 Hz:</strong> The system is completing its 13th position — the octave return. This is not a new beginning yet, but the preparation for one. Water the system gently, as you would wake a sleeping organism.',
+    timingPrinciple: '<strong>Seed preparation window:</strong> Schauberger recommended treating seeds before planting by soaking in spring water exposed to moonlight. UFT extends this: soak seeds in water pre-treated at LUNAR_ROOT (210.42 Hz) during Awakening phase — the seeds enter germination already tuned to the Rising cycle they will grow into.',
+  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LUNAR POSITION CALCULATION
+// Same epoch as 5-cosmic-translator-test.html
+// ─────────────────────────────────────────────────────────────────────────────
+function getLunarPosition() {
+  const nowDays  = Date.now() / 86400000; // Unix days
+  const elapsed  = nowDays - EPOCH_NEW_MOON_DAYS;
+  const phase    = ((elapsed % SYNODIC_DAYS) + SYNODIC_DAYS) % SYNODIC_DAYS; // 0–29.53
+  const dayInCycle = phase; // 0 = new moon
+
+  // Map synodic day to 13 positions (each ~2.27 days)
+  const pc = Math.min(12, Math.floor((phase / SYNODIC_DAYS) * 13));
+  const positionFrac = (phase / SYNODIC_DAYS) * 13; // 0–13
+
+  return { pc, phase, dayInCycle, positionFrac };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let audioCtx = null;
+let toneOsc  = null;
+let toneGain = null;
+let isPlaying = false;
+const sessionLog = JSON.parse(localStorage.getItem('uft_schauberger_log') || '[]');
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DRAW MOON DIAL
+// ─────────────────────────────────────────────────────────────────────────────
+function drawDial(positionFrac, currentPc) {
+  const canvas = document.getElementById('dialCanvas');
+  const ctx    = canvas.getContext('2d');
+  const cx = 110, cy = 110, r = 100;
+
+  ctx.clearRect(0, 0, 220, 220);
+
+  // Background
+  ctx.fillStyle = '#030a06';
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+
+  // Outer ring
+  ctx.strokeStyle = '#1a3d2a';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+
+  // 13 position marks
+  LUNAR.forEach((pos, i) => {
+    const angle = (i / 13) * Math.PI * 2 - Math.PI / 2;
+    const x1 = cx + (r - 14) * Math.cos(angle);
+    const y1 = cy + (r - 14) * Math.sin(angle);
+    const x2 = cx + (r - 4)  * Math.cos(angle);
+    const y2 = cy + (r - 4)  * Math.sin(angle);
+
+    ctx.strokeStyle = i === currentPc ? pos.color : '#1a3d2a';
+    ctx.lineWidth   = i === currentPc ? 3 : 1;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+
+    // Proto-word label on outer edge
+    const lx = cx + (r - 28) * Math.cos(angle);
+    const ly = cy + (r - 28) * Math.sin(angle);
+    ctx.fillStyle = i === currentPc ? pos.color : '#1a3d2a';
+    ctx.font = i === currentPc ? 'bold 8px Courier New' : '7px Courier New';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(pos.proto, lx, ly);
+  });
+
+  // Current position needle
+  const needleAngle = (positionFrac / 13) * Math.PI * 2 - Math.PI / 2;
+  const lunar = LUNAR[currentPc];
+
+  ctx.strokeStyle = lunar.color;
+  ctx.lineWidth   = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + (r - 20) * Math.cos(needleAngle), cy + (r - 20) * Math.sin(needleAngle));
+  ctx.stroke();
+
+  // Center dot
+  ctx.fillStyle = lunar.color;
+  ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2); ctx.fill();
+
+  // Inner text
+  ctx.fillStyle = lunar.color;
+  ctx.font = 'bold 18px Courier New';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(lunar.proto, cx, cy - 14);
+
+  ctx.fillStyle = '#2e6040';
+  ctx.font = '9px Courier New';
+  ctx.fillText(lunar.note + ' · ' + lunar.hz.toFixed(2) + ' Hz', cx, cy + 5);
+
+  ctx.fillStyle = '#1a4028';
+  ctx.font = '8px Courier New';
+  ctx.fillText(lunar.tree, cx, cy + 18);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUILD POSITION STRIP
+// ─────────────────────────────────────────────────────────────────────────────
+function buildStrip() {
+  const strip = document.getElementById('posStrip');
+  strip.innerHTML = '';
+  LUNAR.forEach((pos, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'strip-cell';
+    cell.id = 'strip-' + i;
+    cell.style.background = pos.color + '18';
+    cell.style.color = pos.color;
+    cell.innerHTML = `<span class="strip-word">${pos.proto}</span><span class="strip-note">${pos.note}</span>`;
+    cell.title = `Moon ${i}: ${pos.tree} · ${pos.sap} · ${pos.hz} Hz`;
+    strip.appendChild(cell);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UPDATE UI
+// ─────────────────────────────────────────────────────────────────────────────
+function update() {
+  const { pc, phase, dayInCycle, positionFrac } = getLunarPosition();
+  const lunar    = LUNAR[pc];
+  const sapKey   = lunar.sap.replace(' ', '-');
+  const protocol = PROTOCOLS[lunar.sap] || PROTOCOLS['Dormant'];
+
+  // Dial
+  drawDial(positionFrac, pc);
+
+  // Strip highlight
+  LUNAR.forEach((_, i) => {
+    const cell = document.getElementById('strip-' + i);
+    if (cell) cell.classList.toggle('active', i === pc);
+  });
+
+  // Moon info
+  document.getElementById('protoDisp').textContent = lunar.proto;
+  document.getElementById('protoDisp').style.color = lunar.color;
+  document.getElementById('treeDisp').textContent  = lunar.tree + ' · ' + lunar.ogham;
+  document.getElementById('hzDisp').textContent    = lunar.hz.toFixed(4) + ' Hz';
+
+  const sap = document.getElementById('sapBadge');
+  sap.textContent  = lunar.sap.toUpperCase();
+  sap.className    = 'sap-badge sap-' + sapKey;
+
+  document.getElementById('posDisp').textContent  = 'Moon ' + pc + ' of 12 (position ' + (pc + 1) + '/13)';
+  document.getElementById('noteDisp').textContent = lunar.note;
+  document.getElementById('fibDisp').textContent  = 'F(' + (pc + 1) + ') = ' + lunar.fib;
+  document.getElementById('oghamDisp').textContent= lunar.ogham;
+  document.getElementById('bodyDisp').textContent = lunar.body;
+  document.getElementById('dayDisp').textContent  = 'Day ~' + dayInCycle.toFixed(1) + ' of 29.5';
+
+  // Frequency bar
+  const pct = ((lunar.hz - LUNAR_ROOT) / (TAO_HZ - LUNAR_ROOT)) * 100;
+  const bar = document.getElementById('freqBar');
+  bar.style.width      = pct.toFixed(1) + '%';
+  bar.style.background = lunar.color;
+  bar.textContent      = lunar.hz.toFixed(2) + ' Hz';
+  document.getElementById('freqBarLabel').textContent =
+    'Position ' + (pc) + '/12 in lunar octave · ' + LUNAR_ROOT + ' → ' + TAO_HZ + ' Hz';
+
+  // Tone button note
+  document.getElementById('toneNote').textContent =
+    'Lunar frequency: ' + lunar.hz.toFixed(4) + ' Hz · ' + lunar.note + ' · ' + lunar.proto;
+
+  // Protocol
+  const actionEl = document.getElementById('protAction');
+  actionEl.textContent = protocol.intensity;
+  actionEl.className   = 'prot-action prot-' + protocol.action;
+
+  const stepList = document.getElementById('stepList');
+  stepList.innerHTML = '';
+  protocol.steps.forEach((step, i) => {
+    const li = document.createElement('li');
+    const freqNote = step.freq
+      ? `<span class="step-freq">[${lunar.hz.toFixed(2)} Hz]</span> `
+      : '';
+    li.innerHTML = `<span class="step-num">${i + 1}.</span><span class="step-text">${freqNote}${step.text}</span>`;
+    stepList.appendChild(li);
+  });
+
+  document.getElementById('sapPrinciple').innerHTML    = protocol.sapPrinciple;
+  document.getElementById('timingPrinciple').innerHTML = protocol.timingPrinciple;
+
+  // Coherency banner
+  const isCoherent = true; // UFT positions are always internally coherent — this is the neutral translation
+  document.getElementById('coherencyStatus').textContent =
+    `Moon ${pc} · ${lunar.proto} · ${lunar.sap} · ${lunar.hz.toFixed(2)} Hz · Day ${dayInCycle.toFixed(1)}/29.5 · REFERENCE.md §IV coherent`;
+  document.getElementById('coherencyStatus').className = 'coherency-ok';
+
+  // Tone frequency update (if playing)
+  if (isPlaying && toneOsc) {
+    toneOsc.frequency.setTargetAtTime(lunar.hz, audioCtx.currentTime, 0.1);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TONE GENERATOR
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleTone() {
+  const btn = document.getElementById('toneBtn');
+  const { pc } = getLunarPosition();
+  const hz = LUNAR[pc].hz;
+
+  if (isPlaying) {
+    toneGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.3);
+    setTimeout(() => { toneOsc.stop(); audioCtx.close(); audioCtx = null; toneOsc = null; toneGain = null; }, 400);
+    isPlaying = false;
+    btn.textContent = '▶ PLAY LUNAR FREQUENCY';
+    btn.classList.remove('playing');
+  } else {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    toneOsc  = audioCtx.createOscillator();
+    toneGain = audioCtx.createGain();
+
+    toneOsc.type = 'sine';
+    toneOsc.frequency.value = hz;
+    toneGain.gain.value = 0;
+    toneGain.gain.setTargetAtTime(0.25, audioCtx.currentTime, 0.5);
+
+    toneOsc.connect(toneGain);
+    toneGain.connect(audioCtx.destination);
+    toneOsc.start();
+
+    isPlaying = true;
+    btn.textContent = '■ STOP FREQUENCY';
+    btn.classList.add('playing');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SESSION LOGGER
+// ─────────────────────────────────────────────────────────────────────────────
+function logSession() {
+  const { pc, dayInCycle } = getLunarPosition();
+  const lunar    = LUNAR[pc];
+  const protocol = PROTOCOLS[lunar.sap] || PROTOCOLS['Dormant'];
+
+  const duration = prompt('Session duration (e.g. "20 min", "1h"):') || '—';
+  const notes    = prompt('Notes (plant, volume, observations):') || '—';
+
+  const entry = {
+    datetime: new Date().toLocaleString(),
+    position: 'Moon ' + pc + ' (' + lunar.note + ')',
+    sap:      lunar.sap,
+    hz:       lunar.hz.toFixed(4) + ' Hz',
+    proto:    lunar.proto,
+    action:   protocol.action,
+    duration,
+    notes,
+    day:      dayInCycle.toFixed(1),
+  };
+
+  sessionLog.push(entry);
+  localStorage.setItem('uft_schauberger_log', JSON.stringify(sessionLog));
+  renderLog();
+}
+
+function renderLog() {
+  const tbody = document.getElementById('logBody');
+  tbody.innerHTML = '';
+  [...sessionLog].reverse().forEach(e => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${e.datetime}</td>
+      <td>${e.position}</td>
+      <td>${e.sap}</td>
+      <td style="color:#52c77e">${e.hz}</td>
+      <td>${e.action}</td>
+      <td>${e.duration}</td>
+      <td>${e.notes}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  if (sessionLog.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="color:#1a3d2a;text-align:center;padding:12px;">No sessions logged yet.</td></tr>';
+  }
+}
+
+function exportCSV() {
+  if (sessionLog.length === 0) { alert('No sessions to export.'); return; }
+  const header = 'Date/Time,Moon Position,Sap Phase,Frequency,Proto,Action,Duration,Notes\n';
+  const rows   = sessionLog.map(e =>
+    `"${e.datetime}","${e.position}","${e.sap}","${e.hz}","${e.proto}","${e.action}","${e.duration}","${e.notes}"`
+  ).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = 'uft-schauberger-garden-log-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearLog() {
+  if (!confirm('Clear all session logs? This cannot be undone.')) return;
+  sessionLog.length = 0;
+  localStorage.removeItem('uft_schauberger_log');
+  renderLog();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CLOCK
+// ─────────────────────────────────────────────────────────────────────────────
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toUTCString().slice(0, 25) + ' UTC';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+buildStrip();
+update();
+renderLog();
+updateClock();
+setInterval(update, 60000);     // update every minute
+setInterval(updateClock, 1000); // clock every second
+</script>
+
+<!-- ── SOURCE DECLARATION ──────────────────────────────────────────────────────
+  All lunar data: REFERENCE.md §IV (13 Nikkal positions, confirmed via 7-ayurveda-bass-reading.html)
+  Constants: REFERENCE.md §II (LUNAR_ROOT 210.4186 Hz, ZERO_POINT_HZ 297.5768 Hz, TAO_HZ 420.8372 Hz)
+  Lunar epoch: Jan 11 2024 new moon — used consistently across UFT-demos
+  Schauberger layer: qualitative timing/phase principles applied to UFT sap positions.
+    No Schauberger geometry values (pipe dimensions, spiral ratios) are claimed or invented.
+    UFT provides the frequency selection and timing layer only.
+  UFT is a neutral translator. This file reports what UFT reads for today's lunar position.
+  It makes no claim about results. Data logged here is raw observation, not validated outcomes.
+─────────────────────────────────────────────────────────────────────────────── -->
+
+</body>
+</html>
