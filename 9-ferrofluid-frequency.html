@@ -749,6 +749,8 @@ let taoGroup = null;
 let currentGroup = null;
 let currentKey = 'HA';
 let currentIntensity = 0;
+let cosmicParticles = null;  // Orbital particle system
+let starfield = null;         // Background starfield
 
 function initThreeJS() {
   const canvas = document.getElementById('glCanvas');
@@ -757,6 +759,7 @@ function initThreeJS() {
   
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x040814);
+  scene.fog = new THREE.FogExp2(0x040814, 0.3);  // Cosmic depth fog
   
   camera = new THREE.PerspectiveCamera(75, w/h, 0.1, 1000);
   camera.position.z = 3;
@@ -765,30 +768,130 @@ function initThreeJS() {
   renderer.setSize(w, h);
   renderer.setPixelRatio(window.devicePixelRatio);
   
-  // Lighting
-  const ambLight = new THREE.AmbientLight(0xffffff, 0.5);
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CELESTIAL BACKGROUND — Starfield
+  // ═══════════════════════════════════════════════════════════════════════════
+  createStarfield();
+  
+  // Cosmic Lighting — Dual color scheme (golden + cyan)
+  const ambLight = new THREE.AmbientLight(0x6040ff, 0.35);  // Deep violet base
   scene.add(ambLight);
   
-  const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-  pointLight.position.set(5, 5, 5);
-  scene.add(pointLight);
+  // Primary cosmic light — warm golden (280 Hz HA warmth)
+  const pointLight1 = new THREE.PointLight(0xffb366, 0.9, 100);
+  pointLight1.position.set(5, 3, 6);
+  scene.add(pointLight1);
+  
+  // Secondary cosmic light — cyan (NA equilibrium cool)
+  const pointLight2 = new THREE.PointLight(0x40e0ff, 0.6, 100);
+  pointLight2.position.set(-5, -3, 6);
+  scene.add(pointLight2);
   
   // Create geometry groups
   createHAGeometry();
   createNAGeometry();
   createTAOGeometry();
   
+  // Add orbital cosmic particles
+  createCosmicParticles();
+  
   // Start with HA
   showGeometry('HA');
+}}
+
+function createStarfield() {
+  // 500+ cosmic background stars
+  const starsGeom = new THREE.BufferGeometry();
+  const starPositions = [];
+  const starColors = [];
+  
+  // Cosmic color palette for stars
+  const starPalette = [
+    new THREE.Color(0xffffff),   // white
+    new THREE.Color(0xffb366),   // golden
+    new THREE.Color(0x40e0ff),   // cyan
+    new THREE.Color(0xff40ff),   // magenta
+    new THREE.Color(0x40ff80),   // emerald
+    new THREE.Color(0xffe0ff),   // soft pink
+    new THREE.Color(0xb0d0ff),   // icy blue
+  ];
+  
+  for (let i = 0; i < 600; i++) {
+    const x = (Math.random() - 0.5) * 80;
+    const y = (Math.random() - 0.5) * 80;
+    const z = (Math.random() - 0.5) * 80 - 40;  // Mostly behind
+    starPositions.push(x, y, z);
+    
+    const color = starPalette[Math.floor(Math.random() * starPalette.length)];
+    starColors.push(color.r, color.g, color.b);
+  }
+  
+  starsGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(starPositions), 3));
+  starsGeom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(starColors), 3));
+  
+  const starMaterial = new THREE.PointsMaterial({
+    size: 0.15,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.8,
+    sizeAttenuation: true
+  });
+  
+  starfield = new THREE.Points(starsGeom, starMaterial);
+  scene.add(starfield);
 }
 
-function createHAGeometry() {
+function createCosmicParticles() {
+  // Orbital dust particles around each geometry
+  const dustGeom = new THREE.BufferGeometry();
+  const dustPositions = [];
+  const dustColors = [];
+  
+  // Create 300 particles in orbital paths
+  for (let i = 0; i < 300; i++) {
+    const radius = 1.5 + Math.random() * 1.5;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.random() * Math.PI * 2;
+    
+    const x = Math.cos(theta) * Math.sin(phi) * radius;
+    const y = Math.sin(theta) * Math.sin(phi) * radius;
+    const z = Math.cos(phi) * radius * 0.3;
+    
+    dustPositions.push(x, y, z);
+    
+    // Cosmic dust colors (cyan, magenta, gold blends)
+    const colorChoice = Math.random();
+    if (colorChoice < 0.33) {
+      dustColors.push(0.16, 0.88, 1.0);  // Cyan
+    } else if (colorChoice < 0.66) {
+      dustColors.push(1.0, 0.25, 1.0);   // Magenta
+    } else {
+      dustColors.push(1.0, 0.7, 0.4);    // Gold
+    }
+  }
+  
+  dustGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(dustPositions), 3));
+  dustGeom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(dustColors), 3));
+  
+  const dustMaterial = new THREE.PointsMaterial({
+    size: 0.08,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.4,
+    sizeAttenuation: true
+  });
+  
+  cosmicParticles = new THREE.Points(dustGeom, dustMaterial);
+  scene.add(cosmicParticles);
+}
   haGroup = new THREE.Group();
   
   const material = new THREE.MeshStandardMaterial({
     color: 0xf97316,
-    emissive: 0xf97316,
-    emissiveIntensity: 0.3,
+    emissive: 0xff6600,      // Golden glow
+    emissiveIntensity: 0.5,
+    metalness: 0.3,
+    roughness: 0.4,
     wireframe: false
   });
   
@@ -824,18 +927,29 @@ function createHAGeometry() {
     ringPts.push(Math.cos(angle) * 1.5, Math.sin(angle) * 1.5, 0);
   }
   ringGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(ringPts), 3));
+  const lineMaterial = new THREE.LineBasicMaterial({ 
+    color: 0xf97316,
+    linewidth: 2,
+    transparent: true,
+    opacity: 0.8
+  });
   const ring = new THREE.Line(ringGeom, lineMaterial);
   haGroup.add(ring);
   
   scene.add(haGroup);
-}
+}}
 
 function createNAGeometry() {
   naGroup = new THREE.Group();
   
-  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x4ade80 });
+  const lineMaterial = new THREE.LineBasicMaterial({ 
+    color: 0x4ade80,
+    linewidth: 2,
+    transparent: true,
+    opacity: 0.8
+  });
   
-  // 5 concentric rings
+  // 5 concentric rings — pulsing equilibrium
   for (let ring = 1; ring <= 5; ring++) {
     const radius = 0.3 * ring;
     const ringGeom = new THREE.BufferGeometry();
@@ -849,25 +963,36 @@ function createNAGeometry() {
     naGroup.add(ringLine);
   }
   
-  // Crosshair null point
+  // Crosshair null point — glowing
   const crossGeom = new THREE.BufferGeometry();
   const crossPts = [
     -0.5, 0, 0,  0.5, 0, 0,  // X axis
     0, -0.5, 0,  0, 0.5, 0   // Y axis
   ];
   crossGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(crossPts), 3));
-  const cross = new THREE.LineSegments(crossGeom, lineMaterial);
+  const crossMaterial = new THREE.LineBasicMaterial({ 
+    color: 0x80ff00,
+    linewidth: 3,
+    transparent: true,
+    opacity: 1.0
+  });
+  const cross = new THREE.LineSegments(crossGeom, crossMaterial);
   naGroup.add(cross);
   
   scene.add(naGroup);
-}
+}}
 
 function createTAOGeometry() {
   taoGroup = new THREE.Group();
   
-  const lineMaterial = new THREE.LineBasicMaterial({ color: 0xe2e8f0 });
+  const lineMaterial = new THREE.LineBasicMaterial({ 
+    color: 0xe2e8f0,
+    linewidth: 2,
+    transparent: true,
+    opacity: 0.9
+  });
   
-  // 13 radiating spikes
+  // 13 radiating spikes — tritone tension
   for (let i = 0; i < 13; i++) {
     const angle = (i / 13) * Math.PI * 2;
     const x1 = Math.cos(angle) * 0.4;
@@ -894,7 +1019,7 @@ function createTAOGeometry() {
   taoGroup.add(ring);
   
   scene.add(taoGroup);
-}
+}}
 
 function showGeometry(key) {
   [haGroup, naGroup, taoGroup].forEach(g => { if(g) g.visible = false; });
@@ -905,18 +1030,33 @@ function showGeometry(key) {
 function animateThreeJS() {
   animPhase += 0.018;
   
-  // HA: rotating hexagon
+  // Rotating starfield (slow cosmic drift)
+  if (starfield) {
+    starfield.rotation.z += 0.0002;
+  }
+  
+  // Orbiting cosmic particles
+  if (cosmicParticles) {
+    cosmicParticles.rotation.x += 0.0005;
+    cosmicParticles.rotation.y += 0.0003;
+  }
+  
+  // HA: rotating hexagon with glow pulse
   if (haGroup && haGroup.visible) {
     haGroup.rotation.z += 0.01;
     haGroup.children.forEach((child, idx) => {
       if (idx < 6 && child.userData.basePos) {
         const bob = Math.sin(animPhase + idx) * 0.15;
         child.position.z = bob;
+        // Glow pulse
+        if (child.material) {
+          child.material.emissiveIntensity = 0.3 + 0.4 * Math.sin(animPhase + idx * 0.5);
+        }
       }
     });
   }
   
-  // NA: pulsing rings
+  // NA: pulsing rings with glow
   if (naGroup && naGroup.visible) {
     naGroup.children.forEach((child, idx) => {
       if (idx < 5) {
@@ -926,9 +1066,16 @@ function animateThreeJS() {
     });
   }
   
-  // TAO: rotating burst
+  // TAO: rotating burst with color pulse
   if (taoGroup && taoGroup.visible) {
     taoGroup.rotation.z -= 0.015;
+    // Harmonic shimmer
+    taoGroup.children.forEach(child => {
+      if (child.material && child.material.color) {
+        const shimmer = 0.8 + 0.2 * Math.sin(animPhase * 2);
+        child.material.opacity = shimmer;
+      }
+    });
   }
   
   // Render
@@ -938,7 +1085,7 @@ function animateThreeJS() {
   drawFFTSpectrum();
   
   animFrame = requestAnimationFrame(animateThreeJS);
-}
+}}
 
 function drawGeom(key, intensity) {
   currentKey = key;
