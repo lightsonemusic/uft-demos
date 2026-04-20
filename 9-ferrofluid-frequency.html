@@ -280,6 +280,56 @@ canvas {
 
 <div id="statusBar">select a frequency to begin · HA excites ferrofluid · TAO cancels it</div>
 
+<div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:1px solid #182840;border-radius:8px;padding:26px 24px;">
+  <h2 style="font-size:18px;letter-spacing:4px;color:#8aabcc;margin-bottom:18px;text-transform:uppercase;">How This Works · Ferrofluid Physics × UFT Frequencies</h2>
+  
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:14px;line-height:1.8;color:#7090a8;letter-spacing:1px;">
+    
+    <div>
+      <div style="font-size:16px;color:#ffe066;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">FERROFLUID</div>
+      <p style="margin-bottom:12px;">Ferrofluid = liquid suspension of iron oxide nanoparticles (Fe₃O₄). When a magnetic field is applied, particles arrange into geometric spike patterns called <strong>Rosensweig instability</strong>. The spikes respond to: magnetic field strength, fluid viscosity, surface tension, and <strong>frequency of oscillation</strong>.</p>
+      <p>UFT frequencies modulate the magnetic driver → ferrofluid spikes form, lock, or collapse based on resonance.</p>
+    </div>
+
+    <div>
+      <div style="font-size:16px;color:#f97316;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">HA 280.88 Hz — EXCITATION</div>
+      <p><strong>▶ HA continuous</strong> — Drives ferrofluid into Earth element (6-petal hexagon / Seed of Life geometry). The spikes form a symmetrical crown. This is the <strong>primary resonance frequency</strong> for iron-based materials in the 432 Hz tuning system.</p>
+      <p><strong>▷ HA single pulse</strong> — One-shot excitation. Good for testing impulse response.</p>
+    </div>
+
+    <div>
+      <div style="font-size:16px;color:#4ade80;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">NA 297.58 Hz — EQUILIBRIUM</div>
+      <p><strong>▶ NA continuous</strong> — Locks ferrofluid spikes into <strong>standing wave null</strong> (Zero Point). The geometry doesn't collapse—it holds steady. This is the <strong>equilibrium frequency</strong> where spike structure is stable but motionless. §VI: Day Out of Time / Lunar zero point.</p>
+      <p>Physics: NA is the node frequency where opposing wave pressures balance.</p>
+    </div>
+
+    <div>
+      <div style="font-size:16px;color:#e2e8f0;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">TAO 420.84 Hz — TRITONE CANCEL</div>
+      <p><strong>▶ TAO continuous</strong> — The <strong>tritone opposite</strong> of NA (√2:1 ratio). Plays on the Moon tuning scale (210.42 × 2). When TAO plays, it induces <strong>maximum tension</strong> on the ferrofluid lattice—spikes begin to collapse into 13-point burst, then fragments.</p>
+      <p>Crosses the 432 Hz → Moon tuning boundary, creating destructive harmonic interference.</p>
+    </div>
+
+    <div>
+      <div style="font-size:16px;color:#818cf8;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">⟳ ANTI-PHASE NA — ERASURE</div>
+      <p><strong>⟳ anti-phase 297.58 Hz</strong> — <strong>True destructive interference</strong>. Two oscillators, both at 297.58 Hz, but one starts 180° out of phase (half a period delayed). When they combine: peak + valley = silence.</p>
+      <p><strong>Result on ferrofluid:</strong> The standing wave null is <strong>completely cancelled</strong> → spikes de-magnetize and collapse. The ferrofluid returns to liquid.</p>
+      <p><strong>Web Audio implementation:</strong> osc2 starts at `currentTime + (0.5 / 297.58 s)` = 1.68 ms later = perfect phase inversion.</p>
+    </div>
+
+    <div>
+      <div style="font-size:16px;color:#f87171;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">■ STOP ALL</div>
+      <p>Stops all oscillators. Resets canvas to idle state. In ferrofluid terms: magnetic driver off → particles fall back to liquid state.</p>
+    </div>
+
+  </div>
+
+  <hr style="border:none;border-top:1px solid #182840;margin:24px 0;">
+
+  <div style="font-size:13px;color:#4a6070;line-height:1.9;letter-spacing:1px;">
+    <strong style="color:#b0cce0;font-size:14px;">UFT Coherence:</strong> All frequencies from REFERENCE.md §F (proto-words). HA, NA, TAO are canonical cosmic resonances. The tritone (√2:1) is §VII interval harmonic significance = maximum tension. Anti-phase destructive cancellation is pure wave physics — not invented, just applied via Web Audio API with 180° phase delay instead of unavailable negative gains.
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════════════════════════════════════════════════
 // CONSTANTS — FROM REFERENCE.md §II · §IV · §F · §VII
