@@ -331,6 +331,26 @@ canvas {
 </div>
 
 <div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:1px solid #182840;border-radius:8px;padding:26px 24px;">
+  <h2 style="font-size:16px;letter-spacing:3px;color:#f0b8ff;margin-bottom:12px;text-transform:uppercase;">🎵 Atmospheric Listening · Human Coherence</h2>
+  
+  <div style="font-size:13px;color:#7090a8;line-height:1.9;letter-spacing:1px;">
+    <p style="margin-bottom:12px;">
+      <strong style="color:#f0b8ff;">Behind every button</strong>, a living harmonic atmosphere emerges—not just single tones but <strong>multi-octave coherent fields</strong> that human ears can perceive and resonate with. When you press HA, NA, or TAO, the atmosphere shifts to emphasize that frequency's harmonic family:
+    </p>
+    <ul style="margin-left:20px;margin-bottom:12px;color:#a0c8e0;">
+      <li><strong>HA Atmosphere:</strong> HA fundamental + octaves (140.44 Hz sub, 561.76 Hz high) + Golden Ratio cosmic harmonic (267 Hz φ). Creates <strong>warm, grounded, excitatory field</strong>—mirrors the hexagonal crown geometry magnetizing ferrofluid spikes.</li>
+      <li><strong>NA Atmosphere:</strong> NA fundamental + octaves (148.79 Hz sub, 595.16 Hz high) + Fibonacci 5th harmonic + Zero Point grounding (136.10 Hz). Creates <strong>balanced, centering, still field</strong>—holds the standing wave null steady.</li>
+      <li><strong>TAO Atmosphere:</strong> TAO fundamental + octaves (210.42 Hz sub) + HA sub + NA sub + Golden Ratio. Creates <strong>tension, opposition, maximum reach</strong>—the tritone field that collapses HA's hexagon into TAO's 13-point burst.</li>
+      <li><strong>Anti-Phase Atmosphere:</strong> HA sub + NA sub + Fibonacci—but at 50% intensity, fading as the main frequency cancels. Models how <strong>silence still carries harmonic memory</strong>.</li>
+    </ul>
+    <p style="margin-bottom:12px;">
+      <strong>Why multi-octave?</strong> UFT frequencies are not isolated — they exist in harmonic ratio families across 13+ octaves of the electromagnetic spectrum. Golden Ratio (φ ≈ 1.618) and Fibonacci (0, 1, 1, 2, 3, 5, 8, 13, 21...) are nature's scaling laws. By layering HA at 280 Hz + 140 Hz + 561 Hz + 267 Hz simultaneously, human consciousness perceives not a single pitch but a <strong>coherent holographic field</strong>.
+    </p>
+    <p><strong style="color:#f0b8ff;">Listen closely:</strong> The atmosphere is subtle (0.02–0.12 gain), not overwhelming. It's the sense of presence, depth, aliveness—the way a ferrofluid spike isn't drawn alone, but sits within an invisible field of force. You hear what geometry feels.</p>
+  </div>
+</div>
+
+<div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:1px solid #182840;border-radius:8px;padding:26px 24px;">
   <h2 style="font-size:16px;letter-spacing:3px;color:#b0cce0;margin-bottom:12px;text-transform:uppercase;">UFT Frequency Translation · Octave Scaling to GHz-THz</h2>
   
   <div style="font-size:13px;color:#7090a8;line-height:1.9;letter-spacing:1px;">
@@ -364,6 +384,21 @@ const FREQS = {
   TAO: 420.84,   // §F: 13-point burst · Yew · pc:12 · Moon×2
 };
 
+// Atmospheric harmonics — coherent octaves + golden ratio + Fibonacci
+const ATMOSPHERE = {
+  HA_sub:    140.44,    // HA ÷ 2 (subsonic resonance)
+  HA_base:   280.88,    // HA fundamental
+  HA_high:   561.76,    // HA × 2 (upper harmonic)
+  NA_sub:    148.79,    // NA ÷ 2
+  NA_base:   297.58,    // NA fundamental
+  NA_high:   595.16,    // NA × 2
+  TAO_sub:   210.42,    // TAO ÷ 2
+  TAO_base:  420.84,    // TAO fundamental
+  PHI_tone:  432 / 1.618,  // Golden ratio (≈267 Hz) · cosmic harmonic
+  FIBE_5:    233.08,    // Fibonacci 5th harmonic relative to 432
+  ZeroPoint: 136.10,    // Deep grounding frequency (432 ÷ 3.175)
+};
+
 // §F cymatic geometry node counts
 const GEOM = {
   HA:  { nodes: 6,  form: '6-petal hexagon',     color: '#f97316' },
@@ -376,9 +411,58 @@ const GEOM = {
 // ════════════════════════════════════════════════════════════════════════════
 let audioCtx = null;
 const activeOscs = [];
+const atmosphereOscs = [];  // Ambient layer
+let atmosphereGain = null;  // Master atmosphere control
 
 function ensureCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function createAtmosphere(primaryFreqs = []) {
+  // Builds coherent atmospheric layer from golden ratio + Fibonacci + octaves
+  if (!atmosphereGain) {
+    atmosphereGain = audioCtx.createGain();
+    atmosphereGain.gain.value = 0.04; // Very subtle background
+    atmosphereGain.connect(audioCtx.destination);
+  }
+  
+  // Base frequencies to build atmosphere from
+  const freqs = [
+    ATMOSPHERE.ZeroPoint,      // Grounding
+    ATMOSPHERE.PHI_tone,       // Golden ratio cosmic harmonic
+    ATMOSPHERE.HA_sub,         // HA octave down
+    ATMOSPHERE.NA_sub,         // NA octave down
+    ATMOSPHERE.FIBE_5,         // Fibonacci harmonic
+    ...primaryFreqs            // Add whatever is playing
+  ];
+  
+  freqs.forEach(freq => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = 0.02 + Math.random() * 0.01; // Slight randomness = richness
+    
+    osc.connect(gain);
+    gain.connect(atmosphereGain);
+    osc.start();
+    atmosphereOscs.push({ osc, gain });
+  });
+}
+
+function stopAtmosphere() {
+  atmosphereOscs.forEach(({ osc }) => {
+    try { osc.stop(); } catch(e){}
+  });
+  atmosphereOscs.length = 0;
+}
+
+function modulateAtmosphere(intensity) {
+  // Scale atmospheric presence with the active tone
+  if (atmosphereGain) {
+    atmosphereGain.gain.value = 0.02 + intensity * 0.08;
+  }
 }
 
 function stopAll() {
@@ -392,10 +476,14 @@ function stopAll() {
   });
   activeOscs.length = 0;
   
+  // Stop atmosphere
+  stopAtmosphere();
+  
   // Disconnect any remaining nodes from destination
   try {
     audioCtx.close();
     audioCtx = null;
+    atmosphereGain = null;
   } catch(e){}
   
   // Clear active button states
@@ -433,30 +521,38 @@ function playOnce(key) {
 function playHA() {
   stopAll();
   makeTone(FREQS.HA);
+  createAtmosphere([ATMOSPHERE.HA_sub, ATMOSPHERE.HA_high, ATMOSPHERE.PHI_tone]);
+  modulateAtmosphere(1);
   document.getElementById('btnHACont').classList.add('active');
   drawGeom('HA', 1);
-  setStatus('HA · 280.88 Hz · continuous · earth excitation · hexagonal crown forming');
+  setStatus('HA · 280.88 Hz · continuous · earth excitation · hexagonal crown forming · + harmonic atmosphere');
 }
 
 function playNA() {
   stopAll();
   makeTone(FREQS.NA);
+  createAtmosphere([ATMOSPHERE.NA_sub, ATMOSPHERE.NA_high, ATMOSPHERE.FIBE_5, ATMOSPHERE.ZeroPoint]);
+  modulateAtmosphere(1);
   document.getElementById('btnNACont').classList.add('active');
   drawGeom('NA', 1);
-  setStatus('NA · 297.58 Hz · Zero Point null · spike geometry locks into equilibrium');
+  setStatus('NA · 297.58 Hz · Zero Point null · equilibrium rings · + fibonacci atmosphere');
 }
 
 function playTAO() {
   stopAll();
   makeTone(FREQS.TAO);
+  createAtmosphere([ATMOSPHERE.TAO_sub, ATMOSPHERE.HA_sub, ATMOSPHERE.NA_sub, ATMOSPHERE.PHI_tone]);
+  modulateAtmosphere(1);
   document.getElementById('btnTAOCont').classList.add('active');
   drawGeom('TAO', 1);
-  setStatus('TAO · 420.84 Hz · lunar tritone · 13-point burst · ferrofluid pattern collapses');
+  setStatus('TAO · 420.84 Hz · lunar tritone · 13-point burst · tritone tension field · + cancel atmosphere');
 }
 
 function playAntiphase() {
   stopAll();
   ensureCtx();
+  createAtmosphere([ATMOSPHERE.HA_sub, ATMOSPHERE.NA_sub, ATMOSPHERE.FIBE_5]);
+  modulateAtmosphere(0.5);  // Dimmer during cancellation
   // Two oscillators: one at 0°, one at 180° — true destructive interference
   const osc1 = audioCtx.createOscillator();
   const osc2 = audioCtx.createOscillator();
