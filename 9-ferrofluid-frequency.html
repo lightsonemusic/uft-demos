@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ferrofluid Frequency Portal · UFT</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -126,6 +127,13 @@ canvas {
   height: 280px;
   border-radius: 50%;
 }
+#glCanvas {
+  width: 100%;
+  height: 280px;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(15,25,50,1) 0%, rgba(4,8,20,1) 100%);
+}
 #fftCanvas {
   height: 120px;
   border-radius: 6px;
@@ -235,8 +243,8 @@ canvas {
 
   <!-- ─────────────────── CENTER : GEOMETRY + INTERVAL ──────────────────── -->
   <div class="panel">
-    <div class="lbl">§F · live cymatic geometry</div>
-    <canvas id="cymaCanvas"></canvas>
+    <div class="lbl">§F · live cymatic geometry · 3D</div>
+    <canvas id="glCanvas"></canvas>
 
     <div class="lbl">🎚️ harmonic spectrum · frequency domain</div>
     <canvas id="fftCanvas"></canvas>
@@ -729,140 +737,236 @@ function drawFFTSpectrum() {
 // ════════════════════════════════════════════════════════════════════════════
 let animFrame = null;
 let animPhase = 0;
+// ════════════════════════════════════════════════════════════════════════════
+// THREE.JS 3D GEOMETRY ENGINE
+// ════════════════════════════════════════════════════════════════════════════
+let scene = null;
+let camera = null;
+let renderer = null;
+let haGroup = null;
+let naGroup = null;
+let taoGroup = null;
+let currentGroup = null;
+let mouseX = 0;
+let mouseY = 0;
 let currentKey = 'HA';
 let currentIntensity = 0;
+
+function initThreeJS() {
+  const canvas = document.getElementById('glCanvas');
+  const w = canvas.parentElement.offsetWidth;
+  const h = w; // square
+  
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x040814);
+  
+  camera = new THREE.PerspectiveCamera(75, w/h, 0.1, 1000);
+  camera.position.z = 3;
+  
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  
+  // Lighting
+  const ambLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambLight);
+  
+  const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+  pointLight.position.set(5, 5, 5);
+  scene.add(pointLight);
+  
+  // Mouse controls
+  document.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / w) * 2 - 1;
+    mouseY = -(e.clientY / h) * 2 + 1;
+  });
+  
+  // Create geometry groups
+  createHAGeometry();
+  createNAGeometry();
+  createTAOGeometry();
+  
+  // Start with HA
+  showGeometry('HA');
+}
+
+function createHAGeometry() {
+  haGroup = new THREE.Group();
+  
+  const material = new THREE.MeshStandardMaterial({
+    color: 0xf97316,
+    emissive: 0xf97316,
+    emissiveIntensity: 0.3,
+    wireframe: false
+  });
+  
+  const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf97316 });
+  
+  // 6 spheres in hexagon pattern
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2;
+    const x = Math.cos(angle) * 1.2;
+    const y = Math.sin(angle) * 1.2;
+    
+    const sphere = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(0.25, 4),
+      material.clone()
+    );
+    sphere.position.set(x, y, 0);
+    sphere.userData.basePos = { x, y, z: 0 };
+    haGroup.add(sphere);
+  }
+  
+  // Center sphere
+  const centerSphere = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(0.18, 3),
+    material.clone()
+  );
+  haGroup.add(centerSphere);
+  
+  // Outer ring
+  const ringGeom = new THREE.BufferGeometry();
+  const ringPts = [];
+  for (let i = 0; i <= 64; i++) {
+    const angle = (i / 64) * Math.PI * 2;
+    ringPts.push(Math.cos(angle) * 1.5, Math.sin(angle) * 1.5, 0);
+  }
+  ringGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(ringPts), 3));
+  const ring = new THREE.Line(ringGeom, lineMaterial);
+  haGroup.add(ring);
+  
+  scene.add(haGroup);
+}
+
+function createNAGeometry() {
+  naGroup = new THREE.Group();
+  
+  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x4ade80 });
+  
+  // 5 concentric rings
+  for (let ring = 1; ring <= 5; ring++) {
+    const radius = 0.3 * ring;
+    const ringGeom = new THREE.BufferGeometry();
+    const ringPts = [];
+    for (let i = 0; i <= 64; i++) {
+      const angle = (i / 64) * Math.PI * 2;
+      ringPts.push(Math.cos(angle) * radius, Math.sin(angle) * radius, 0);
+    }
+    ringGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(ringPts), 3));
+    const ringLine = new THREE.Line(ringGeom, lineMaterial);
+    naGroup.add(ringLine);
+  }
+  
+  // Crosshair null point
+  const crossGeom = new THREE.BufferGeometry();
+  const crossPts = [
+    -0.5, 0, 0,  0.5, 0, 0,  // X axis
+    0, -0.5, 0,  0, 0.5, 0   // Y axis
+  ];
+  crossGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(crossPts), 3));
+  const cross = new THREE.LineSegments(crossGeom, lineMaterial);
+  naGroup.add(cross);
+  
+  scene.add(naGroup);
+}
+
+function createTAOGeometry() {
+  taoGroup = new THREE.Group();
+  
+  const lineMaterial = new THREE.LineBasicMaterial({ color: 0xe2e8f0 });
+  
+  // 13 radiating spikes
+  for (let i = 0; i < 13; i++) {
+    const angle = (i / 13) * Math.PI * 2;
+    const x1 = Math.cos(angle) * 0.4;
+    const y1 = Math.sin(angle) * 0.4;
+    const x2 = Math.cos(angle) * 1.8;
+    const y2 = Math.sin(angle) * 1.8;
+    
+    const spikeGeom = new THREE.BufferGeometry();
+    const spikePts = [x1, y1, 0, x2, y2, 0];
+    spikeGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(spikePts), 3));
+    const spike = new THREE.LineSegments(spikeGeom, lineMaterial);
+    taoGroup.add(spike);
+  }
+  
+  // Outer burst ring
+  const ringGeom = new THREE.BufferGeometry();
+  const ringPts = [];
+  for (let i = 0; i <= 64; i++) {
+    const angle = (i / 64) * Math.PI * 2;
+    ringPts.push(Math.cos(angle) * 1.9, Math.sin(angle) * 1.9, 0);
+  }
+  ringGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(ringPts), 3));
+  const ring = new THREE.Line(ringGeom, lineMaterial);
+  taoGroup.add(ring);
+  
+  scene.add(taoGroup);
+}
+
+function showGeometry(key) {
+  [haGroup, naGroup, taoGroup].forEach(g => { if(g) g.visible = false; });
+  currentGroup = { 'HA': haGroup, 'NA': naGroup, 'TAO': taoGroup }[key];
+  if (currentGroup) currentGroup.visible = true;
+}
+
+function animateThreeJS() {
+  animPhase += 0.018;
+  
+  // HA: rotating hexagon
+  if (haGroup && haGroup.visible) {
+    haGroup.rotation.z += 0.01;
+    haGroup.children.forEach((child, idx) => {
+      if (idx < 6 && child.userData.basePos) {
+        const bob = Math.sin(animPhase + idx) * 0.15;
+        child.position.z = bob;
+      }
+    });
+  }
+  
+  // NA: pulsing rings
+  if (naGroup && naGroup.visible) {
+    naGroup.children.forEach((child, idx) => {
+      if (idx < 5) {
+        const scale = 0.8 + 0.3 * Math.sin(animPhase + idx * 0.5);
+        child.scale.set(scale, scale, 1);
+      }
+    });
+  }
+  
+  // TAO: rotating burst
+  if (taoGroup && taoGroup.visible) {
+    taoGroup.rotation.z -= 0.015;
+  }
+  
+  // Camera follows mouse (subtle)
+  if (camera && currentGroup) {
+    camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+    camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+    camera.lookAt(0, 0, 0);
+  }
+  
+  // Render
+  renderer.render(scene, camera);
+  
+  // Update FFT spectrum
+  drawFFTSpectrum();
+  
+  animFrame = requestAnimationFrame(animateThreeJS);
+}
 
 function drawGeom(key, intensity) {
   currentKey = key;
   currentIntensity = intensity;
+  
+  if (!scene) {
+    initThreeJS();
+  }
+  
+  showGeometry(key);
+  
   if (animFrame) cancelAnimationFrame(animFrame);
-  animateGeom();
-}
-
-function animateGeom() {
-  animPhase += 0.018;
-  const canvas = document.getElementById('cymaCanvas');
-  const parent = canvas.parentElement;
-  const w = parent.offsetWidth;
-  const h = parent.offsetWidth; // square canvas
-  canvas.width  = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  const cx = w/2, cy = h/2;
-  const R = Math.min(w,h) * 0.38;
-  const geom = GEOM[currentKey];
-  const col  = geom.color;
-
-  ctx.clearRect(0,0,w,h);
-
-  // Background pulse
-  if (currentIntensity > 0) {
-    const grad = ctx.createRadialGradient(cx,cy,0,cx,cy,R*1.3);
-    grad.addColorStop(0, col + '18');
-    grad.addColorStop(1, 'transparent');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0,0,w,h);
-  }
-
-  ctx.save();
-  ctx.translate(cx, cy);
-
-  if (currentKey === 'HA') {
-    // 6-petal hexagon — §F Earth / Seed of Life
-    for (let p = 0; p < 6; p++) {
-      const angle = (p / 6) * Math.PI * 2 + animPhase;
-      const pr = R * 0.48;
-      const px = Math.cos(angle) * pr;
-      const py = Math.sin(angle) * pr;
-      ctx.beginPath();
-      ctx.arc(px, py, pr, 0, Math.PI*2);
-      ctx.strokeStyle = col;
-      ctx.lineWidth = currentIntensity > 0 ? 2.2 : 1;
-      ctx.globalAlpha = 0.55 + 0.3 * Math.sin(animPhase + p);
-      ctx.shadowColor = col;
-      ctx.shadowBlur  = currentIntensity > 0 ? 12 : 0;
-      ctx.stroke();
-    }
-    // Centre circle
-    ctx.beginPath();
-    ctx.arc(0, 0, R * 0.48, 0, Math.PI*2);
-    ctx.strokeStyle = col;
-    ctx.lineWidth = 2;
-    ctx.globalAlpha = 0.7;
-    ctx.stroke();
-    // Outer ring
-    ctx.beginPath();
-    ctx.arc(0, 0, R, 0, Math.PI*2);
-    ctx.strokeStyle = col;
-    ctx.lineWidth = 1.2;
-    ctx.globalAlpha = 0.3;
-    ctx.shadowBlur = 0;
-    ctx.stroke();
-
-  } else if (currentKey === 'TAO') {
-    // 13-point burst — §F Yew / lunar octave
-    for (let p = 0; p < 13; p++) {
-      const angle = (p / 13) * Math.PI * 2 + animPhase * 0.7;
-      const r1 = R * (0.3 + 0.15 * Math.sin(animPhase * 2 + p));
-      const r2 = R * (0.9 + 0.08 * Math.cos(animPhase + p * 0.7));
-      ctx.beginPath();
-      ctx.moveTo(Math.cos(angle) * r1, Math.sin(angle) * r1);
-      ctx.lineTo(Math.cos(angle) * r2, Math.sin(angle) * r2);
-      ctx.strokeStyle = col;
-      ctx.lineWidth = 2.5;
-      ctx.globalAlpha = 0.6 + 0.3 * Math.sin(animPhase*1.5 + p);
-      ctx.shadowColor = col;
-      ctx.shadowBlur  = 14;
-      ctx.stroke();
-    }
-    // Outer burst ring
-    ctx.beginPath();
-    ctx.arc(0, 0, R * 0.95, 0, Math.PI*2);
-    ctx.strokeStyle = col;
-    ctx.lineWidth = 1;
-    ctx.globalAlpha = 0.2;
-    ctx.shadowBlur = 0;
-    ctx.stroke();
-
-  } else {
-    // NA — Standing wave null · expanding / collapsing rings
-    for (let ring = 1; ring <= 5; ring++) {
-      const phase = animPhase * (ring % 2 === 0 ? 1 : -1);
-      const r = R * (0.15 * ring + 0.04 * Math.sin(phase * 2));
-      ctx.beginPath();
-      ctx.arc(0, 0, r, 0, Math.PI*2);
-      ctx.strokeStyle = col;
-      ctx.lineWidth = 1.5;
-      ctx.globalAlpha = 0.2 + 0.15 * Math.sin(phase + ring);
-      ctx.shadowColor = col;
-      ctx.shadowBlur  = currentIntensity > 0.5 ? 8 : 0;
-      ctx.stroke();
-    }
-    // Cross hair — the null point
-    ctx.globalAlpha = 0.4;
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = col;
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(-R*0.1, 0); ctx.lineTo(R*0.1, 0); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, -R*0.1); ctx.lineTo(0, R*0.1); ctx.stroke();
-  }
-
-  ctx.restore();
-
-  // Label at bottom
-  ctx.save();
-  ctx.font = '13px Georgia, serif';
-  ctx.fillStyle = geom.color;
-  ctx.globalAlpha = 0.7;
-  ctx.textAlign = 'center';
-  ctx.fillText(geom.form, w/2, h - 10);
-  ctx.globalAlpha = 1.0;
-  ctx.restore();
-
-  // Update FFT spectrum in real-time
-  drawFFTSpectrum();
-
-  animFrame = requestAnimationFrame(animateGeom);
+  animateThreeJS();
 }
 
 function setStatus(msg) {
