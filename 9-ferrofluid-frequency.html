@@ -759,7 +759,7 @@ function initThreeJS() {
   
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x040814);
-  scene.fog = new THREE.FogExp2(0x040814, 0.3);  // Cosmic depth fog
+  scene.fog = new THREE.FogExp2(0x040814, 0.08);  // Much lighter fog for visibility
   
   camera = new THREE.PerspectiveCamera(75, w/h, 0.1, 1000);
   camera.position.z = 3;
@@ -774,16 +774,16 @@ function initThreeJS() {
   createStarfield();
   
   // Cosmic Lighting — Dual color scheme (golden + cyan)
-  const ambLight = new THREE.AmbientLight(0x6040ff, 0.35);  // Deep violet base
+  const ambLight = new THREE.AmbientLight(0x6040ff, 0.5);  // Brighter violet base
   scene.add(ambLight);
   
   // Primary cosmic light — warm golden (280 Hz HA warmth)
-  const pointLight1 = new THREE.PointLight(0xffb366, 0.9, 100);
+  const pointLight1 = new THREE.PointLight(0xffb366, 1.2, 150);
   pointLight1.position.set(5, 3, 6);
   scene.add(pointLight1);
   
   // Secondary cosmic light — cyan (NA equilibrium cool)
-  const pointLight2 = new THREE.PointLight(0x40e0ff, 0.6, 100);
+  const pointLight2 = new THREE.PointLight(0x40e0ff, 0.9, 150);
   pointLight2.position.set(-5, -3, 6);
   scene.add(pointLight2);
   
@@ -830,11 +830,12 @@ function createStarfield() {
   starsGeom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(starColors), 3));
   
   const starMaterial = new THREE.PointsMaterial({
-    size: 0.15,
+    size: 0.2,
     vertexColors: true,
     transparent: true,
-    opacity: 0.8,
-    sizeAttenuation: true
+    opacity: 1.0,
+    sizeAttenuation: true,
+    fog: false
   });
   
   starfield = new THREE.Points(starsGeom, starMaterial);
@@ -874,11 +875,12 @@ function createCosmicParticles() {
   dustGeom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(dustColors), 3));
   
   const dustMaterial = new THREE.PointsMaterial({
-    size: 0.08,
+    size: 0.12,
     vertexColors: true,
     transparent: true,
-    opacity: 0.4,
-    sizeAttenuation: true
+    opacity: 0.7,
+    sizeAttenuation: true,
+    fog: false
   });
   
   cosmicParticles = new THREE.Points(dustGeom, dustMaterial);
@@ -929,9 +931,10 @@ function createCosmicParticles() {
   ringGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(ringPts), 3));
   const lineMaterial = new THREE.LineBasicMaterial({ 
     color: 0xf97316,
-    linewidth: 2,
-    transparent: true,
-    opacity: 0.8
+    linewidth: 3,
+    transparent: false,
+    opacity: 1.0,
+    fog: false
   });
   const ring = new THREE.Line(ringGeom, lineMaterial);
   haGroup.add(ring);
@@ -944,9 +947,9 @@ function createNAGeometry() {
   
   const lineMaterial = new THREE.LineBasicMaterial({ 
     color: 0x4ade80,
-    linewidth: 2,
-    transparent: true,
-    opacity: 0.8
+    linewidth: 3,
+    transparent: false,
+    fog: false
   });
   
   // 5 concentric rings — pulsing equilibrium
@@ -972,9 +975,9 @@ function createNAGeometry() {
   crossGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(crossPts), 3));
   const crossMaterial = new THREE.LineBasicMaterial({ 
     color: 0x80ff00,
-    linewidth: 3,
-    transparent: true,
-    opacity: 1.0
+    linewidth: 4,
+    transparent: false,
+    fog: false
   });
   const cross = new THREE.LineSegments(crossGeom, crossMaterial);
   naGroup.add(cross);
@@ -987,9 +990,9 @@ function createTAOGeometry() {
   
   const lineMaterial = new THREE.LineBasicMaterial({ 
     color: 0xe2e8f0,
-    linewidth: 2,
-    transparent: true,
-    opacity: 0.9
+    linewidth: 3,
+    transparent: false,
+    fog: false
   });
   
   // 13 radiating spikes — tritone tension
