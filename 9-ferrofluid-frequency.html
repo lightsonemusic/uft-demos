@@ -753,11 +753,16 @@ let cosmicParticles = null;  // Orbital particle system
 let starfield = null;         // Background starfield
 
 function initThreeJS() {
+  console.log('🔵 initThreeJS() START');
   const canvas = document.getElementById('glCanvas');
+  console.log('Canvas element:', canvas);
+  console.log('Canvas parent:', canvas?.parentElement);
   const w = canvas.parentElement.offsetWidth;
   const h = w; // square
+  console.log('Canvas size:', w, 'x', h);
   
   scene = new THREE.Scene();
+  console.log('✅ Scene created');
   scene.background = new THREE.Color(0x040814);
   scene.fog = new THREE.FogExp2(0x040814, 0.08);  // Much lighter fog for visibility
   
@@ -765,8 +770,10 @@ function initThreeJS() {
   camera.position.z = 3;
   
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  console.log('✅ Renderer created:', renderer);
   renderer.setSize(w, h);
   renderer.setPixelRatio(window.devicePixelRatio);
+  console.log('Renderer size set to', w, 'x', h);
   
   // ═══════════════════════════════════════════════════════════════════════════
   // CELESTIAL BACKGROUND — Starfield
@@ -797,7 +804,8 @@ function initThreeJS() {
   
   // Start with HA
   showGeometry('HA');
-}}
+  console.log('✅ initThreeJS() COMPLETE - scene ready');
+}
 
 function createStarfield() {
   // 500+ cosmic background stars
@@ -1025,13 +1033,28 @@ function createTAOGeometry() {
 }}
 
 function showGeometry(key) {
+  console.log('🟢 showGeometry():', key);
+  if (!scene) {
+    console.log('   Scene null - calling initThreeJS()');
+    initThreeJS();
+  }
   [haGroup, naGroup, taoGroup].forEach(g => { if(g) g.visible = false; });
   currentGroup = { 'HA': haGroup, 'NA': naGroup, 'TAO': taoGroup }[key];
-  if (currentGroup) currentGroup.visible = true;
+  if (currentGroup) {
+    currentGroup.visible = true;
+    console.log('   ✅ Group set visible:', key);
+  } else {
+    console.log('   ❌ Group NOT found:', key);
+  }
 }
 
 function animateThreeJS() {
   animPhase += 0.018;
+  
+  if (!renderer) {
+    console.warn('Renderer not initialized - stopping animation');
+    return;
+  }
   
   // Rotating starfield (slow cosmic drift)
   if (starfield) {
@@ -1091,16 +1114,21 @@ function animateThreeJS() {
 }}
 
 function drawGeom(key, intensity) {
+  console.log('🔴 drawGeom() called:', key, 'intensity:', intensity);
   currentKey = key;
   currentIntensity = intensity;
   
   if (!scene) {
+    console.log('   Scene is null - initializing THREE.js');
     initThreeJS();
+  } else {
+    console.log('   Scene already initialized');
   }
   
   showGeometry(key);
   
   if (animFrame) cancelAnimationFrame(animFrame);
+  console.log('   Starting animation loop...');
   animateThreeJS();
 }
 
@@ -1111,6 +1139,8 @@ function setStatus(msg) {
 // ════════════════════════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════════════════════════
+console.log('🚀 UFT Ferrofluid Demo Loading...');
+console.log('THREE.js version:', THREE.REVISION);
 drawGeom('HA', 0);
 </script>
 </body>
