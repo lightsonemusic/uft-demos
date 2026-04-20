@@ -118,11 +118,18 @@ h1 {
 /* ── CANVAS ─────────────────────────────────────────── */
 canvas {
   width: 100%;
-  height: 280px;
   display: block;
-  border-radius: 50%;
   background: rgba(4,8,20,0.9);
   margin-bottom: 16px;
+}
+#cymaCanvas {
+  height: 280px;
+  border-radius: 50%;
+}
+#fftCanvas {
+  height: 120px;
+  border-radius: 6px;
+  border: 1px solid #1a3a50;
 }
 
 /* ── CENTER INFO ────────────────────────────────────── */
@@ -230,6 +237,9 @@ canvas {
   <div class="panel">
     <div class="lbl">§F · live cymatic geometry</div>
     <canvas id="cymaCanvas"></canvas>
+
+    <div class="lbl">🎚️ harmonic spectrum · frequency domain</div>
+    <canvas id="fftCanvas"></canvas>
 
     <div class="lbl">§VII · interval · torus axis</div>
     <div class="axis-label" id="intervalLabel" style="color:#ffe066">TRITONE</div>
@@ -467,8 +477,19 @@ const activeOscs = [];
 const atmosphereOscs = [];  // Ambient layer
 let atmosphereGain = null;  // Master atmosphere control
 
+let analyser = null;  // FFT analyser node
+let dataArray = null;  // FFT data buffer
+
 function ensureCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Create analyser for FFT spectrum
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;  // 512 frequency bins
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    // Connect analyser to destination (tap the output)
+    analyser.connect(audioCtx.destination);
+  }
 }
 
 function createAtmosphere(primaryFreqs = []) {
@@ -532,11 +553,21 @@ function stopAll() {
   // Stop atmosphere
   stopAtmosphere();
   
+  // Clear FFT display
+  const fftCanvas = document.getElementById('fftCanvas');
+  if (fftCanvas) {
+    const fftCtx = fftCanvas.getContext('2d');
+    fftCtx.fillStyle = 'rgba(4,8,20,0.9)';
+    fftCtx.fillRect(0, 0, fftCanvas.width, fftCanvas.height);
+  }
+  
   // Disconnect any remaining nodes from destination
   try {
     audioCtx.close();
     audioCtx = null;
     atmosphereGain = null;
+    analyser = null;
+    dataArray = null;
   } catch(e){}
   
   // Clear active button states
@@ -557,9 +588,25 @@ function makeTone(freq, gainVal = 0.18) {
   osc.frequency.value = freq;
   gain.gain.value = gainVal;
   osc.connect(gain);
-  gain.connect(audioCtx.destination);
+  gain.connect(analyser);  // Connect through analyser for spectrum visualization
   osc.start();
   activeOscs.push(osc);
+  
+  // Auto-generate harmonic overtones (2x, 3x, 4x, 5x)
+  const harmonics = [2, 3, 4, 5];  // harmonic series
+  const harmonicGain = gainVal * 0.3;  // Overtones quieter than fundamental
+  harmonics.forEach((ratio, idx) => {
+    const harmOsc = audioCtx.createOscillator();
+    const harmGain = audioCtx.createGain();
+    harmOsc.type = 'sine';
+    harmOsc.frequency.value = freq * ratio;
+    harmGain.gain.value = harmonicGain / (idx + 1);  // Each higher harmonic slightly quieter
+    harmOsc.connect(harmGain);
+    harmGain.connect(analyser);
+    harmOsc.start();
+    activeOscs.push(harmOsc);
+  });
+  
   return { osc, gain };
 }
 
@@ -627,6 +674,54 @@ function playAntiphase() {
   document.getElementById('btnAnti').classList.add('active');
   drawGeom('NA', 0.15);
   setStatus('anti-phase · NA 297.58 Hz at 180° · destructive interference · ferrofluid erased');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FFT SPECTRUM VISUALIZATION
+// ════════════════════════════════════════════════════════════════════════════
+function drawFFTSpectrum() {
+  const fftCanvas = document.getElementById('fftCanvas');
+  if (!fftCanvas || !analyser) return;
+  
+  const ctx = fftCanvas.getContext('2d');
+  const w = fftCanvas.offsetWidth;
+  const h = fftCanvas.offsetHeight;
+  
+  // Set canvas resolution
+  fftCanvas.width = w;
+  fftCanvas.height = h;
+  
+  // Get frequency data
+  analyser.getByteFrequencyData(dataArray);
+  
+  // Background
+  ctx.fillStyle = 'rgba(4,8,20,0.9)';
+  ctx.fillRect(0, 0, w, h);
+  
+  // Draw spectrum bars
+  const barWidth = w / analyser.frequencyBinCount;
+  const centerX = w / 2;
+  let x = centerX;  // Start from center, radiate outward
+  
+  for (let i = 0; i < analyser.frequencyBinCount; i++) {
+    const value = dataArray[i];
+    const barHeight = (value / 255) * h;
+    
+    // Color gradient: blue → cyan → green → yellow → red
+    let hue = (i / analyser.frequencyBinCount) * 360;
+    ctx.fillStyle = `hsl(${hue}, 100%, ${50 + (value / 255) * 20}%)`;
+    ctx.fillRect(x, h - barHeight, barWidth, barHeight);
+    
+    x += barWidth;
+  }
+  
+  // Draw center line
+  ctx.strokeStyle = 'rgba(112,200,255,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, h / 2);
+  ctx.lineTo(w, h / 2);
+  ctx.stroke();
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -763,6 +858,9 @@ function animateGeom() {
   ctx.fillText(geom.form, w/2, h - 10);
   ctx.globalAlpha = 1.0;
   ctx.restore();
+
+  // Update FFT spectrum in real-time
+  drawFFTSpectrum();
 
   animFrame = requestAnimationFrame(animateGeom);
 }
