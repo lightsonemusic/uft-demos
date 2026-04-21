@@ -424,6 +424,34 @@ header .sub { color: #2e5c40; font-size: 0.85em; }
     <div class="panel">
       <div class="panel-title">Session Log</div>
 
+    <!-- HARDWARE COHERENCY PANEL -->
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-title">Hardware Coherency Panel</div>
+      <div style="margin-bottom:10px; color:#7ab88a; font-size:0.85em;">
+        <strong>Layer 1 — Sensor Pre-Flight:</strong> Water temp, soil temp, soil moisture %, time of day, barometric pressure trend
+      </div>
+      <div id="hwSensorRow" style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:10px;">
+        <div><span style="color:#2e7a4a;">Water Temp</span><br><span id="hwWaterTemp">—</span> °C</div>
+        <div><span style="color:#2e7a4a;">Soil Temp</span><br><span id="hwSoilTemp">—</span> °C</div>
+        <div><span style="color:#2e7a4a;">Soil Moisture</span><br><span id="hwSoilMoist">—</span> %</div>
+        <div><span style="color:#2e7a4a;">Time</span><br><span id="hwTime">—</span></div>
+        <div><span style="color:#2e7a4a;">Pressure Trend</span><br><span id="hwPressure">—</span></div>
+      </div>
+      <div style="margin-bottom:10px; color:#7ab88a; font-size:0.85em;">
+        <strong>Layer 2 — UFT Auto-Checks:</strong> Hz range vs sap phase, Fibonacci coherency, lunar day vs sap phase, LUNAR_ROOT anchors
+      </div>
+      <div id="hwAutoCheckRow" style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:10px;">
+        <div><span style="color:#3a7a52;">Hz Range</span><br><span id="hwHzRange">—</span></div>
+        <div><span style="color:#3a7a52;">Fibonacci</span><br><span id="hwFib">—</span></div>
+        <div><span style="color:#3a7a52;">Lunar Day</span><br><span id="hwLunarDay">—</span></div>
+        <div><span style="color:#3a7a52;">LUNAR_ROOT</span><br><span id="hwLunarRoot">—</span></div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <span id="hwGateBadge" class="prot-action prot-IRRIGATE" style="display:inline-block; min-width:180px;">APPLY PROTOCOL</span>
+      </div>
+      <div style="font-size:0.75em; color:#7788aa;">All sensor readings and coherency checks are saved with each session log.</div>
+    </div>
+
       <table id="logTable">
         <thead>
           <tr>
