@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ferrofluid Frequency Portal � UFT</title>
+<title>Ferrofluid Frequency Portal &middot; UFT</title>
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -88,7 +88,7 @@ h1 {
   font-style: italic;
 }
 
-/* \u2500\u2500 BUTTONS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+/* -- BUTTONS ---------------------------------------------------- */
 .freq-btn {
   display: block;
   width: 100%;
@@ -117,16 +117,12 @@ h1 {
 .btn-stop    { color: #f87171; border-color: #5a1a1a; }
 .btn-stop:hover { background: rgba(248,113,113,0.14); }
 
-/* \u2500\u2500 CANVAS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+/* -- CANVAS ----------------------------------------------------- */
 canvas {
   width: 100%;
   display: block;
   background: rgba(4,8,20,0.9);
   margin-bottom: 16px;
-}
-#cymaCanvas {
-  height: 280px;
-  border-radius: 50%;
 }
 #cymaCanvas {
   height: 280px;
@@ -138,7 +134,7 @@ canvas {
   border: 1px solid #1a3a50;
 }
 
-/* \u2500\u2500 CENTER INFO \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+/* -- CENTER INFO ------------------------------------------------ */
 .axis-label {
   font-size: 22px;
   text-align: center;
@@ -181,7 +177,7 @@ canvas {
   margin-bottom: 6px;
 }
 
-/* \u2500\u2500 STATUS BAR \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+/* -- STATUS BAR ------------------------------------------------- */
 #statusBar {
   max-width: 1200px;
   margin: 16px auto 0;
@@ -196,7 +192,7 @@ canvas {
   transition: color 0.3s;
 }
 
-/* \u2500\u2500 TUNING NOTE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+/* -- TUNING NOTE ------------------------------------------------ */
 .tuning-badge {
   display: inline-block;
   font-size: 11px;
@@ -213,128 +209,128 @@ canvas {
 <body>
 
 <h1>Ferrofluid Frequency Portal</h1>
-<p class="subtitle">earth element excitation � zero point equilibrium � lunar tritone cancellation</p>
+<p class="subtitle">earth element excitation &middot; zero point equilibrium &middot; lunar tritone cancellation</p>
 
 <div class="grid">
 
-  <!-- \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 LEFT : INJECT (excite ferrofluid) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 -->
+  <!-- LEFT : INJECT (excite ferrofluid) -->
   <div class="panel">
-    <div class="lbl">�F � earth element input</div>
+    <div class="lbl">&sect;F &middot; earth element input</div>
 
     <div class="proto-huge" id="leftProto" style="color:#f97316">HA</div>
     <div class="hz-display" id="leftHz" style="color:#f97316">280.88 Hz</div>
     <div class="form-name">6-petal hexagon</div>
-    <div class="planet-line">Jupiter � Seed of Life � torus cross-section</div>
-    <div class="tuning-badge">432 Hz tuning � F � pc:5</div>
+    <div class="planet-line">Jupiter &middot; Seed of Life &middot; torus cross-section</div>
+    <div class="tuning-badge">432 Hz tuning &middot; F &middot; pc:5</div>
 
     <hr class="divider">
-    <div class="lbl">�IV � body location</div>
+    <div class="lbl">&sect;IV &middot; body location</div>
     <div style="font-size:20px;text-align:center;color:#d08040;margin-bottom:6px;letter-spacing:2px;">Diaphragm</div>
-    <div style="font-size:14px;text-align:center;color:#4a5868;margin-bottom:20px;font-style:italic;">Hawthorn � Huath � Fib:13 � Sap: Peak</div>
+    <div style="font-size:14px;text-align:center;color:#4a5868;margin-bottom:20px;font-style:italic;">Hawthorn &middot; Huath &middot; Fib:13 &middot; Sap: Peak</div>
 
     <hr class="divider">
     <div class="lbl">play</div>
-    <button class="freq-btn btn-excite" id="btnHACont" onclick="playHA()">▶ HA continuous · 280.88 Hz</button>
-    <button class="freq-btn btn-excite" onclick="playOnce('HA')">▷ HA single pulse</button>
-    <button class="freq-btn btn-stop"   onclick="stopAll()">� stop all</button>
+    <button class="freq-btn btn-excite" id="btnHACont" onclick="playHA()">&#9654; HA continuous &middot; 280.88 Hz</button>
+    <button class="freq-btn btn-excite" onclick="playOnce('HA')">&#9655; HA single pulse</button>
+    <button class="freq-btn btn-stop"   onclick="stopAll()">&#9632; stop all</button>
   </div>
 
-  <!-- \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 CENTER : GEOMETRY + INTERVAL \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 -->
+  <!-- CENTER : GEOMETRY + INTERVAL -->
   <div class="panel">
-    <div class="lbl">�F � live cymatic geometry</div>
+    <div class="lbl">&sect;F &middot; live cymatic geometry</div>
     <canvas id="cymaCanvas"></canvas>
 
-    <div class="lbl">🎚️ harmonic spectrum � frequency domain</div>
+    <div class="lbl">&#127898; harmonic spectrum &middot; frequency domain</div>
     <canvas id="fftCanvas"></canvas>
 
-    <div class="lbl">�VII � interval � torus axis</div>
+    <div class="lbl">&sect;VII &middot; interval &middot; torus axis</div>
     <div class="axis-label" id="intervalLabel" style="color:#ffe066">TRITONE</div>
-    <div class="axis-sub">HA �� TAO � diabolus in musica</div>
-    <div class="interval-display" id="ratioDisplay" style="color:#ffe066">��2 : 1</div>
-    <div class="interval-name">maximum tension � zero-point opposition</div>
+    <div class="axis-sub">HA &rarr; TAO &middot; diabolus in musica</div>
+    <div class="interval-display" id="ratioDisplay" style="color:#ffe066">&radic;2 : 1</div>
+    <div class="interval-name">maximum tension &middot; zero-point opposition</div>
 
     <hr class="divider">
     <div class="state-line">
-      <strong id="stateLabel">earth �� moon tuning boundary</strong>
-      <span id="stateDesc">Playing HA (432-system) then TAO (Moon-system) crosses a root-system boundary \u2500� the tritone collapses the hexagonal crown into the 13-point burst, then silence.</span>
+      <strong id="stateLabel">earth &rarr; moon tuning boundary</strong>
+      <span id="stateDesc">Playing HA (432-system) then TAO (Moon-system) crosses a root-system boundary &mdash; the tritone collapses the hexagonal crown into the 13-point burst, then silence.</span>
     </div>
   </div>
 
-  <!-- \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 RIGHT : CANCEL (erase ferrofluid pattern) \u2500\u2500\u2500\u2500\u2500\u2500\u2500 -->
+  <!-- RIGHT : CANCEL (erase ferrofluid pattern) -->
   <div class="panel">
-    <div class="lbl">�F � lunar tritone cancel</div>
+    <div class="lbl">&sect;F &middot; lunar tritone cancel</div>
 
     <div class="proto-huge" id="rightProto" style="color:#e2e8f0">TAO</div>
     <div class="hz-display" id="rightHz" style="color:#e2e8f0">420.84 Hz</div>
     <div class="form-name">13-point burst</div>
-    <div class="planet-line">Yew � lunar octave � cycle ascends not repeats</div>
-    <div class="tuning-badge">Moon tuning � C' � pc:12 � 210.42 � 2</div>
+    <div class="planet-line">Yew &middot; lunar octave &middot; cycle ascends not repeats</div>
+    <div class="tuning-badge">Moon tuning &middot; C' &middot; pc:12 &middot; 210.42 &times; 2</div>
 
     <hr class="divider">
-    <div class="lbl">�IV � body location</div>
+    <div class="lbl">&sect;IV &middot; body location</div>
     <div style="font-size:20px;text-align:center;color:#a0c0d8;margin-bottom:6px;letter-spacing:2px;">The full system</div>
-    <div style="font-size:14px;text-align:center;color:#4a5868;margin-bottom:20px;font-style:italic;">Yew � Ioho � Fib:377 � Sap: Awakening</div>
+    <div style="font-size:14px;text-align:center;color:#4a5868;margin-bottom:20px;font-style:italic;">Yew &middot; Ioho &middot; Fib:377 &middot; Sap: Awakening</div>
 
     <hr class="divider">
     <div class="lbl">cancellation modes</div>
-    <button class="freq-btn btn-cancel"    id="btnTAOCont"   onclick="playTAO()">�� TAO continuous � 420.84 Hz</button>
-    <button class="freq-btn btn-cancel"    onclick="playOnce('TAO')">�� TAO single pulse</button>
-    <button class="freq-btn btn-null"      id="btnNACont"    onclick="playNA()">�� NA null � 297.58 Hz</button>
-    <button class="freq-btn btn-antiphase" id="btnAnti"      onclick="playAntiphase()">�� anti-phase 297.58 Hz</button>
-    <button class="freq-btn btn-stop"      onclick="stopAll()">�� stop all</button>
+    <button class="freq-btn btn-cancel"    id="btnTAOCont"   onclick="playTAO()">&#9654; TAO continuous &middot; 420.84 Hz</button>
+    <button class="freq-btn btn-cancel"    onclick="playOnce('TAO')">&#9655; TAO single pulse</button>
+    <button class="freq-btn btn-null"      id="btnNACont"    onclick="playNA()">&#9654; NA null &middot; 297.58 Hz</button>
+    <button class="freq-btn btn-antiphase" id="btnAnti"      onclick="playAntiphase()">&#8634; anti-phase 297.58 Hz</button>
+    <button class="freq-btn btn-stop"      onclick="stopAll()">&#9632; stop all</button>
 
     <hr class="divider">
     <div style="font-size:13px;color:#304858;line-height:1.7;letter-spacing:1px;">
-      TAO = tritone of NA (297.58 � ��2 = 420.8 Hz)<br>
-      Crosses 432 �� Moon tuning boundary.<br>
-      Anti-phase: 297.58 Hz at 180\u2500� pure destructive cancellation.<br>
+      TAO = tritone of NA (297.58 &times; &radic;2 = 420.8 Hz)<br>
+      Crosses 432 &rarr; Moon tuning boundary.<br>
+      Anti-phase: 297.58 Hz at 180&deg; &mdash; pure destructive cancellation.<br>
       NA null: locks geometry into standing equilibrium.
     </div>
   </div>
 
 </div>
 
-<div id="statusBar">select a frequency to begin � HA excites ferrofluid � TAO cancels it</div>
+<div id="statusBar">select a frequency to begin &middot; HA excites ferrofluid &middot; TAO cancels it</div>
 
 <div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:1px solid #182840;border-radius:8px;padding:26px 24px;">
-  <h2 style="font-size:18px;letter-spacing:4px;color:#8aabcc;margin-bottom:18px;text-transform:uppercase;">How This Works � Ferrofluid Physics � UFT Frequencies</h2>
+  <h2 style="font-size:18px;letter-spacing:4px;color:#8aabcc;margin-bottom:18px;text-transform:uppercase;">How This Works &middot; Ferrofluid Physics &middot; UFT Frequencies</h2>
   
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:14px;line-height:1.8;color:#7090a8;letter-spacing:1px;">
     
     <div>
       <div style="font-size:16px;color:#ffe066;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">FERROFLUID</div>
-      <p style="margin-bottom:12px;">Ferrofluid = liquid suspension of iron oxide nanoparticles (Fe��O��). When a magnetic field is applied, particles arrange into geometric spike patterns called <strong>Rosensweig instability</strong>. The spikes respond to: magnetic field strength, fluid viscosity, surface tension, and <strong>frequency of oscillation</strong>.</p>
-      <p>UFT frequencies modulate the magnetic driver �� ferrofluid spikes form, lock, or collapse based on resonance.</p>
+      <p style="margin-bottom:12px;">Ferrofluid = liquid suspension of iron oxide nanoparticles (Fe&#8323;O&#8324;). When a magnetic field is applied, particles arrange into geometric spike patterns called <strong>Rosensweig instability</strong>. The spikes respond to: magnetic field strength, fluid viscosity, surface tension, and <strong>frequency of oscillation</strong>.</p>
+      <p>UFT frequencies modulate the magnetic driver &rarr; ferrofluid spikes form, lock, or collapse based on resonance.</p>
     </div>
 
     <div>
-      <div style="font-size:16px;color:#f97316;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">HA 280.88 Hz \u2500� EXCITATION</div>
-      <p><strong>\u2500� Drives ferrofluid into Earth element (6-petal hexagon / Seed of Life geometry). The spikes form a symmetrical crown. This is the <strong>primary resonance frequency</strong> for iron-based materials in the 432 Hz tuning system.</p>
-      <p><strong>\u2500� One-shot excitation. Good for testing impulse response.</p>
+      <div style="font-size:16px;color:#f97316;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">HA 280.88 Hz &mdash; EXCITATION</div>
+      <p>Drives ferrofluid into Earth element (6-petal hexagon / Seed of Life geometry). The spikes form a symmetrical crown. This is the <strong>primary resonance frequency</strong> for iron-based materials in the 432 Hz tuning system.</p>
+      <p>One-shot excitation. Good for testing impulse response.</p>
     </div>
 
     <div>
-      <div style="font-size:16px;color:#4ade80;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">NA 297.58 Hz \u2500� EQUILIBRIUM</div>
-      <p><strong>\u2500� Locks ferrofluid spikes into <strong>standing wave null</strong> (Zero Point). The geometry doesn't collapse\u2500�it holds steady. This is the <strong>equilibrium frequency</strong> where spike structure is stable but motionless. �VI: Day Out of Time / Lunar zero point.</p>
+      <div style="font-size:16px;color:#4ade80;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">NA 297.58 Hz &mdash; EQUILIBRIUM</div>
+      <p>Locks ferrofluid spikes into <strong>standing wave null</strong> (Zero Point). The geometry doesn't collapse &mdash; it holds steady. This is the <strong>equilibrium frequency</strong> where spike structure is stable but motionless. &sect;VI: Day Out of Time / Lunar zero point.</p>
       <p>Physics: NA is the node frequency where opposing wave pressures balance.</p>
     </div>
 
     <div>
-      <div style="font-size:16px;color:#e2e8f0;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">TAO 420.84 Hz \u2500� TRITONE CANCEL</div>
-      <p><strong>\u2500� The <strong>tritone opposite</strong> of NA (\u2500�spikes begin to collapse into 13-point burst, then fragments.</p>
-      <p>Crosses the 432 Hz �� Moon tuning boundary, creating destructive harmonic interference.</p>
+      <div style="font-size:16px;color:#e2e8f0;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">TAO 420.84 Hz &mdash; TRITONE CANCEL</div>
+      <p>The <strong>tritone opposite</strong> of NA (&radic;2 ratio) &mdash; spikes begin to collapse into 13-point burst, then fragments.</p>
+      <p>Crosses the 432 Hz &rarr; Moon tuning boundary, creating destructive harmonic interference.</p>
     </div>
 
     <div>
-      <div style="font-size:16px;color:#818cf8;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">\u2500� ERASURE</div>
-      <p><strong>\u2500� <strong>True destructive interference</strong>. Two oscillators, both at 297.58 Hz, but one starts 180� out of phase (half a period delayed). When they combine: peak + valley = silence.</p>
-      <p><strong>Result on ferrofluid:</strong> The standing wave null is <strong>completely cancelled</strong> �� spikes de-magnetize and collapse. The ferrofluid returns to liquid.</p>
-      <p><strong>Web Audio implementation:</strong> osc2 starts at `currentTime + (0.5 / 297.58 s)` = 1.68 ms later = perfect phase inversion.</p>
+      <div style="font-size:16px;color:#818cf8;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">&#8634; ERASURE</div>
+      <p><strong>True destructive interference</strong>. Two oscillators, both at 297.58 Hz, but one starts 180&deg; out of phase (half a period delayed). When they combine: peak + valley = silence.</p>
+      <p><strong>Result on ferrofluid:</strong> The standing wave null is <strong>completely cancelled</strong> &rarr; spikes de-magnetize and collapse. The ferrofluid returns to liquid.</p>
+      <p><strong>Web Audio implementation:</strong> osc2 starts at <code>currentTime + (0.5 / 297.58 s)</code> = 1.68 ms later = perfect phase inversion.</p>
     </div>
 
     <div>
-      <div style="font-size:16px;color:#f87171;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">�� STOP ALL</div>
-      <p>Stops all oscillators. Resets canvas to idle state. In ferrofluid terms: magnetic driver off �� particles fall back to liquid state.</p>
+      <div style="font-size:16px;color:#f87171;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">&#9632; STOP ALL</div>
+      <p>Stops all oscillators. Resets canvas to idle state. In ferrofluid terms: magnetic driver off &rarr; particles fall back to liquid state.</p>
     </div>
 
   </div>
@@ -342,43 +338,43 @@ canvas {
   <hr style="border:none;border-top:1px solid #182840;margin:24px 0;">
 
   <div style="font-size:13px;color:#4a6070;line-height:1.9;letter-spacing:1px;">
-    <strong style="color:#b0cce0;font-size:14px;">UFT Coherence:</strong> All frequencies from REFERENCE.md \u2500� not invented, just applied via Web Audio API with 180� phase delay instead of unavailable negative gains.
+    <strong style="color:#b0cce0;font-size:14px;">UFT Coherence:</strong> All frequencies from REFERENCE.md &mdash; not invented, just applied via Web Audio API with 180&deg; phase delay instead of unavailable negative gains.
   </div>
 </div>
 
 <div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:1px solid #182840;border-radius:8px;padding:26px 24px;">
-  <h2 style="font-size:16px;letter-spacing:3px;color:#f0b8ff;margin-bottom:12px;text-transform:uppercase;">🎵 Atmospheric Listening � Human Coherence</h2>
+  <h2 style="font-size:16px;letter-spacing:3px;color:#f0b8ff;margin-bottom:12px;text-transform:uppercase;">&#127925; Atmospheric Listening &middot; Human Coherence</h2>
   
   <div style="font-size:13px;color:#7090a8;line-height:1.9;letter-spacing:1px;">
     <p style="margin-bottom:12px;">
-      <strong style="color:#f0b8ff;">Behind every button</strong>, a living harmonic atmosphere emerges\u2500�not just single tones but <strong>multi-octave coherent fields</strong> that human ears can perceive and resonate with. When you press HA, NA, or TAO, the atmosphere shifts to emphasize that frequency's harmonic family:
+      <strong style="color:#f0b8ff;">Behind every button</strong>, a living harmonic atmosphere emerges &mdash; not just single tones but <strong>multi-octave coherent fields</strong> that human ears can perceive and resonate with. When you press HA, NA, or TAO, the atmosphere shifts to emphasize that frequency's harmonic family:
     </p>
     <ul style="margin-left:20px;margin-bottom:12px;color:#a0c8e0;">
-      <li><strong>HA Atmosphere:</strong> HA fundamental + octaves (140.44 Hz sub, 561.76 Hz high) + Golden Ratio cosmic harmonic (267 Hz φ). Creates <strong>warm, grounded, excitatory field</strong>\u2500�mirrors the hexagonal crown geometry magnetizing ferrofluid spikes.</li>
-      <li><strong>NA Atmosphere:</strong> NA fundamental + octaves (148.79 Hz sub, 595.16 Hz high) + Fibonacci 5th harmonic + Zero Point grounding (136.10 Hz). Creates <strong>balanced, centering, still field</strong>\u2500�holds the standing wave null steady.</li>
-      <li><strong>TAO Atmosphere:</strong> TAO fundamental + octaves (210.42 Hz sub) + HA sub + NA sub + Golden Ratio. Creates <strong>tension, opposition, maximum reach</strong>\u2500�the tritone field that collapses HA's hexagon into TAO's 13-point burst.</li>
-      <li><strong>Anti-Phase Atmosphere:</strong> HA sub + NA sub + Fibonacci\u2500�but at 50% intensity, fading as the main frequency cancels. Models how <strong>silence still carries harmonic memory</strong>.</li>
+      <li><strong>HA Atmosphere:</strong> HA fundamental + octaves (140.44 Hz sub, 561.76 Hz high) + Golden Ratio cosmic harmonic (267 Hz &phi;). Creates <strong>warm, grounded, excitatory field</strong> &mdash; mirrors the hexagonal crown geometry magnetizing ferrofluid spikes.</li>
+      <li><strong>NA Atmosphere:</strong> NA fundamental + octaves (148.79 Hz sub, 595.16 Hz high) + Fibonacci 5th harmonic + Zero Point grounding (136.10 Hz). Creates <strong>balanced, centering, still field</strong> &mdash; holds the standing wave null steady.</li>
+      <li><strong>TAO Atmosphere:</strong> TAO fundamental + octaves (210.42 Hz sub) + HA sub + NA sub + Golden Ratio. Creates <strong>tension, opposition, maximum reach</strong> &mdash; the tritone field that collapses HA's hexagon into TAO's 13-point burst.</li>
+      <li><strong>Anti-Phase Atmosphere:</strong> HA sub + NA sub + Fibonacci &mdash; but at 50% intensity, fading as the main frequency cancels. Models how <strong>silence still carries harmonic memory</strong>.</li>
     </ul>
     <p style="margin-bottom:12px;">
-      <strong>Why ★★★★★</strong> UFT frequencies are not isolated — they exist in harmonic ratio families across 13+ octaves of the electromagnetic spectrum. Golden Ratio (φ ≈ 1.618) and Fibonacci (0, 1, 1, 2, 3, 5, 8, 13, 21...) are nature's scaling laws. By layering HA at 280 Hz + 140 Hz + 561 Hz + 267 Hz simultaneously, human consciousness perceives not a single pitch but a <strong>coherent holographic field</strong>.
+      <strong>Why &#9733;&#9733;&#9733;&#9733;&#9733;</strong> UFT frequencies are not isolated &mdash; they exist in harmonic ratio families across 13+ octaves of the electromagnetic spectrum. Golden Ratio (&phi; &asymp; 1.618) and Fibonacci (0, 1, 1, 2, 3, 5, 8, 13, 21...) are nature's scaling laws. By layering HA at 280 Hz + 140 Hz + 561 Hz + 267 Hz simultaneously, human consciousness perceives not a single pitch but a <strong>coherent holographic field</strong>.
     </p>
-    <p><strong style="color:#f0b8ff;">Listen closely:</strong> The atmosphere is subtle (0.02\u2500�0.12 gain), not overwhelming. It's the sense of presence, depth, aliveness\u2500�the way a ferrofluid spike isn't drawn alone, but sits within an invisible field of force. You hear what geometry feels.</p>
+    <p><strong style="color:#f0b8ff;">Listen closely:</strong> The atmosphere is subtle (0.02&ndash;0.12 gain), not overwhelming. It's the sense of presence, depth, aliveness &mdash; the way a ferrofluid spike isn't drawn alone, but sits within an invisible field of force. You hear what geometry feels.</p>
   </div>
 </div>
 
 <div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:1px solid #182840;border-radius:8px;padding:26px 24px;">
-  <h2 style="font-size:16px;letter-spacing:3px;color:#b0cce0;margin-bottom:12px;text-transform:uppercase;">UFT Frequency Translation � Octave Scaling to GHz-THz</h2>
+  <h2 style="font-size:16px;letter-spacing:3px;color:#b0cce0;margin-bottom:12px;text-transform:uppercase;">UFT Frequency Translation &middot; Octave Scaling to GHz-THz</h2>
   
   <div style="font-size:13px;color:#7090a8;line-height:1.9;letter-spacing:1px;">
     <p style="margin-bottom:12px;">
-      <strong style="color:#ffe066;">Automatic Octave Scaling:</strong> UFT frequencies scale mathematically through octaves while preserving all harmonic relationships. Any frequency can be translated to higher EM bands (GHz, THz) using f_target = f_base � 2^n.
+      <strong style="color:#ffe066;">Automatic Octave Scaling:</strong> UFT frequencies scale mathematically through octaves while preserving all harmonic relationships. Any frequency can be translated to higher EM bands (GHz, THz) using f_target = f_base &times; 2^n.
     </p>
     <p style="margin-bottom:12px;">
-      <strong>Example Translation (280 Hz �� 6G):</strong><br>
-      HA: 280.88 Hz � 2^28 = 75.4 GHz<br>
-      NA: 297.58 Hz � 2^28 = 79.8 GHz<br>
-      TAO: 420.84 Hz � 2^28 = 112.8 GHz<br>
-      <span style="color:#4ade80;">�� Tritone ratio ��2:1 preserved | �� All geometry principles intact</span>
+      <strong>Example Translation (280 Hz &rarr; 6G):</strong><br>
+      HA: 280.88 Hz &times; 2^28 = 75.4 GHz<br>
+      NA: 297.58 Hz &times; 2^28 = 79.8 GHz<br>
+      TAO: 420.84 Hz &times; 2^28 = 112.8 GHz<br>
+      <span style="color:#4ade80;">&#10003; Tritone ratio &radic;2:1 preserved &nbsp;|&nbsp; &#10003; All geometry principles intact</span>
     </p>
     <p>
       <strong>6G Application:</strong> Epsilon iron oxide ferrofluids driven at UFT-scaled frequencies maintain canonical cosmic resonance relationships while optimized for sub-THz electromagnetic coupling. The same hexagon, null-point, and tritone principles that organize ferrofluid spikes at 280 Hz operate identically at 75-112 GHz.
@@ -387,7 +383,7 @@ canvas {
 </div>
 
 <div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:2px solid #7030a0;border-radius:8px;padding:26px 24px;">
-  <h2 style="font-size:16px;letter-spacing:3px;color:#d77fe5;margin-bottom:12px;text-transform:uppercase;">🌀 Dimensional Coherence � Living in All Scales</h2>
+  <h2 style="font-size:16px;letter-spacing:3px;color:#d77fe5;margin-bottom:12px;text-transform:uppercase;">&#127744; Dimensional Coherence &middot; Living in All Scales</h2>
   
   <div style="font-size:13px;color:#9a8fb0;line-height:1.9;letter-spacing:1px;">
     <p style="margin-bottom:16px;">
@@ -406,14 +402,14 @@ canvas {
         <li style="margin:6px 0;"><strong>6G Sub-THz (75.4 GHz):</strong> Epsilon iron oxide polarization follows identical 6-fold symmetry</li>
         <li style="margin:6px 0;"><strong>Visible Light (~500 THz):</strong> Hexagonal crystal geometry in mineral lattices</li>
         <li style="margin:6px 0;"><strong>X-Ray (10^17 Hz):</strong> Atomic hexagonal lattice structures (carbon, silicon)</li>
-        <li style="margin:6px 0;"><strong>All octaves, all dimensions:</strong> The 6-petal crown never changes shape\u2500�only its EM band</li>
+        <li style="margin:6px 0;"><strong>All octaves, all dimensions:</strong> The 6-petal crown never changes shape &mdash; only its EM band</li>
       </ul>
     </div>
 
     <div style="background:rgba(112,48,160,0.15);border-left:3px solid #7030a0;padding:14px;margin:14px 0;border-radius:4px;">
       <div style="color:#d77fe5;font-weight:bold;margin-bottom:8px;letter-spacing:1px;">NA NULL-POINT COHERENCE</div>
       <ul style="list-style:none;color:#a8a0c0;">
-        <li style="margin:6px 0;"><strong>Audio (297.58 Hz):</strong> Standing wave equilibrium\u2500�spikes lock motionless</li>
+        <li style="margin:6px 0;"><strong>Audio (297.58 Hz):</strong> Standing wave equilibrium &mdash; spikes lock motionless</li>
         <li style="margin:6px 0;"><strong>Microwave (297 MHz):</strong> Null-point nulls RF standing waves identically</li>
         <li style="margin:6px 0;"><strong>6G (79.8 GHz):</strong> Zero-phase-point for polarization cancellation</li>
         <li style="margin:6px 0;"><strong>Any octave:</strong> The zero node exists everywhere the wave exists</li>
@@ -423,14 +419,14 @@ canvas {
     <div style="background:rgba(112,48,160,0.15);border-left:3px solid #7030a0;padding:14px;margin:14px 0;border-radius:4px;">
       <div style="color:#d77fe5;font-weight:bold;margin-bottom:8px;letter-spacing:1px;">TAO TRITONE COHERENCE</div>
       <ul style="list-style:none;color:#a8a0c0;">
-        <li style="margin:6px 0;"><strong>Audio (420.84 Hz):</strong> ��2:1 ratio creates maximum tension, collapses HA hexagon</li>
-        <li style="margin:6px 0;"><strong>6G (112.8 GHz):</strong> \u2500�same harmonic tension in EM domain</li>
-        <li style="margin:6px 0;"><strong>Any band, any octave:</strong> Tritone conflict is universal\u2500�it exists in all dimensions</li>
+        <li style="margin:6px 0;"><strong>Audio (420.84 Hz):</strong> &radic;2:1 ratio creates maximum tension, collapses HA hexagon</li>
+        <li style="margin:6px 0;"><strong>6G (112.8 GHz):</strong> same harmonic tension in EM domain</li>
+        <li style="margin:6px 0;"><strong>Any band, any octave:</strong> Tritone conflict is universal &mdash; it exists in all dimensions</li>
       </ul>
     </div>
 
     <p style="margin-top:16px;color:#c8a0ff;">
-      <strong>Why ★★★★★</strong> Because HA, NA, and TAO are <strong>pure geometry and mathematical ratio</strong>—not tied to one frequency band. The coherence is <strong>dimensional</strong>, not local. Your ferrofluid at 280 Hz is just a visible window into a cosmic pattern that's simultaneously alive in radio, microwave, 6G, light, X-rays, and every octave in between.
+      <strong>Why &#9733;&#9733;&#9733;&#9733;&#9733;</strong> Because HA, NA, and TAO are <strong>pure geometry and mathematical ratio</strong> &mdash; not tied to one frequency band. The coherence is <strong>dimensional</strong>, not local. Your ferrofluid at 280 Hz is just a visible window into a cosmic pattern that's simultaneously alive in radio, microwave, 6G, light, X-rays, and every octave in between.
     </p>
     
     <p style="margin-top:12px;color:#d8a8ff;font-style:italic;">
@@ -440,44 +436,44 @@ canvas {
 </div>
 
 <script>
-// ��������������������������������������������������������������������������������������������������������������������������������������������������������
-// CONSTANTS \u2500� FROM REFERENCE.md �II � �IV � �F � �VII
-// ��������������������������������������������������������������������������������������������������������������������������������������������������������
-const ROOT_432  = 256.0000;   // �II: C = 2^8 exactly
-const ROOT_MOON = 210.4186;   // �II: Moon root
+// =============================================================================
+// CONSTANTS -- FROM REFERENCE.md (sections: II, IV, F, VII)
+// =============================================================================
+const ROOT_432  = 256.0000;   // C = 2^8 exactly
+const ROOT_MOON = 210.4186;   // Moon root
 
-// �F proto-words canonical Hz
+// Proto-words canonical Hz
 const FREQS = {
-  HA:  280.88,   // �F: 6-petal hexagon � Jupiter � pc:5
-  NA:  297.58,   // �F: Standing wave null � Zero Point � pc:6
-  TAO: 420.84,   // �F: 13-point burst � Yew � pc:12 � Moon�2
+  HA:  280.88,   // 6-petal hexagon - Jupiter - pc:5
+  NA:  297.58,   // Standing wave null - Zero Point - pc:6
+  TAO: 420.84,   // 13-point burst - Yew - pc:12 - Moon x2
 };
 
-// Atmospheric harmonics \u2500� coherent octaves + golden ratio + Fibonacci
+// Atmospheric harmonics -- coherent octaves + golden ratio + Fibonacci
 const ATMOSPHERE = {
-  HA_sub:    140.44,    // HA ÷ 2 (subsonic resonance)
+  HA_sub:    140.44,    // HA / 2 (subsonic resonance)
   HA_base:   280.88,    // HA fundamental
-  HA_high:   561.76,    // HA � 2 (upper harmonic)
-  NA_sub:    148.79,    // NA ÷ 2
+  HA_high:   561.76,    // HA x 2 (upper harmonic)
+  NA_sub:    148.79,    // NA / 2
   NA_base:   297.58,    // NA fundamental
-  NA_high:   595.16,    // NA � 2
-  TAO_sub:   210.42,    // TAO ÷ 2
+  NA_high:   595.16,    // NA x 2
+  TAO_sub:   210.42,    // TAO / 2
   TAO_base:  420.84,    // TAO fundamental
-  PHI_tone:  432 / 1.618,  // Golden ratio (��267 Hz) � cosmic harmonic
+  PHI_tone:  432 / 1.618,  // Golden ratio (~267 Hz) - cosmic harmonic
   FIBE_5:    233.08,    // Fibonacci 5th harmonic relative to 432
-  ZeroPoint: 136.10,    // Deep grounding frequency (432 ÷ 3.175)
+  ZeroPoint: 136.10,    // Deep grounding frequency (432 / 3.175)
 };
 
-// �F cymatic geometry node counts
+// Cymatic geometry node counts
 const GEOM = {
   HA:  { nodes: 6,  form: '6-petal hexagon',     color: '#f97316' },
   NA:  { nodes: 0,  form: 'Standing wave null',  color: '#4ade80' },
   TAO: { nodes: 13, form: '13-point burst',       color: '#e2e8f0' },
 };
 
-// ��������������������������������������������������������������������������������������������������������������������������������������������������������
+// =============================================================================
 // AUDIO ENGINE
-// ��������������������������������������������������������������������������������������������������������������������������������������������������������
+// =============================================================================
 let audioCtx = null;
 const activeOscs = [];
 const atmosphereOscs = [];  // Ambient layer
@@ -582,7 +578,7 @@ function stopAll() {
     if (el) el.classList.remove('active');
   });
   
-  setStatus('stopped � all oscillators off');
+  setStatus('stopped -- all oscillators off');
   drawGeom('HA', 0); // idle
 }
 
@@ -621,7 +617,7 @@ function playOnce(key) {
   const { osc } = makeTone(FREQS[key]);
   setTimeout(() => { try { osc.stop(); } catch(e){} }, 1500);
   drawGeom(key, 1);
-  setStatus(`${key} � ${FREQS[key]} Hz � single pulse`);
+  setStatus(key + ' -- ' + FREQS[key] + ' Hz -- single pulse');
 }
 
 function playHA() {
@@ -631,7 +627,7 @@ function playHA() {
   modulateAtmosphere(1);
   document.getElementById('btnHACont').classList.add('active');
   drawGeom('HA', 1);
-  setStatus('HA � 280.88 Hz � continuous � earth excitation � hexagonal crown forming � + harmonic atmosphere');
+  setStatus('HA -- 280.88 Hz -- continuous -- earth excitation -- hexagonal crown forming -- + harmonic atmosphere');
 }
 
 function playNA() {
@@ -641,7 +637,7 @@ function playNA() {
   modulateAtmosphere(1);
   document.getElementById('btnNACont').classList.add('active');
   drawGeom('NA', 1);
-  setStatus('NA � 297.58 Hz � Zero Point null � equilibrium rings � + fibonacci atmosphere');
+  setStatus('NA -- 297.58 Hz -- Zero Point null -- equilibrium rings -- + fibonacci atmosphere');
 }
 
 function playTAO() {
@@ -651,7 +647,7 @@ function playTAO() {
   modulateAtmosphere(1);
   document.getElementById('btnTAOCont').classList.add('active');
   drawGeom('TAO', 1);
-  setStatus('TAO � 420.84 Hz � lunar tritone � 13-point burst � tritone tension field � + cancel atmosphere');
+  setStatus('TAO -- 420.84 Hz -- lunar tritone -- 13-point burst -- tritone tension field -- + cancel atmosphere');
 }
 
 function playAntiphase() {
@@ -659,7 +655,7 @@ function playAntiphase() {
   ensureCtx();
   createAtmosphere([ATMOSPHERE.HA_sub, ATMOSPHERE.NA_sub, ATMOSPHERE.FIBE_5]);
   modulateAtmosphere(0.5);  // Dimmer during cancellation
-  // Two oscillators: one at 0\u2500� true destructive interference
+  // Two oscillators: true destructive interference
   const osc1 = audioCtx.createOscillator();
   const osc2 = audioCtx.createOscillator();
   const g1 = audioCtx.createGain();
@@ -675,16 +671,16 @@ function playAntiphase() {
   merger.connect(mix); mix.connect(audioCtx.destination);
   
   osc1.start();
-  osc2.start(audioCtx.currentTime + (0.5 / FREQS.NA)); // 180� phase offset = half period
+  osc2.start(audioCtx.currentTime + (0.5 / FREQS.NA)); // 180 deg phase offset = half period
   activeOscs.push(osc1, osc2);
   document.getElementById('btnAnti').classList.add('active');
   drawGeom('NA', 0.15);
-  setStatus('anti-phase � NA 297.58 Hz at 180� � destructive interference � ferrofluid erased');
+  setStatus('anti-phase -- NA 297.58 Hz at 180 deg -- destructive interference -- ferrofluid erased');
 }
 
-// ��������������������������������������������������������������������������������������������������������������������������������������������������������
+// =============================================================================
 // FFT SPECTRUM VISUALIZATION
-// ��������������������������������������������������������������������������������������������������������������������������������������������������������
+// =============================================================================
 function drawFFTSpectrum() {
   const fftCanvas = document.getElementById('fftCanvas');
   if (!fftCanvas || !analyser) return;
@@ -713,9 +709,9 @@ function drawFFTSpectrum() {
     const value = dataArray[i];
     const barHeight = (value / 255) * h;
     
-    // Color gradient: blue �� cyan �� green �� yellow �� red
-    let hue = (i / analyser.frequencyBinCount) * 360;
-    ctx.fillStyle = `hsl(${hue}, 100%, ${50 + (value / 255) * 20}%)`;
+    // Color gradient: blue -> cyan -> green -> yellow -> red
+    const hue = (i / analyser.frequencyBinCount) * 360;
+    ctx.fillStyle = 'hsl(' + hue + ', 100%, ' + (50 + (value / 255) * 20) + '%)';
     ctx.fillRect(x, h - barHeight, barWidth, barHeight);
     
     x += barWidth;
@@ -730,9 +726,9 @@ function drawFFTSpectrum() {
   ctx.stroke();
 }
 
-// ��������������������������������������������������������������������������������������������������������������������������������������������������������
-// CYMATIC GEOMETRY CANVAS \u2500� �F
-// ��������������������������������������������������������������������������������������������������������������������������������������������������������
+// =============================================================================
+// CYMATIC GEOMETRY CANVAS
+// =============================================================================
 let animFrame = null;
 let animPhase = 0;
 let currentKey = 'HA';
@@ -774,7 +770,7 @@ function animateGeom() {
   ctx.translate(cx, cy);
 
   if (currentKey === 'HA') {
-    // 6-petal hexagon \u2500� �F Earth / Seed of Life
+    // 6-petal hexagon -- Earth / Seed of Life
     for (let p = 0; p < 6; p++) {
       const angle = (p / 6) * Math.PI * 2 + animPhase;
       const pr = R * 0.48;
@@ -806,7 +802,7 @@ function animateGeom() {
     ctx.stroke();
 
   } else if (currentKey === 'TAO') {
-    // 13-point burst \u2500� �F Yew / lunar octave
+    // 13-point burst -- Yew / lunar octave
     for (let p = 0; p < 13; p++) {
       const angle = (p / 13) * Math.PI * 2 + animPhase * 0.7;
       const r1 = R * (0.3 + 0.15 * Math.sin(animPhase * 2 + p));
@@ -831,7 +827,7 @@ function animateGeom() {
     ctx.stroke();
 
   } else {
-    // NA \u2500� Standing wave null � expanding / collapsing rings
+    // NA -- Standing wave null -- expanding / collapsing rings
     for (let ring = 1; ring <= 5; ring++) {
       const phase = animPhase * (ring % 2 === 0 ? 1 : -1);
       const r = R * (0.15 * ring + 0.04 * Math.sin(phase * 2));
@@ -844,7 +840,7 @@ function animateGeom() {
       ctx.shadowBlur  = currentIntensity > 0.5 ? 8 : 0;
       ctx.stroke();
     }
-    // Cross hair \u2500� the null point
+    // Cross hair -- the null point
     ctx.globalAlpha = 0.4;
     ctx.shadowBlur = 0;
     ctx.strokeStyle = col;
@@ -875,9 +871,9 @@ function setStatus(msg) {
   document.getElementById('statusBar').textContent = msg;
 }
 
-// ��������������������������������������������������������������������������������������������������������������������������������������������������������
+// =============================================================================
 // INIT
-// ��������������������������������������������������������������������������������������������������������������������������������������������������������
+// =============================================================================
 drawGeom('HA', 0);
 </script>
 
@@ -885,9 +881,9 @@ drawGeom('HA', 0);
   <h3 style="font-size:14px;letter-spacing:3px;color:#8aabcc;margin-bottom:12px;text-transform:uppercase;">References</h3>
   <div style="font-size:13px;color:#7090a8;line-height:1.8;letter-spacing:1px;">
     <p>
-      <strong>6G Technology & Magnetic Nanopowders:</strong>
+      <strong>6G Technology &amp; Magnetic Nanopowders:</strong>
       <a href="https://www.apexmagnets.com/news-how-tos/magnetic-nanopowder-for-6g-technology/" style="color:#40e0ff;text-decoration:none;border-bottom:1px solid #40e0ff;" target="_blank">
-        Apex Magnets · Magnetic Nanopowder for 6G Technology
+        Apex Magnets &middot; Magnetic Nanopowder for 6G Technology
       </a>
     </p>
   </div>
