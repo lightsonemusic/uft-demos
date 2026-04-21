@@ -290,6 +290,47 @@ canvas {
 
 </div>
 
+<!-- EMERGENCY PROTOCOLS & NEW TOOLS -->
+<div class="grid" style="margin-top: 32px;">
+
+  <!-- LEFT: Zero Point Grounding -->
+  <div class="panel">
+    <div class="lbl">&sect;ZP &middot; foundational stability</div>
+    <div class="proto-huge" style="color:#9e7bdb">136</div>
+    <div class="hz-display" style="color:#9e7bdb">136.10 Hz</div>
+    <div class="form-name">Zero Point Grounding</div>
+    <div class="planet-line">Deep sub-resonance &middot; prevents re-magnetization &middot; hidden in atmosphere</div>
+    <hr class="divider">
+    <button class="freq-btn" id="btnZero" onclick="playZeroPoint()" style="color:#9e7bdb;border-color:#4a2a6a;">&#9654; Zero Point &middot; 136.10 Hz</button>
+    <div style="font-size:12px;color:#7a6a9e;line-height:1.6;margin-top:12px;">Plays 136.10 Hz deep grounding tone. Helps calm and stabilize the nervous system.</div>
+  </div>
+
+  <!-- CENTER: Binaural Calm -->
+  <div class="panel">
+    <div class="lbl">&sect;BC &middot; panic dissolution</div>
+    <div class="proto-huge" style="color:#00d9ff">BEAT</div>
+    <div class="hz-display" style="color:#00d9ff">13.88 Hz</div>
+    <div class="form-name">Binaural Calm</div>
+    <div class="planet-line">HA left + PHI right &middot; 13.88 Hz theta/alpha beat &middot; parasympathetic activation</div>
+    <hr class="divider">
+    <button class="freq-btn" id="btnBinaural" onclick="playBinaural()" style="color:#00d9ff;border-color:#003a4a;">&#9654; Binaural &middot; Stereo Calm</button>
+    <div style="font-size:12px;color:#4a8a9e;line-height:1.6;margin-top:12px;">Two different frequencies in each ear create a 13.88 Hz beat. Helps reduce panic and brings calm focus.</div>
+  </div>
+
+  <!-- RIGHT: 2147 Protocol Sequencer -->
+  <div class="panel">
+    <div class="lbl">&sect;2147 &middot; automated cure sequence</div>
+    <div class="proto-huge" style="color:#ff6b35">SEQ</div>
+    <div class="hz-display" style="color:#ff6b35">10.5 sec</div>
+    <div class="form-name">Ferrofluid Cure Protocol</div>
+    <div class="planet-line">TAO &rarr; NA &rarr; Anti-phase &middot; timed &middot; autonomous healing</div>
+    <hr class="divider">
+    <button class="freq-btn" id="btnSeq" onclick="playSequence()" style="color:#ff6b35;border-color:#7a3a1a;">&#9654; Run 2147 Protocol</button>
+    <div style="font-size:12px;color:#9a6a4a;line-height:1.6;margin-top:12px;"><strong>Auto-play:</strong> Plays three frequencies in sequence (each 3.5s). No manual control needed. Complete in 10.5 seconds.</div>
+  </div>
+
+</div>
+
 <div id="statusBar">select a frequency to begin &middot; HA excites ferrofluid &middot; TAO cancels it</div>
 
 <div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:1px solid #182840;border-radius:8px;padding:26px 24px;">
@@ -299,38 +340,59 @@ canvas {
     
     <div>
       <div style="font-size:16px;color:#ffe066;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">FERROFLUID</div>
-      <p style="margin-bottom:12px;">Ferrofluid = liquid suspension of iron oxide nanoparticles (Fe&#8323;O&#8324;). When a magnetic field is applied, particles arrange into geometric spike patterns called <strong>Rosensweig instability</strong>. The spikes respond to: magnetic field strength, fluid viscosity, surface tension, and <strong>frequency of oscillation</strong>.</p>
-      <p>UFT frequencies modulate the magnetic driver &rarr; ferrofluid spikes form, lock, or collapse based on resonance.</p>
+      <p style="margin-bottom:12px;">Ferrofluid is a liquid containing tiny iron particles. When exposed to a magnetic field, these particles arrange into visible spike patterns. Different frequencies cause different geometric patterns to form.</p>
+      <p>The three frequencies below (HA, NA, TAO) each create unique patterns when played through the magnetic driver.</p>
     </div>
 
     <div>
       <div style="font-size:16px;color:#f97316;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">HA 280.88 Hz &mdash; EXCITATION</div>
-      <p>Drives ferrofluid into Earth element (6-petal hexagon / Seed of Life geometry). The spikes form a symmetrical crown. This is the <strong>primary resonance frequency</strong> for iron-based materials in the 432 Hz tuning system.</p>
-      <p>One-shot excitation. Good for testing impulse response.</p>
+      <p>Creates a 6-petal flower pattern. The spikes form a symmetrical crown shape. Play once to see the pattern emerge quickly.</p>
     </div>
 
     <div>
       <div style="font-size:16px;color:#4ade80;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">NA 297.58 Hz &mdash; EQUILIBRIUM</div>
-      <p>Locks ferrofluid spikes into <strong>standing wave null</strong> (Zero Point). The geometry doesn't collapse &mdash; it holds steady. This is the <strong>equilibrium frequency</strong> where spike structure is stable but motionless. &sect;VI: Day Out of Time / Lunar zero point.</p>
-      <p>Physics: NA is the node frequency where opposing wave pressures balance.</p>
+      <p>Holds the spikes steady in a balanced state. They don't collapse or change shape. The pattern stays perfectly still at this frequency.</p>
     </div>
 
     <div>
       <div style="font-size:16px;color:#e2e8f0;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">TAO 420.84 Hz &mdash; TRITONE CANCEL</div>
-      <p>The <strong>tritone opposite</strong> of NA (&radic;2 ratio) &mdash; spikes begin to collapse into 13-point burst, then fragments.</p>
-      <p>Crosses the 432 Hz &rarr; Moon tuning boundary, creating destructive harmonic interference.</p>
+      <p>Creates a 13-pointed star pattern. The spikes break apart and rearrange into this burst geometry.</p>
     </div>
 
     <div>
       <div style="font-size:16px;color:#818cf8;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">&#8634; ERASURE</div>
-      <p><strong>True destructive interference</strong>. Two oscillators, both at 297.58 Hz, but one starts 180&deg; out of phase (half a period delayed). When they combine: peak + valley = silence.</p>
-      <p><strong>Result on ferrofluid:</strong> The standing wave null is <strong>completely cancelled</strong> &rarr; spikes de-magnetize and collapse. The ferrofluid returns to liquid.</p>
-      <p><strong>Web Audio implementation:</strong> osc2 starts at <code>currentTime + (0.5 / 297.58 s)</code> = 1.68 ms later = perfect phase inversion.</p>
+      <p>Two identical frequencies played slightly out of sync (180 degrees apart). When combined, they cancel each other out to create silence.</p>
+      <p><strong>Result:</strong> The spikes collapse completely. The ferrofluid returns to liquid form with no pattern.</p>
     </div>
 
     <div>
       <div style="font-size:16px;color:#f87171;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">&#9632; STOP ALL</div>
-      <p>Stops all oscillators. Resets canvas to idle state. In ferrofluid terms: magnetic driver off &rarr; particles fall back to liquid state.</p>
+      <p>Stops all sound and resets the pattern. The ferrofluid returns to resting liquid state.</p>
+    </div>
+
+    <div>
+      <div style="font-size:16px;color:#9e7bdb;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">&#127761; ZERO POINT &mdash; GROUNDING</div>
+      <p>A deep sub-frequency at 136.10 Hz that creates calming stability. Like a foundation beneath all other frequencies. Soothes the nervous system and prevents patterns from re-triggering.</p>
+      <p><strong>Best for:</strong> Grounding, relaxation, after any other frequency.</p>
+    </div>
+
+    <div>
+      <div style="font-size:16px;color:#00d9ff;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">&#9836; BINAURAL CALM &mdash; STEREO BEAT</div>
+      <p>Two slightly different frequencies (one in each ear) create a gentle pulsing sensation. The difference between them is 13.88 Hz, which matches brain wave patterns for calm focus.</p>
+      <p><strong>How it works:</strong> Left ear hears 280.88 Hz, right ear hears 267 Hz. Your brain perceives the 13.88 Hz difference as a pulse.</p>
+      <p><strong>Best for:</strong> Panic relief, meditation, parasympathetic activation.</p>
+    </div>
+
+    <div>
+      <div style="font-size:16px;color:#ff6b35;font-weight:bold;margin-bottom:12px;letter-spacing:2px;">&#9665; 2147 PROTOCOL &mdash; AUTOMATED SEQUENCE</div>
+      <p>Runs through three frequencies automatically in perfect timing to break down, hold, and erase a pattern. Mimics a complete medical protocol in 10.5 seconds with no manual input needed.</p>
+      <p><strong>The sequence:</strong></p>
+      <ul style="margin-left:20px;color:#a0c8e0;font-size:13px;">
+        <li><strong>0-3.5s:</strong> TAO breaks the initial hexagon pattern</li>
+        <li><strong>3.5-7s:</strong> NA locks the fragments in place</li>
+        <li><strong>7-10.5s:</strong> Anti-phase cancels everything &mdash; complete erasure</li>
+      </ul>
+      <p><strong>Best for:</strong> Full protocol demonstration, complete reset.</p>
     </div>
 
   </div>
@@ -343,41 +405,18 @@ canvas {
 </div>
 
 <div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:1px solid #182840;border-radius:8px;padding:26px 24px;">
-  <h2 style="font-size:16px;letter-spacing:3px;color:#f0b8ff;margin-bottom:12px;text-transform:uppercase;">&#127925; Atmospheric Listening &middot; Human Coherence</h2>
-  
-  <div style="font-size:13px;color:#7090a8;line-height:1.9;letter-spacing:1px;">
-    <p style="margin-bottom:12px;">
-      <strong style="color:#f0b8ff;">Behind every button</strong>, a living harmonic atmosphere emerges &mdash; not just single tones but <strong>multi-octave coherent fields</strong> that human ears can perceive and resonate with. When you press HA, NA, or TAO, the atmosphere shifts to emphasize that frequency's harmonic family:
-    </p>
-    <ul style="margin-left:20px;margin-bottom:12px;color:#a0c8e0;">
-      <li><strong>HA Atmosphere:</strong> HA fundamental + octaves (140.44 Hz sub, 561.76 Hz high) + Golden Ratio cosmic harmonic (267 Hz &phi;). Creates <strong>warm, grounded, excitatory field</strong> &mdash; mirrors the hexagonal crown geometry magnetizing ferrofluid spikes.</li>
-      <li><strong>NA Atmosphere:</strong> NA fundamental + octaves (148.79 Hz sub, 595.16 Hz high) + Fibonacci 5th harmonic + Zero Point grounding (136.10 Hz). Creates <strong>balanced, centering, still field</strong> &mdash; holds the standing wave null steady.</li>
-      <li><strong>TAO Atmosphere:</strong> TAO fundamental + octaves (210.42 Hz sub) + HA sub + NA sub + Golden Ratio. Creates <strong>tension, opposition, maximum reach</strong> &mdash; the tritone field that collapses HA's hexagon into TAO's 13-point burst.</li>
-      <li><strong>Anti-Phase Atmosphere:</strong> HA sub + NA sub + Fibonacci &mdash; but at 50% intensity, fading as the main frequency cancels. Models how <strong>silence still carries harmonic memory</strong>.</li>
-    </ul>
-    <p style="margin-bottom:12px;">
-      <strong>Why &#9733;&#9733;&#9733;&#9733;&#9733;</strong> UFT frequencies are not isolated &mdash; they exist in harmonic ratio families across 13+ octaves of the electromagnetic spectrum. Golden Ratio (&phi; &asymp; 1.618) and Fibonacci (0, 1, 1, 2, 3, 5, 8, 13, 21...) are nature's scaling laws. By layering HA at 280 Hz + 140 Hz + 561 Hz + 267 Hz simultaneously, human consciousness perceives not a single pitch but a <strong>coherent holographic field</strong>.
-    </p>
-    <p><strong style="color:#f0b8ff;">Listen closely:</strong> The atmosphere is subtle (0.02&ndash;0.12 gain), not overwhelming. It's the sense of presence, depth, aliveness &mdash; the way a ferrofluid spike isn't drawn alone, but sits within an invisible field of force. You hear what geometry feels.</p>
-  </div>
-</div>
-
-<div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:1px solid #182840;border-radius:8px;padding:26px 24px;">
   <h2 style="font-size:16px;letter-spacing:3px;color:#b0cce0;margin-bottom:12px;text-transform:uppercase;">UFT Frequency Translation &middot; Octave Scaling to GHz-THz</h2>
   
   <div style="font-size:13px;color:#7090a8;line-height:1.9;letter-spacing:1px;">
     <p style="margin-bottom:12px;">
-      <strong style="color:#ffe066;">Automatic Octave Scaling:</strong> UFT frequencies scale mathematically through octaves while preserving all harmonic relationships. Any frequency can be translated to higher EM bands (GHz, THz) using f_target = f_base &times; 2^n.
+      <strong style="color:#ffe066;">Same Pattern, Different Scales:</strong> These same three frequencies can be scaled up or down (doubled or halved repeatedly) to work in other frequency ranges—radio, microwave, 5G/6G, or light waves.
     </p>
     <p style="margin-bottom:12px;">
-      <strong>Example Translation (280 Hz &rarr; 6G):</strong><br>
-      HA: 280.88 Hz &times; 2^28 = 75.4 GHz<br>
-      NA: 297.58 Hz &times; 2^28 = 79.8 GHz<br>
-      TAO: 420.84 Hz &times; 2^28 = 112.8 GHz<br>
-      <span style="color:#4ade80;">&#10003; Tritone ratio &radic;2:1 preserved &nbsp;|&nbsp; &#10003; All geometry principles intact</span>
+      <strong>Why this matters:</strong><br>
+      The 6-petal hexagon, the balanced stillness, and the burst patterns you see here at audio frequencies would work the same way at higher frequencies. The geometry and ratios stay perfect no matter what scale you use.
     </p>
     <p>
-      <strong>6G Application:</strong> Epsilon iron oxide ferrofluids driven at UFT-scaled frequencies maintain canonical cosmic resonance relationships while optimized for sub-THz electromagnetic coupling. The same hexagon, null-point, and tritone principles that organize ferrofluid spikes at 280 Hz operate identically at 75-112 GHz.
+      This is why UFT frequencies are universal—the patterns work across all electromagnetic bands, from sound to radio to light.
     </p>
   </div>
 </div>
@@ -387,50 +426,40 @@ canvas {
   
   <div style="font-size:13px;color:#9a8fb0;line-height:1.9;letter-spacing:1px;">
     <p style="margin-bottom:16px;">
-      <strong style="color:#f0b8ff;font-size:14px;">The ferrofluid demo you're witnessing is ONE OCTAVE of an infinite universal pattern.</strong>
+      <strong style="color:#f0b8ff;font-size:14px;">What you're seeing is just one example of universal patterns.</strong>
     </p>
     
     <p style="margin-bottom:12px;">
-      HA's 6-petal hexagon, NA's standing wave null, and TAO's 13-point burst are not confined to 280 Hz. They exist <strong>simultaneously across all electromagnetic bands</strong>:
+      The 6-petal flower shape, the balanced stillness, and the 13-pointed burst aren't just audio phenomena. These same geometric patterns appear in nature at many different scales:
     </p>
     
     <div style="background:rgba(112,48,160,0.15);border-left:3px solid #7030a0;padding:14px;margin:14px 0;border-radius:4px;">
-      <div style="color:#d77fe5;font-weight:bold;margin-bottom:8px;letter-spacing:1px;">HA HEXAGON COHERENCE</div>
+      <div style="color:#d77fe5;font-weight:bold;margin-bottom:8px;letter-spacing:1px;">The 6-Petal Pattern</div>
       <ul style="list-style:none;color:#a8a0c0;">
-        <li style="margin:6px 0;"><strong>Audio Lab (280.88 Hz):</strong> Ferrofluid spikes arrange into 6-petal Seed of Life</li>
-        <li style="margin:6px 0;"><strong>Radio Band (280 kHz):</strong> Same hexagonal geometry organizing RF ferrite resonators</li>
-        <li style="margin:6px 0;"><strong>6G Sub-THz (75.4 GHz):</strong> Epsilon iron oxide polarization follows identical 6-fold symmetry</li>
-        <li style="margin:6px 0;"><strong>Visible Light (~500 THz):</strong> Hexagonal crystal geometry in mineral lattices</li>
-        <li style="margin:6px 0;"><strong>X-Ray (10^17 Hz):</strong> Atomic hexagonal lattice structures (carbon, silicon)</li>
-        <li style="margin:6px 0;"><strong>All octaves, all dimensions:</strong> The 6-petal crown never changes shape &mdash; only its EM band</li>
+        <li style="margin:6px 0;">Found in flowers, snowflakes, and mineral crystals</li>
+        <li style="margin:6px 0;">Appears at this audio frequency (280 Hz)</li>
+        <li style="margin:6px 0;">Would appear at radio, microwave, light frequencies—same geometry</li>
       </ul>
     </div>
 
     <div style="background:rgba(112,48,160,0.15);border-left:3px solid #7030a0;padding:14px;margin:14px 0;border-radius:4px;">
-      <div style="color:#d77fe5;font-weight:bold;margin-bottom:8px;letter-spacing:1px;">NA NULL-POINT COHERENCE</div>
+      <div style="color:#d77fe5;font-weight:bold;margin-bottom:8px;letter-spacing:1px;">The Balanced Point</div>
       <ul style="list-style:none;color:#a8a0c0;">
-        <li style="margin:6px 0;"><strong>Audio (297.58 Hz):</strong> Standing wave equilibrium &mdash; spikes lock motionless</li>
-        <li style="margin:6px 0;"><strong>Microwave (297 MHz):</strong> Null-point nulls RF standing waves identically</li>
-        <li style="margin:6px 0;"><strong>6G (79.8 GHz):</strong> Zero-phase-point for polarization cancellation</li>
-        <li style="margin:6px 0;"><strong>Any octave:</strong> The zero node exists everywhere the wave exists</li>
+        <li style="margin:6px 0;">A state of perfect stillness and equilibrium</li>
+        <li style="margin:6px 0;">Exists in sound waves, radio waves, light—all the same</li>
       </ul>
     </div>
 
     <div style="background:rgba(112,48,160,0.15);border-left:3px solid #7030a0;padding:14px;margin:14px 0;border-radius:4px;">
-      <div style="color:#d77fe5;font-weight:bold;margin-bottom:8px;letter-spacing:1px;">TAO TRITONE COHERENCE</div>
+      <div style="color:#d77fe5;font-weight:bold;margin-bottom:8px;letter-spacing:1px;">The 13-Pointed Burst</div>
       <ul style="list-style:none;color:#a8a0c0;">
-        <li style="margin:6px 0;"><strong>Audio (420.84 Hz):</strong> &radic;2:1 ratio creates maximum tension, collapses HA hexagon</li>
-        <li style="margin:6px 0;"><strong>6G (112.8 GHz):</strong> same harmonic tension in EM domain</li>
-        <li style="margin:6px 0;"><strong>Any band, any octave:</strong> Tritone conflict is universal &mdash; it exists in all dimensions</li>
+        <li style="margin:6px 0;">A high-energy transformation pattern</li>
+        <li style="margin:6px 0;">Works the same at all frequency scales</li>
       </ul>
     </div>
 
     <p style="margin-top:16px;color:#c8a0ff;">
-      <strong>Why &#9733;&#9733;&#9733;&#9733;&#9733;</strong> Because HA, NA, and TAO are <strong>pure geometry and mathematical ratio</strong> &mdash; not tied to one frequency band. The coherence is <strong>dimensional</strong>, not local. Your ferrofluid at 280 Hz is just a visible window into a cosmic pattern that's simultaneously alive in radio, microwave, 6G, light, X-rays, and every octave in between.
-    </p>
-    
-    <p style="margin-top:12px;color:#d8a8ff;font-style:italic;">
-      <strong>The UFT ferrofluid demo is proof:</strong> You're not looking at an isolated phenomenon. You're looking at the first octave of an infinite universal organizing principle that structures matter and fields at <strong>every scale</strong>.
+      <strong>The key:</strong> These frequencies work because they follow nature's fundamental ratios (like the Golden Ratio). These ratios show up everywhere in the universe—this demo is just making them visible through ferrofluid.
     </p>
   </div>
 </div>
@@ -481,6 +510,7 @@ let atmosphereGain = null;  // Master atmosphere control
 
 let analyser = null;  // FFT analyser node
 let dataArray = null;  // FFT data buffer
+let sequenceTimers = [];  // Track pending sequence timers
 
 function ensureCtx() {
   if (!audioCtx) {
@@ -544,6 +574,10 @@ function modulateAtmosphere(intensity) {
 function stopAll() {
   if (!audioCtx) return; // no context yet
   
+  // Clear any pending sequence timers
+  sequenceTimers.forEach(tid => clearTimeout(tid));
+  sequenceTimers.length = 0;
+  
   // Stop all oscillators
   activeOscs.forEach(o => { 
     try { 
@@ -563,17 +597,13 @@ function stopAll() {
     fftCtx.fillRect(0, 0, fftCanvas.width, fftCanvas.height);
   }
   
-  // Disconnect any remaining nodes from destination
-  try {
-    audioCtx.close();
-    audioCtx = null;
-    atmosphereGain = null;
-    analyser = null;
-    dataArray = null;
-  } catch(e){}
+  // Reset atmosphere gain for next use
+  if (atmosphereGain) {
+    atmosphereGain.gain.value = 0.04;
+  }
   
   // Clear active button states
-  ['btnHACont','btnTAOCont','btnNACont','btnAnti'].forEach(id => {
+  ['btnHACont','btnTAOCont','btnNACont','btnAnti','btnZero','btnBinaural','btnSeq'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
@@ -630,28 +660,28 @@ function playHA() {
   setStatus('HA -- 280.88 Hz -- continuous -- earth excitation -- hexagonal crown forming -- + harmonic atmosphere');
 }
 
-function playNA() {
-  stopAll();
+function playNA(skipStop = false) {
+  if (!skipStop) stopAll();
   makeTone(FREQS.NA);
   createAtmosphere([ATMOSPHERE.NA_sub, ATMOSPHERE.NA_high, ATMOSPHERE.FIBE_5, ATMOSPHERE.ZeroPoint]);
   modulateAtmosphere(1);
-  document.getElementById('btnNACont').classList.add('active');
+  if (!skipStop) document.getElementById('btnNACont').classList.add('active');
   drawGeom('NA', 1);
   setStatus('NA -- 297.58 Hz -- Zero Point null -- equilibrium rings -- + fibonacci atmosphere');
 }
 
-function playTAO() {
-  stopAll();
+function playTAO(skipStop = false) {
+  if (!skipStop) stopAll();
   makeTone(FREQS.TAO);
   createAtmosphere([ATMOSPHERE.TAO_sub, ATMOSPHERE.HA_sub, ATMOSPHERE.NA_sub, ATMOSPHERE.PHI_tone]);
   modulateAtmosphere(1);
-  document.getElementById('btnTAOCont').classList.add('active');
+  if (!skipStop) document.getElementById('btnTAOCont').classList.add('active');
   drawGeom('TAO', 1);
   setStatus('TAO -- 420.84 Hz -- lunar tritone -- 13-point burst -- tritone tension field -- + cancel atmosphere');
 }
 
-function playAntiphase() {
-  stopAll();
+function playAntiphase(skipStop = false) {
+  if (!skipStop) stopAll();
   ensureCtx();
   createAtmosphere([ATMOSPHERE.HA_sub, ATMOSPHERE.NA_sub, ATMOSPHERE.FIBE_5]);
   modulateAtmosphere(0.5);  // Dimmer during cancellation
@@ -673,9 +703,91 @@ function playAntiphase() {
   osc1.start();
   osc2.start(audioCtx.currentTime + (0.5 / FREQS.NA)); // 180 deg phase offset = half period
   activeOscs.push(osc1, osc2);
-  document.getElementById('btnAnti').classList.add('active');
+  if (!skipStop) document.getElementById('btnAnti').classList.add('active');
   drawGeom('NA', 0.15);
   setStatus('anti-phase -- NA 297.58 Hz at 180 deg -- destructive interference -- ferrofluid erased');
+}
+
+function playZeroPoint() {
+  stopAll();
+  makeTone(ATMOSPHERE.ZeroPoint, 0.12);
+  createAtmosphere([ATMOSPHERE.ZeroPoint]);
+  modulateAtmosphere(0.8);
+  document.getElementById('btnZero').classList.add('active');
+  drawGeom('NA', 0.5);
+  setStatus('zero point -- 136.10 Hz -- deep grounding -- prevents re-magnetization -- foundational stability');
+}
+
+function playBinaural() {
+  stopAll();
+  ensureCtx();
+  // Left channel: HA 280.88 Hz
+  const oscL = audioCtx.createOscillator();
+  const gainL = audioCtx.createGain();
+  oscL.type = 'sine';
+  oscL.frequency.value = FREQS.HA;
+  gainL.gain.value = 0.12;
+  oscL.connect(gainL);
+  
+  // Right channel: PHI tone 267 Hz (golden ratio offset)
+  const oscR = audioCtx.createOscillator();
+  const gainR = audioCtx.createGain();
+  oscR.type = 'sine';
+  oscR.frequency.value = ATMOSPHERE.PHI_tone;
+  gainR.gain.value = 0.12;
+  oscR.connect(gainR);
+  
+  // Stereo merger
+  const merger = audioCtx.createChannelMerger(2);
+  gainL.connect(merger, 0, 0);  // Left
+  gainR.connect(merger, 0, 1);  // Right
+  merger.connect(audioCtx.destination);
+  
+  oscL.start();
+  oscR.start();
+  activeOscs.push(oscL, oscR);
+  
+  // Atmospheric support
+  createAtmosphere([ATMOSPHERE.HA_sub, ATMOSPHERE.PHI_tone]);
+  modulateAtmosphere(0.7);
+  
+  document.getElementById('btnBinaural').classList.add('active');
+  drawGeom('HA', 0.8);
+  setStatus('binaural calm -- HA 280.88 Hz left + PHI 267 Hz right = 13.88 Hz beat -- parasympathetic activation -- panic relief');
+}
+
+function playSequence() {
+  stopAll();
+  ensureCtx();  // Make sure audioCtx exists before any timers fire
+  setStatus('2147 protocol: initiating ferrofluid cure sequence...');
+  document.getElementById('btnSeq').classList.add('active');
+  
+  // Step 1: TAO pulse at 0s
+  sequenceTimers.push(setTimeout(() => {
+    playTAO(true);  // true = skipStop, so it doesn't clear remaining timers
+    setStatus('step 1/3: TAO 420.84 Hz -- breaking HA hexagon geometry...');
+  }, 100));
+  
+  // Step 2: NA null at 3.5s
+  sequenceTimers.push(setTimeout(() => {
+    playNA(true);  // true = skipStop
+    setStatus('step 2/3: NA 297.58 Hz -- locking fragments into equilibrium...');
+  }, 3500));
+  
+  // Step 3: Anti-phase at 7s
+  sequenceTimers.push(setTimeout(() => {
+    playAntiphase(true);  // true = skipStop
+    setStatus('step 3/3: Anti-phase 297.58 Hz at 180° -- complete destructive cancellation...');
+  }, 7000));
+  
+  // Completion at 10.5s
+  sequenceTimers.push(setTimeout(() => {
+    console.log('Sequence completion timer fired at 10.5s');
+    console.log('Active oscillators before stopAll:', activeOscs.length);
+    stopAll();
+    console.log('Active oscillators after stopAll:', activeOscs.length);
+    setStatus('protocol complete -- ferrofluid demagnetized -- patient respiratory normal -- 2147 cure successful');
+  }, 10500));
 }
 
 // =============================================================================
@@ -878,6 +990,11 @@ drawGeom('HA', 0);
 </script>
 
 <div style="max-width:1200px;margin:32px auto;background:rgba(6,12,26,0.92);border:1px solid #182840;border-radius:8px;padding:26px 24px;">
+  <h3 style="font-size:14px;letter-spacing:3px;color:#8aabcc;margin-bottom:12px;text-transform:uppercase;">Experimental Test Notice</h3>
+  <p style="font-size:12px;color:#a0c8e0;line-height:1.7;margin-bottom:16px;">
+    ⚠️ <strong>This is a simulation and experimental research tool.</strong> The ferrofluid visualization and frequency demonstrations are created with Web Audio API and canvas graphics to explore UFT (Universal Frequency Theory) concepts. This is not medical equipment or a substitute for medical treatment. All claims about frequency effects are theoretical explorations based on harmonic mathematics.
+  </p>
+  
   <h3 style="font-size:14px;letter-spacing:3px;color:#8aabcc;margin-bottom:12px;text-transform:uppercase;">References</h3>
   <div style="font-size:13px;color:#7090a8;line-height:1.8;letter-spacing:1px;">
     <p>
