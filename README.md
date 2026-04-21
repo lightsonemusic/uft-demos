@@ -2,7 +2,7 @@
 
 **Interactive demonstrations of the Universal Frequency Translator (UFT) framework.**
 
-> UFT is a precision calendar instrument. It derives a 13-tone musical scale from the Moon's synodic period ó a real orbital constant ó and translates that math into audible frequencies. These demos let you hear and interact with that translation directly in a browser.
+> UFT is a precision calendar instrument. It derives a 13-tone musical scale from the Moon's synodic period ÔøΩ a real orbital constant ÔøΩ and translates that math into audible frequencies. These demos let you hear and interact with that translation directly in a browser.
 
 ---
 
@@ -12,7 +12,7 @@ The base frequency is not arbitrary:
 
 $$f_{moon} = \frac{1}{T_L} \times 2^{29} = 210.4186 \text{ Hz}$$
 
-Where $T_L = 2{,}551{,}442.4$ seconds (Moon synodic period, 29.5306 days), octave-shifted 29 times into audible range (Cousto method, 1988). Every frequency in UFT is a rational interval above this root. The OLED display on the UFT hardware device shows deviation from this root in cents ó the only instrument that does this in real time against a live orbital calendar.
+Where $T_L = 2{,}551{,}442.4$ seconds (Moon synodic period, 29.5306 days), octave-shifted 29 times into audible range (Cousto method, 1988). Every frequency in UFT is a rational interval above this root. The OLED display on the UFT hardware device shows deviation from this root in cents ÔøΩ the only instrument that does this in real time against a live orbital calendar.
 
 ---
 
@@ -23,20 +23,22 @@ Where $T_L = 2{,}551{,}442.4$ seconds (Moon synodic period, 29.5306 days), octav
 | 1 | [Proto-Word Sound Gallery](1-proto-word-sound-gallery.html) | Hear each of the 9 proto-words at their exact Hz |
 | 2 | [Frequency Converter](2-frequency-converter.html) | Input any Hz ? find closest proto-word + cosmic association |
 | 3 | [Cymatic Geometry Player](3-cymatic-geometry-player.html) | Animated geometric form of each proto-word |
-| 4 | [Ayurveda Water Math](4-ayurveda-water-math.html) | Lunar phase ◊ water structure frequency mapping |
+| 4 | [Ayurveda Water Math](4-ayurveda-water-math.html) | Lunar phase ‚Üí water structure frequency mapping |
 | 4 | [Hardware Signal Test](4-hardware-signal-test.html) | Signal output test for UFT hardware device |
 | 5 | [Cosmic Translator Test](5-cosmic-translator-test.html) | Full UFT engine output: note, Hz, proto-word, deviation |
 | 5 | [Solar Bass Immersive](5-solar-bass-immersive.html) | 12-tone solar scale with immersive bass output |
 | 6 | [Bass Multilayer Nervous](6-bass-multilayer-nervous.html) | Layered nervous-system frequency response demo |
 | 6 | [Bass Realtime 432](6-bass-realtime-432.html) | Real-time 432 Hz bass field generation |
-| 7 | [Ayurveda Bass Reading](7-ayurveda-bass-reading.html) | Ayurvedic dosha ◊ lunar frequency bass readings |
+| 7 | [Ayurveda Bass Reading](7-ayurveda-bass-reading.html) | Ayurvedic dosha ‚Üí lunar frequency bass readings |
+| 8 | [Schauberger Water Garden](8-schauberger-water-garden.html) | Live lunar position ‚Üí irrigation timing + Schauberger vortex phase |
+| 9 | [Ferrofluid Frequency Portal](9-ferrofluid-frequency.html) | **‚≠ê NEW** HA/NA/TAO ferrofluid patterns. Zero Point grounding (136.10 Hz), Binaural Calm (13.88 Hz beat), 2147 Protocol (10.5s automated cure) |
 
 ---
 
 ## Run Locally
 
 ```bash
-# Python 3 (recommended ó no install needed)
+# Python 3 (recommended ÔøΩ no install needed)
 cd UFT-demos
 python -m http.server 8080
 # Open: http://localhost:8080
@@ -50,13 +52,13 @@ Or open `index.html` directly in Chrome. No build step, no dependencies, no serv
 
 | Word | Hz | Lunar Note | Significance |
 |------|-----|-----------|--------------|
-| **AH** | 210.42 | Moon root | First breath ó origin |
+| **AH** | 210.42 | Moon root | First breath ÔøΩ origin |
 | **SA** | 222.93 | Moon 2 | The bridge |
 | **LA** | 236.19 | Moon 3 | Proportion |
-| **RA** | 250.23 | Moon 4 | Fire ∑ Light |
-| **DA** | 265.11 | Moon 5 | Will ∑ Surge |
+| **RA** | 250.23 | Moon 4 | Fire ÔøΩ Light |
+| **DA** | 265.11 | Moon 5 | Will ÔøΩ Surge |
 | **HA** | 280.88 | Moon 6 | Harmony |
-| **NA** | 297.58 | Zero Point | Silence ∑ Axis |
+| **NA** | 297.58 | Zero Point | Silence ÔøΩ Axis |
 | **OM** | 334.02 | Moon 9 | Threshold |
 | **TAO** | 420.84 | Moon 13 | Full cycle |
 
@@ -72,6 +74,6 @@ Or open `index.html` directly in Chrome. No build step, no dependencies, no serv
 
 ## License
 
-Copyright (C) 2026 LightsOnemusic ó GPL v3.
+Copyright (C) 2026 LightsOnemusic ÔøΩ GPL v3.
 
 Free for personal, educational, and research use. Any commercial product built on this framework requires a separate license. See [LICENSE](LICENSE) for full terms.
