@@ -5,7 +5,15 @@
 > UFT is a precision calendar instrument. It derives a 13-tone musical scale from the Moon's synodic period � a real orbital constant � and translates that math into audible frequencies. These demos let you hear and interact with that translation directly in a browser.
 
 ---
+## ⚠️ Experimental Test Notice
 
+**All demos in this repository are simulation and experimental research tools.** The frequency demonstrations, visualizations, and cymatic geometry animations are created with Web Audio API and canvas graphics to explore UFT concepts theoretically. 
+
+**This is not:** Medical equipment, clinical intervention, scientific proof, or a substitute for professional guidance.
+
+**This is:** An experimental platform for learning, testing, and demonstrating harmonic mathematics principles. All claims about frequency effects are theoretical explorations based on mathematical ratios and harmonic relationships.
+
+---
 ## What is MOON_ROOT?
 
 The base frequency is not arbitrary:
