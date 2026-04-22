@@ -352,6 +352,87 @@
             color: #ff3333;
         }
 
+        .feedback-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feedback-box {
+            background: rgba(0, 50, 80, 0.6);
+            border: 2px solid #00ffff;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .feedback-label {
+            color: #00ffff;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .feedback-value {
+            color: #ffff00;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .feedback-mini {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .convergence-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ffff;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .convergence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff00ff, #00ff88);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .lock-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background: #ff3333;
+        }
+
+        .lock-indicator.locked {
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        .feedback-history {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ffff;
+            border-radius: 3px;
+            padding: 10px;
+            font-size: 0.8em;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .history-entry {
+            color: #00ffff;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
         @media (max-width: 1024px) {
             .section {
                 grid-template-columns: 1fr;
@@ -489,6 +570,64 @@
                 <div class="bar"></div>
                 <div class="bar"></div>
                 <div class="bar"></div>
+            </div>
+        </div>
+
+        <!-- Feedback Control System -->
+        <div class="panel full-width">
+            <h2>🔄 Real-Time Feedback Control</h2>
+            <p style="color: #aaa; margin-bottom: 15px; font-size: 0.9em;">Simulates closed-loop frequency locking via microphone feedback and gap adjustment</p>
+            
+            <div class="feedback-grid">
+                <div class="feedback-box">
+                    <div class="feedback-label">🎯 Target Frequency</div>
+                    <div class="feedback-value" id="feedback-target">256 Hz</div>
+                </div>
+                <div class="feedback-box">
+                    <div class="feedback-label">📊 Measured Frequency</div>
+                    <div class="feedback-value" id="feedback-measured">--</div>
+                    <div class="feedback-mini" id="feedback-error">Error: --</div>
+                </div>
+                <div class="feedback-box">
+                    <div class="feedback-label">📏 Slot Gap (mm)</div>
+                    <div class="feedback-value" id="feedback-gap">--</div>
+                    <div class="feedback-mini" id="feedback-gap-adjust">Adjustment: --</div>
+                </div>
+                <div class="feedback-box">
+                    <div class="feedback-label">⚡ Pressure (PSI)</div>
+                    <div class="feedback-value" id="feedback-pressure">--</div>
+                    <div class="feedback-mini" id="feedback-pressure-adjust">Adjustment: --</div>
+                </div>
+                <div class="feedback-box">
+                    <div class="feedback-label">🔒 Lock Status</div>
+                    <div style="margin-top: 10px;">
+                        <span class="lock-indicator" id="lock-dot"></span>
+                        <span id="lock-status" style="color: #ffaa00;">Waiting...</span>
+                    </div>
+                </div>
+                <div class="feedback-box">
+                    <div class="feedback-label">📈 Convergence</div>
+                    <div class="convergence-bar">
+                        <div class="convergence-fill" id="convergence-fill"></div>
+                    </div>
+                    <div class="feedback-mini" id="convergence-percent">0%</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn" id="btn-feedback-start">🔄 Start Feedback Loop</button>
+                <button class="btn stop" id="btn-feedback-stop">■ Stop</button>
+            </div>
+
+            <div class="feedback-history" id="feedback-history">
+                <div class="history-entry">📋 Feedback control idle. Press START to begin locking.</div>
+            </div>
+
+            <div class="reference-box" style="margin-top: 20px;">
+                <div class="reference-label">How It Works</div>
+                <div class="reference-text">
+                    Real-time feedback control continuously adjusts the slot gap and compressor pressure based on microphone-measured frequency. The system iterates: (1) measure actual frequency, (2) calculate error vs. target, (3) adjust gap proportionally, (4) re-measure. Lock is achieved when error stays within ±2 Hz for 5 consecutive iterations. This closes the loop between theory and hardware reality.
+                </div>
             </div>
         </div>
 
@@ -806,6 +945,134 @@
         });
 
         document.getElementById('btn-stop').addEventListener('click', stopFrequency);
+
+        // ==================== FEEDBACK CONTROL ====================
+        let feedbackActive = false;
+        let feedbackIterations = 0;
+        let feedbackHistory = [];
+        const TARGET_ERROR_HZ = 2; // Lock target ±2 Hz
+        const LOCK_ITERATIONS = 5; // 5 iterations to declare lock
+
+        function updateFeedbackUI(target, measured, gap, pressure, error, converged, locked) {
+            document.getElementById('feedback-target').textContent = `${target.toFixed(1)} Hz`;
+            document.getElementById('feedback-measured').textContent = measured ? `${measured.toFixed(1)} Hz` : '--';
+            document.getElementById('feedback-error').textContent = `Error: ${error !== null ? error.toFixed(2) + ' Hz' : '--'}`;
+            document.getElementById('feedback-gap').textContent = gap ? gap.toFixed(2) : '--';
+            document.getElementById('feedback-pressure').textContent = pressure ? pressure.toFixed(1) : '--';
+            document.getElementById('convergence-fill').style.width = `${converged}%`;
+            document.getElementById('convergence-percent').textContent = `${converged.toFixed(0)}%`;
+
+            const lockDot = document.getElementById('lock-dot');
+            const lockStatus = document.getElementById('lock-status');
+            if (locked) {
+                lockDot.classList.add('locked');
+                lockStatus.textContent = '🔒 LOCKED';
+                lockStatus.style.color = '#00ff88';
+            } else if (converged > 50) {
+                lockStatus.textContent = '🔄 Converging...';
+                lockStatus.style.color = '#ffaa00';
+            } else {
+                lockDot.classList.remove('locked');
+                lockStatus.textContent = '⏳ Tuning...';
+                lockStatus.style.color = '#ffaa00';
+            }
+        }
+
+        function addFeedbackHistory(text) {
+            const history = document.getElementById('feedback-history');
+            const entry = document.createElement('div');
+            entry.className = 'history-entry';
+            entry.textContent = text;
+            history.insertBefore(entry, history.firstChild);
+            if (history.children.length > 20) {
+                history.removeChild(history.lastChild);
+            }
+        }
+
+        function simulateFeedbackControl(octave) {
+            const targetFreq = khaeos.getRussellFrequency(octave);
+            const config = khaeos.getConfigForOctave(octave);
+            
+            // Simulate starting with a slightly wrong gap
+            let currentGap = config.gap_mm * (0.95 + Math.random() * 0.1); // ±5% initial error
+            let currentPressure = 100; // Starting pressure
+            let measuredFreq = targetFreq * (currentGap / config.gap_mm); // Simplified physics
+
+            feedbackIterations = 0;
+            feedbackHistory = [];
+            let consecutiveLocks = 0;
+            let isLocked = false;
+
+            const feedbackLoop = setInterval(() => {
+                if (!feedbackActive) {
+                    clearInterval(feedbackLoop);
+                    updateFeedbackUI(targetFreq, measuredFreq, currentGap, currentPressure, null, 0, false);
+                    addFeedbackHistory('🛑 Feedback loop stopped.');
+                    return;
+                }
+
+                feedbackIterations++;
+
+                // Simulate microphone measurement with ±1 Hz noise
+                const noise = (Math.random() - 0.5) * 2; // ±1 Hz
+                measuredFreq = targetFreq * (currentGap / config.gap_mm) + noise;
+
+                const error = measuredFreq - targetFreq;
+                const absError = Math.abs(error);
+
+                // Proportional control: adjust gap to reduce error
+                const gapAdjustment = (error / targetFreq) * config.gap_mm * -0.5; // Proportional correction
+                currentGap = Math.max(config.gap_mm * 0.8, Math.min(config.gap_mm * 1.2, currentGap + gapAdjustment));
+
+                // Pressure adjusts based on gap changes
+                currentPressure = 80 + (currentGap / config.gap_mm) * 40;
+
+                feedbackHistory.push({
+                    iteration: feedbackIterations,
+                    measured: measuredFreq,
+                    error: error,
+                    gap: currentGap,
+                    pressure: currentPressure
+                });
+
+                // Check for lock
+                if (absError < TARGET_ERROR_HZ) {
+                    consecutiveLocks++;
+                } else {
+                    consecutiveLocks = 0;
+                }
+
+                isLocked = consecutiveLocks >= LOCK_ITERATIONS;
+                const convergence = Math.min(100, (feedbackIterations / 20) * 100 * (1 - Math.min(1, absError / 10)));
+
+                updateFeedbackUI(targetFreq, measuredFreq, currentGap, currentPressure, error, convergence, isLocked);
+
+                const gapDir = gapAdjustment > 0 ? '↑' : '↓';
+                const lockStr = isLocked ? '✓ LOCKED' : '';
+                addFeedbackHistory(`Iter ${feedbackIterations}: ${measuredFreq.toFixed(1)} Hz | Error: ${error.toFixed(2)} Hz | Gap: ${currentGap.toFixed(2)} mm ${gapDir} ${lockStr}`);
+
+                if (isLocked || feedbackIterations >= 30) {
+                    clearInterval(feedbackLoop);
+                    feedbackActive = false;
+                    if (isLocked) {
+                        addFeedbackHistory(`✅ Frequency locked after ${feedbackIterations} iterations!`);
+                    } else {
+                        addFeedbackHistory('⚠️ Timeout: feedback loop completed.');
+                    }
+                }
+            }, 300); // Update every 300ms
+        }
+
+        // Feedback control button listeners
+        document.getElementById('btn-feedback-start').addEventListener('click', () => {
+            feedbackActive = true;
+            addFeedbackHistory(`🔄 Starting feedback control for Octave ${currentOctave}...`);
+            simulateFeedbackControl(currentOctave);
+        });
+
+        document.getElementById('btn-feedback-stop').addEventListener('click', () => {
+            feedbackActive = false;
+        });
 
         // Initialize on load
         updateDisplay(1);
