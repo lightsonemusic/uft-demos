@@ -433,6 +433,21 @@
             border-bottom: 1px solid rgba(0, 255, 255, 0.2);
         }
 
+        .disclaimer-box {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(255, 100, 0, 0.1));
+            border: 2px solid #ff6600;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9em;
+            color: #ffaa00;
+            line-height: 1.5;
+        }
+
+        .disclaimer-box strong {
+            color: #ff6600;
+        }
+
         @media (max-width: 1024px) {
             .section {
                 grid-template-columns: 1fr;
@@ -483,6 +498,11 @@
             <div class="subtitle">Harmonic Octave Portal</div>
             <p style="margin-top: 10px; color: #aaa;">Pneumatic frequency synthesis across 8 feasible octaves (256 Hz - 32,768 Hz)</p>
         </header>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer-box">
+            <strong>⚠️ RESEARCH & SIMULATION DISCLAIMER:</strong> This is an experimental research tool and simulation only. The ferrofluid visualization and frequency demonstrations are created with Web Audio API and canvas graphics to explore Universal Frequency Theory (UFT) concepts. <strong>This is not medical equipment</strong> and not a substitute for medical treatment. All claims about frequency effects are theoretical explorations based on harmonic mathematics and should not be considered as proven or therapeutic.
+        </div>
 
         <!-- Main Section -->
         <div class="section">
