@@ -567,6 +567,10 @@
                     <div class="output-item-label" style="color: #00ff88;">🎯 Recommended Therapeutic Frequency</div>
                     <div class="output-item-value" id="therapeuticFreq">—</div>
                     <div class="output-item-detail" id="therapeuticFreqDetail">Use for audio synthesis or hardware output</div>
+                    <div style="margin-top: 10px; display: flex; gap: 10px;">
+                        <button id="playFreqBtn" onclick="playTherapeuticFrequency()" style="flex: 1; background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%); color: #000; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9em;">🔊 Play (5s)</button>
+                        <button id="stopFreqBtn" onclick="stopTherapeuticFrequency()" style="flex: 1; background: rgba(255, 100, 100, 0.3); color: #ff8888; border: 1px solid #ff8888; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9em; display: none;">⏹️ Stop</button>
+                    </div>
                 </div>
                 <div class="output-item">
                     <div class="output-item-label">Ogham Tree</div>
@@ -630,6 +634,93 @@
             coherency: 0,
             condition: 'general'
         };
+
+        // Audio state
+        let audioContext = null;
+        let oscillator = null;
+        let gainNode = null;
+        let currentPlayingFrequency = 0;
+
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioContext;
+        }
+
+        function playTherapeuticFrequency() {
+            const freqStr = document.getElementById('therapeuticFreq').textContent;
+            const freq = parseFloat(freqStr);
+            
+            if (!freq || freq <= 0) {
+                alert('No therapeutic frequency available. Process biometrics first.');
+                return;
+            }
+
+            try {
+                const ctx = initAudioContext();
+                
+                // Stop any existing playback
+                stopTherapeuticFrequency();
+                
+                // Create oscillator and gain nodes
+                oscillator = ctx.createOscillator();
+                gainNode = ctx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                // Set frequency and volume
+                oscillator.frequency.value = freq;
+                gainNode.gain.value = 0.1; // Keep volume low for safety
+                
+                // Smooth fade in
+                gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.1);
+                
+                // Start oscillator
+                oscillator.start();
+                currentPlayingFrequency = freq;
+                
+                // Update button states
+                document.getElementById('playFreqBtn').style.display = 'none';
+                document.getElementById('stopFreqBtn').style.display = 'block';
+                
+                // Auto-stop after 5 seconds
+                setTimeout(() => {
+                    stopTherapeuticFrequency();
+                }, 5000);
+                
+            } catch (error) {
+                console.error('Error playing frequency:', error);
+                alert('Could not play frequency. Check browser permissions.');
+            }
+        }
+
+        function stopTherapeuticFrequency() {
+            if (oscillator) {
+                try {
+                    // Smooth fade out
+                    const ctx = audioContext;
+                    gainNode.gain.setValueAtTime(gainNode.gain.value, ctx.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
+                    
+                    // Stop after fade
+                    setTimeout(() => {
+                        oscillator.stop();
+                        oscillator = null;
+                        gainNode = null;
+                        currentPlayingFrequency = 0;
+                    }, 100);
+                } catch (error) {
+                    console.error('Error stopping frequency:', error);
+                }
+            }
+            
+            // Update button states
+            document.getElementById('playFreqBtn').style.display = 'block';
+            document.getElementById('stopFreqBtn').style.display = 'none';
+        }
 
         // Geometric visualization functions
         function drawGeometry(canvas, stateIndex, frequency, coherency) {
