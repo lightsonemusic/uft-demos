@@ -821,6 +821,11 @@
             }
         }
 
+        // Initialize canvas dimensions
+        const canvas = document.getElementById('geometricCanvas');
+        canvas.width = 500;
+        canvas.height = 400;
+
         // Start animation loop
         animationId = requestAnimationFrame(animateGeometry);
 
