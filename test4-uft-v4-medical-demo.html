@@ -568,7 +568,7 @@
                     <div class="output-item-value" id="therapeuticFreq">—</div>
                     <div class="output-item-detail" id="therapeuticFreqDetail">Use for audio synthesis or hardware output</div>
                     <div style="margin-top: 10px; display: flex; gap: 10px;">
-                        <button id="playFreqBtn" onclick="playTherapeuticFrequency()" style="flex: 1; background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%); color: #000; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9em;">🔊 Play (5s)</button>
+                        <button id="playFreqBtn" onclick="playTherapeuticFrequency()" style="flex: 1; background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%); color: #000; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9em;">🔊 Play (10s)</button>
                         <button id="stopFreqBtn" onclick="stopTherapeuticFrequency()" style="flex: 1; background: rgba(255, 100, 100, 0.3); color: #ff8888; border: 1px solid #ff8888; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9em; display: none;">⏹️ Stop</button>
                     </div>
                 </div>
@@ -689,10 +689,10 @@
                 document.getElementById('playFreqBtn').style.display = 'none';
                 document.getElementById('stopFreqBtn').style.display = 'block';
                 
-                // Auto-stop after 5 seconds
+                // Auto-stop after 10 seconds
                 setTimeout(() => {
                     stopTherapeuticFrequency();
-                }, 5000);
+                }, 10000);
                 
             } catch (error) {
                 console.error('Error playing frequency:', error);
