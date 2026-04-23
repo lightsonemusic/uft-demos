@@ -657,11 +657,14 @@
                 return;
             }
 
+            // Check if already playing
+            if (oscillator !== null) {
+                stopTherapeuticFrequency();
+                return;
+            }
+
             try {
                 const ctx = initAudioContext();
-                
-                // Stop any existing playback
-                stopTherapeuticFrequency();
                 
                 // Create oscillator and gain nodes
                 oscillator = ctx.createOscillator();
@@ -924,7 +927,7 @@
             const dpr = window.devicePixelRatio || 1;
             
             // Get actual display size
-            const displayWidth = container.clientWidth * 0.95; // Leave some padding
+            const displayWidth = container.clientWidth * 0.95;
             const displayHeight = 400;
             const maxWidth = 500;
             
@@ -1327,7 +1330,10 @@
             document.querySelectorAll('[data-en][data-pt]').forEach(el => {
                 const text = el.getAttribute(`data-${lang}`);
                 if (text) {
-                    el.textContent = text;
+                    // If it's a container with text content, update textContent
+                    if (el.children.length === 0 || el.tagName === 'LABEL' || el.tagName === 'STRONG' || el.tagName === 'LI' || el.tagName === 'P' || el.tagName === 'H2' || el.tagName === 'DIV') {
+                        el.textContent = text;
+                    }
                 }
             });
 
