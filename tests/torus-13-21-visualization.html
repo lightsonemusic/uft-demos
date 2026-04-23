@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UFT Torus (13,21) Knot — 273 Surface Positions</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0c29 100%);
+      color: #e8f4f8;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1900px; margin: 0 auto; }
+    
+    h1 {
+      font-size: 32px;
+      color: #c4a000;
+      margin-bottom: 5px;
+      text-shadow: 0 0 30px rgba(196, 160, 0, 0.5);
+      text-align: center;
+    }
+    
+    .subtitle {
+      color: #d4aa20;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+    
+    .controls-panel {
+      background: rgba(196, 160, 0, 0.08);
+      border: 2px solid #c4a000;
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin: 15px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: flex-end;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .control-label {
+      color: #d4aa20;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    input[type="range"] { width: 120px; accent-color: #c4a000; }
+    
+    select, input[type="number"] {
+      background: rgba(10, 14, 39, 0.8);
+      border: 1px solid #c4a000;
+      color: #e8f4f8;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-family: 'Monaco', monospace;
+      font-size: 11px;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #8a6e00, #c4a000);
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(196, 160, 0, 0.6);
+    }
+    
+    button.stop { background: linear-gradient(135deg, #ff4444, #ff6666); }
+    
+    .display-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 15px;
+      margin: 15px 0;
+    }
+    
+    .panel {
+      background: rgba(196, 160, 0, 0.04);
+      border: 2px solid rgba(196, 160, 0, 0.3);
+      border-radius: 8px;
+      padding: 15px;
+    }
+    
+    .panel h2 {
+      color: #c4a000;
+      font-size: 14px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(196, 160, 0, 0.2);
+    }
+    
+    canvas {
+      width: 100%;
+      height: 550px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(196, 160, 0, 0.4);
+      border-radius: 4px;
+    }
+    
+    .info-box {
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 4px solid #c4a000;
+      padding: 10px 12px;
+      margin: 8px 0;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    
+    .info-label { color: #888; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { color: #d4aa20; font-weight: bold; font-size: 16px; margin-top: 2px; }
+    
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 10px 0;
+    }
+    
+    .data-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(196, 160, 0, 0.2);
+      border-radius: 4px;
+      padding: 8px;
+      text-align: center;
+    }
+    
+    .data-box .label { color: #888; font-size: 9px; margin-bottom: 3px; }
+    .data-box .value { color: #d4aa20; font-size: 14px; font-weight: bold; }
+    
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin: 10px 0;
+    }
+    
+    .state-dot {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1px solid rgba(196, 160, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: #aaa;
+      transition: all 0.3s;
+      cursor: default;
+    }
+    
+    .state-dot.active {
+      border-color: #c4a000;
+      box-shadow: 0 0 8px rgba(196, 160, 0, 0.6);
+      color: #fff;
+    }
+    
+    .moon-strip {
+      display: flex;
+      gap: 3px;
+      margin: 10px 0;
+    }
+    
+    .moon-bar {
+      flex: 1;
+      height: 24px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: #fff;
+      opacity: 0.4;
+      transition: all 0.3s;
+    }
+    
+    .moon-bar.active { opacity: 1; box-shadow: 0 0 8px rgba(196, 160, 0, 0.5); }
+    
+    .proto-words {
+      display: grid;
+      grid-template-columns: repeat(13, 1fr);
+      gap: 2px;
+      margin: 8px 0;
+    }
+    
+    .pw {
+      text-align: center;
+      font-size: 7px;
+      padding: 3px 1px;
+      background: rgba(196, 160, 0, 0.1);
+      border-radius: 2px;
+      color: #999;
+      transition: all 0.3s;
+    }
+    
+    .pw.active { background: rgba(196, 160, 0, 0.4); color: #fff; }
+    
+    .topology-info {
+      background: rgba(196, 160, 0, 0.08);
+      border: 1px solid rgba(196, 160, 0, 0.2);
+      border-radius: 4px;
+      padding: 10px;
+      font-size: 10px;
+      line-height: 1.7;
+      margin: 10px 0;
+    }
+    
+    .formula { color: #d4aa20; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔮 UFT TORUS (13,21) KNOT — LUNAR × COSMIC</h1>
+    <p class="subtitle">273 Surface Positions | 13 Lunar Windings | 21 Cosmic States | Audio-Reactive Coherence</p>
+    
+    <!-- CONTROLS -->
+    <div class="controls-panel">
+      <div class="control-group">
+        <label class="control-label">Rotation Speed</label>
+        <input type="range" id="rotSpeed" value="40" min="0" max="100">
+        <span id="speedLabel" style="color:#d4aa20;font-size:10px;">40%</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Major Radius (R)</label>
+        <input type="range" id="majorR" value="60" min="30" max="100">
+      </div>
+      <div class="control-group">
+        <label class="control-label">Minor Radius (r)</label>
+        <input type="range" id="minorR" value="25" min="10" max="50">
+      </div>
+      <div class="control-group">
+        <label class="control-label">View Angle</label>
+        <select id="viewAngle">
+          <option value="perspective">Perspective</option>
+          <option value="top">Top (Major axis)</option>
+          <option value="side">Side (Minor axis)</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Frequency (Hz)</label>
+        <input type="number" id="baseFreq" value="210.4" step="0.1" min="100" max="500">
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <button onclick="startAudio()">▶ PLAY</button>
+        <button class="stop" onclick="stopAudio()" id="stopBtn" style="display:none;">⏹ STOP</button>
+      </div>
+    </div>
+    
+    <!-- MAIN DISPLAY -->
+    <div class="display-grid">
+      <!-- TORUS CANVAS -->
+      <div class="panel">
+        <h2>🔷 Torus (13,21) Knot Projection</h2>
+        <canvas id="torusCanvas"></canvas>
+      </div>
+      
+      <!-- DATA PANEL -->
+      <div class="panel">
+        <h2>📊 Torus Topology</h2>
+        
+        <div class="topology-info">
+          <div><span class="formula">p = 13</span> — Lunar windings (13 moons)</div>
+          <div><span class="formula">q = 21</span> — Cosmic windings (21 states)</div>
+          <div><span class="formula">S = p × q = 273</span> — Surface positions</div>
+          <div><span class="formula">θ(moon) = (moon / 13) × 360°</span> — Moon angle mapping</div>
+          <div><span class="formula">pos(state) = (state / 21) × 273</span> — Knot position</div>
+        </div>
+        
+        <div class="data-grid">
+          <div class="data-box">
+            <div class="label">Positions</div>
+            <div class="value" id="posCount">273</div>
+          </div>
+          <div class="data-box">
+            <div class="label">Current State</div>
+            <div class="value" id="curState">0</div>
+          </div>
+          <div class="data-box">
+            <div class="label">U Turns</div>
+            <div class="value" id="uTurns">0</div>
+          </div>
+          <div class="data-box">
+            <div class="label">V Turns</div>
+            <div class="value" id="vTurns">0</div>
+          </div>
+          <div class="data-box">
+            <div class="label">Moon Angle</div>
+            <div class="value" id="moonAngle">0°</div>
+          </div>
+          <div class="data-box">
+            <div class="label">Coherency</div>
+            <div class="value" id="coherency">—</div>
+          </div>
+        </div>
+        
+        <h3 style="color:#c4a000;font-size:12px;margin:12px 0 6px;">🌙 13 Lunar Moons</h3>
+        <div class="moon-strip" id="moonStrip"></div>
+        <div class="proto-words" id="protoWords"></div>
+        
+        <h3 style="color:#c4a000;font-size:12px;margin:12px 0 6px;">🌀 21 Cosmic States</h3>
+        <div class="state-grid" id="stateGrid"></div>
+        
+        <div class="info-box" style="margin-top:12px;">
+          <div class="info-label">Active Knot Position</div>
+          <div class="info-value" id="knotPos">—</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">Frequency Mapping</div>
+          <div class="info-value" id="freqMap">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== UFT TORUS CONSTANTS =====
+    const TORUS_LUNAR_WINDINGS = 13;
+    const TORUS_COSMIC_WINDINGS = 21;
+    const TORUS_SURFACE_POSITIONS = 273; // 13 × 21
+    const PHI = 1.618033988749895;
+    const LUNAR_OCTAVE_ROOT = 210.4186;
+    
+    const PROTO_WORDS = ['OH','AH','EE','OOH','MM','NG','AY','EH','IA','AU','OE','UH','AR'];
+    const PROTO_FREQS = [210.4,223.1,236.2,250.2,265.1,280.9,297.6,315.3,334.0,353.9,374.9,397.2,420.8];
+    
+    const MOON_COLORS = [
+      '#ff4444','#ff7744','#ffaa00','#cccc00','#88cc00',
+      '#44cc44','#00ccaa','#00aacc','#4488ff','#6644ff',
+      '#aa44ff','#ff44cc','#ff4488'
+    ];
+    
+    const COSMIC_STATES = [
+      'Seed','Sprout','Root','Stem','Leaf','Bud','Bloom',
+      'Fruit','Harvest','Rest','Dream','Wake','Rise',
+      'Flow','Merge','Split','Spiral','Pulse','Wave','Echo','Return'
+    ];
+    
+    // ===== AUDIO =====
+    let audioContext, analyser, frequencyData;
+    let oscillators = [];
+    let isPlaying = false;
+    let audioEnergy = 0, bassEnergy = 0, midEnergy = 0, highEnergy = 0;
+    
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.8;
+        frequencyData = new Uint8Array(analyser.frequencyBinCount);
+        analyser.connect(audioContext.destination);
+      }
+    }
+    
+    function startAudio() {
+      initAudio();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      stopAudio();
+      
+      const baseFreq = parseFloat(document.getElementById('baseFreq').value);
+      isPlaying = true;
+      
+      const masterGain = audioContext.createGain();
+      masterGain.gain.setValueAtTime(0.08, audioContext.currentTime);
+      masterGain.connect(analyser);
+      
+      // 13 oscillators — one per lunar winding
+      for (let i = 0; i < 13; i++) {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        osc.frequency.setValueAtTime(PROTO_FREQS[i], audioContext.currentTime);
+        osc.type = i % 3 === 0 ? 'sine' : i % 3 === 1 ? 'triangle' : 'square';
+        gain.gain.setValueAtTime(0.06 / (i + 1), audioContext.currentTime);
+        
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 120);
+        oscillators.push(osc);
+      }
+      
+      document.getElementById('stopBtn').style.display = 'inline-block';
+    }
+    
+    function stopAudio() {
+      oscillators.forEach(o => { try { o.stop(); } catch(e) {} });
+      oscillators = [];
+      isPlaying = false;
+      document.getElementById('stopBtn').style.display = 'none';
+    }
+    
+    function getAudioData() {
+      if (!analyser || !isPlaying) return { energy:0, bass:0, mid:0, high:0, bands: new Array(13).fill(0) };
+      analyser.getByteFrequencyData(frequencyData);
+      const len = frequencyData.length;
+      let bass=0, mid=0, high=0, total=0;
+      const bEnd = Math.floor(len*0.15), mEnd = Math.floor(len*0.5);
+      for (let i=0;i<len;i++) {
+        const v = frequencyData[i]/255;
+        total += v;
+        if (i<bEnd) bass+=v; else if (i<mEnd) mid+=v; else high+=v;
+      }
+      bass /= bEnd||1; mid /= (mEnd-bEnd)||1; high /= (len-mEnd)||1; total /= len;
+      const bandSize = Math.floor(len/13);
+      const bands = [];
+      for (let b=0;b<13;b++) {
+        let s=0;
+        for (let i=b*bandSize;i<(b+1)*bandSize&&i<len;i++) s+=frequencyData[i]/255;
+        bands.push(s/bandSize);
+      }
+      return { energy:total, bass, mid, high, bands };
+    }
+    
+    // ===== TORUS GEOMETRY =====
+    
+    // Map cosmic state index to torus knot position (from cosmic-translator)
+    function mapStatesToTorusKnot(stateIdx) {
+      const position = (stateIdx / 21) * TORUS_SURFACE_POSITIONS;
+      return {
+        position,
+        u_turns: Math.floor(position / TORUS_COSMIC_WINDINGS),
+        v_turns: Math.floor(position % TORUS_COSMIC_WINDINGS),
+        totalSurface: TORUS_SURFACE_POSITIONS
+      };
+    }
+    
+    // Moon angle mapping (from math-coherency-verification)
+    function moonAngle(moon) {
+      return (moon / TORUS_LUNAR_WINDINGS) * 360;
+    }
+    
+    // Generate all 273 torus knot positions
+    // Parametric torus knot: (p,q) where point winds p times around the hole
+    // and q times through the hole
+    function generateTorusKnotPoints(R, r) {
+      const points = [];
+      for (let i = 0; i < TORUS_SURFACE_POSITIONS; i++) {
+        const t = (i / TORUS_SURFACE_POSITIONS) * 2 * Math.PI;
+        
+        // Torus knot parametric equations (p=13, q=21)
+        const p = TORUS_LUNAR_WINDINGS;
+        const q = TORUS_COSMIC_WINDINGS;
+        
+        const rr = R + r * Math.cos(q * t);
+        const x = rr * Math.cos(p * t);
+        const y = rr * Math.sin(p * t);
+        const z = r * Math.sin(q * t);
+        
+        // Which moon and state this position belongs to
+        const moonIdx = Math.floor((i / TORUS_SURFACE_POSITIONS) * TORUS_LUNAR_WINDINGS) % TORUS_LUNAR_WINDINGS;
+        const stateIdx = Math.floor((i / TORUS_SURFACE_POSITIONS) * TORUS_COSMIC_WINDINGS) % TORUS_COSMIC_WINDINGS;
+        
+        points.push({ x, y, z, moonIdx, stateIdx, index: i });
+      }
+      return points;
+    }
+    
+    // Generate torus surface mesh (for the translucent shell)
+    function generateTorusSurface(R, r, segments, tubes) {
+      const points = [];
+      for (let i = 0; i <= segments; i++) {
+        for (let j = 0; j <= tubes; j++) {
+          const u = (i / segments) * 2 * Math.PI;
+          const v = (j / tubes) * 2 * Math.PI;
+          const x = (R + r * Math.cos(v)) * Math.cos(u);
+          const y = (R + r * Math.cos(v)) * Math.sin(u);
+          const z = r * Math.sin(v);
+          points.push({ x, y, z, u: i, v: j });
+        }
+      }
+      return { points, segments, tubes };
+    }
+    
+    // 3D rotation
+    function rotatePoint(p, ax, ay, az) {
+      let { x, y, z } = p;
+      // Rotate Y
+      let x1 = x * Math.cos(ay) + z * Math.sin(ay);
+      let z1 = -x * Math.sin(ay) + z * Math.cos(ay);
+      x = x1; z = z1;
+      // Rotate X
+      let y1 = y * Math.cos(ax) - z * Math.sin(ax);
+      z1 = y * Math.sin(ax) + z * Math.cos(ax);
+      y = y1; z = z1;
+      // Rotate Z
+      x1 = x * Math.cos(az) - y * Math.sin(az);
+      y1 = x * Math.sin(az) + y * Math.cos(az);
+      return { x: x1, y: y1, z };
+    }
+    
+    // Project 3D → 2D
+    function project(p, cx, cy, fov) {
+      const scale = fov / (fov + p.z);
+      return { x: cx + p.x * scale, y: cy + p.y * scale, scale, z: p.z };
+    }
+    
+    // ===== UI INIT =====
+    function initUI() {
+      // Moon strip
+      const strip = document.getElementById('moonStrip');
+      for (let i = 0; i < 13; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'moon-bar';
+        bar.style.background = MOON_COLORS[i];
+        bar.textContent = (i + 1);
+        bar.title = `Moon ${i+1} — ${PROTO_WORDS[i]} (${PROTO_FREQS[i]} Hz)`;
+        strip.appendChild(bar);
+      }
+      
+      // Proto words
+      const pw = document.getElementById('protoWords');
+      PROTO_WORDS.forEach((w, i) => {
+        const el = document.createElement('div');
+        el.className = 'pw';
+        el.textContent = w;
+        el.title = `${PROTO_FREQS[i]} Hz`;
+        pw.appendChild(el);
+      });
+      
+      // State grid
+      const sg = document.getElementById('stateGrid');
+      for (let i = 0; i < 21; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'state-dot';
+        dot.textContent = i;
+        dot.title = COSMIC_STATES[i];
+        sg.appendChild(dot);
+      }
+    }
+    
+    // ===== ANIMATION =====
+    let animId;
+    let rotY = 0, rotX = 0.4, rotZ = 0;
+    let time = 0;
+    let activePosition = 0;
+    
+    function animate() {
+      const canvas = document.getElementById('torusCanvas');
+      const ctx = canvas.getContext('2d');
+      const speed = parseInt(document.getElementById('rotSpeed').value) || 40;
+      const R = parseInt(document.getElementById('majorR').value) || 60;
+      const r = parseInt(document.getElementById('minorR').value) || 25;
+      const view = document.getElementById('viewAngle').value;
+      
+      const cw = canvas.offsetWidth;
+      const ch = canvas.offsetHeight;
+      if (canvas.width !== cw || canvas.height !== ch) {
+        canvas.width = cw;
+        canvas.height = ch;
+      }
+      
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const fov = 300;
+      
+      // Audio data
+      const audio = getAudioData();
+      audioEnergy += (audio.energy - audioEnergy) * 0.15;
+      bassEnergy += (audio.bass - bassEnergy) * 0.12;
+      midEnergy += (audio.mid - midEnergy) * 0.15;
+      highEnergy += (audio.high - highEnergy) * 0.18;
+      
+      // Background
+      const bgPulse = isPlaying ? bassEnergy * 10 : 0;
+      ctx.fillStyle = `rgba(${Math.floor(10+bgPulse)}, ${Math.floor(14+bgPulse*0.5)}, ${Math.floor(39+bgPulse*0.8)}, 0.14)`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Rotation
+      const speedFactor = speed / 40;
+      const audioBoost = isPlaying ? 1 + audioEnergy * 1.5 : 1;
+      
+      if (view === 'top') { rotX = Math.PI / 2; rotZ = 0; }
+      else if (view === 'side') { rotX = 0; rotZ = 0; }
+      else { rotX = 0.4 + (isPlaying ? midEnergy * 0.3 : 0); }
+      
+      rotY += 0.008 * speedFactor * audioBoost;
+      rotZ += 0.003 * speedFactor * audioBoost;
+      
+      // Active position sweeps through 273
+      time += 0.02 * speedFactor;
+      activePosition = Math.floor((time * 3) % TORUS_SURFACE_POSITIONS);
+      const activeMoon = Math.floor((activePosition / TORUS_SURFACE_POSITIONS) * 13) % 13;
+      const activeState = Math.floor((activePosition / TORUS_SURFACE_POSITIONS) * 21) % 21;
+      
+      // Reactive radii
+      const Rr = R + (isPlaying ? bassEnergy * 15 : 0);
+      const rr = r + (isPlaying ? highEnergy * 8 : 0);
+      
+      // ===== DRAW TORUS SURFACE MESH =====
+      const surf = generateTorusSurface(Rr, rr, 48, 24);
+      const surfProjected = surf.points.map(p => {
+        const rot = rotatePoint(p, rotX, rotY, rotZ);
+        return project(rot, cx, cy, fov);
+      });
+      
+      // Draw mesh lines
+      ctx.lineWidth = 0.3;
+      for (let i = 0; i < surf.segments; i++) {
+        for (let j = 0; j < surf.tubes; j++) {
+          const idx = i * (surf.tubes + 1) + j;
+          const idxR = (i + 1) * (surf.tubes + 1) + j;
+          const idxU = i * (surf.tubes + 1) + (j + 1);
+          
+          const a = surfProjected[idx];
+          const b = surfProjected[idxR];
+          const c = surfProjected[idxU];
+          
+          const meshAlpha = 0.04 + (isPlaying ? midEnergy * 0.06 : 0);
+          ctx.strokeStyle = `rgba(196, 160, 0, ${meshAlpha})`;
+          
+          if (b) {
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+          if (c) {
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(c.x, c.y);
+            ctx.stroke();
+          }
+        }
+      }
+      
+      // ===== DRAW KNOT CURVE (273 positions) =====
+      const knotPoints = generateTorusKnotPoints(Rr, rr);
+      const projectedKnot = knotPoints.map(p => {
+        const rot = rotatePoint(p, rotX, rotY, rotZ);
+        return { ...project(rot, cx, cy, fov), moonIdx: p.moonIdx, stateIdx: p.stateIdx, index: p.index };
+      });
+      
+      // Sort by depth for proper drawing
+      const sorted = [...projectedKnot].sort((a, b) => a.z - b.z);
+      
+      // Draw knot curve
+      ctx.lineWidth = 1.5 + (isPlaying ? audioEnergy * 2 : 0);
+      for (let i = 0; i < projectedKnot.length; i++) {
+        const curr = projectedKnot[i];
+        const next = projectedKnot[(i + 1) % projectedKnot.length];
+        
+        const moonColor = MOON_COLORS[curr.moonIdx];
+        const alpha = 0.4 + curr.scale * 0.4 + (isPlaying ? audio.bands[curr.moonIdx % 13] * 0.3 : 0);
+        
+        ctx.strokeStyle = moonColor;
+        ctx.globalAlpha = Math.min(alpha, 0.95);
+        
+        if (isPlaying && audio.bands[curr.moonIdx % 13] > 0.3) {
+          ctx.shadowColor = moonColor;
+          ctx.shadowBlur = audio.bands[curr.moonIdx % 13] * 15;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+        
+        ctx.beginPath();
+        ctx.moveTo(curr.x, curr.y);
+        ctx.lineTo(next.x, next.y);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+      
+      // Draw 273 surface position dots
+      sorted.forEach(p => {
+        const isActive = Math.abs(p.index - activePosition) < 3;
+        const bandReact = isPlaying ? audio.bands[p.moonIdx % 13] : 0;
+        const size = isActive ? 4 + bandReact * 4 : 1.2 + bandReact * 2;
+        const alpha = isActive ? 1 : 0.3 + p.scale * 0.3 + bandReact * 0.4;
+        
+        ctx.globalAlpha = Math.min(alpha, 1);
+        ctx.fillStyle = isActive ? '#fff' : MOON_COLORS[p.moonIdx];
+        
+        if (isActive) {
+          ctx.shadowColor = '#ffffff';
+          ctx.shadowBlur = 12;
+        } else if (isPlaying && bandReact > 0.4) {
+          ctx.shadowColor = MOON_COLORS[p.moonIdx];
+          ctx.shadowBlur = bandReact * 8;
+        }
+        
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+      ctx.globalAlpha = 1;
+      
+      // Draw center info
+      ctx.fillStyle = 'rgba(196, 160, 0, 0.6)';
+      ctx.font = '10px Monaco, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Position ${activePosition}/273 | Moon ${activeMoon+1} (${PROTO_WORDS[activeMoon]}) | State ${activeState} (${COSMIC_STATES[activeState]})`, cx, canvas.height - 15);
+      
+      // ===== UPDATE UI =====
+      const knotMapping = mapStatesToTorusKnot(activeState);
+      document.getElementById('curState').textContent = `${activeState} (${COSMIC_STATES[activeState]})`;
+      document.getElementById('uTurns').textContent = knotMapping.u_turns;
+      document.getElementById('vTurns').textContent = knotMapping.v_turns;
+      document.getElementById('moonAngle').textContent = moonAngle(activeMoon + 1).toFixed(1) + '°';
+      document.getElementById('knotPos').textContent = `${activePosition} / 273 — Moon ${activeMoon+1}, State ${activeState}`;
+      document.getElementById('freqMap').textContent = `${PROTO_WORDS[activeMoon]} @ ${PROTO_FREQS[activeMoon]} Hz → ${COSMIC_STATES[activeState]}`;
+      
+      // Coherency = how close activePosition is to a PHI ratio point
+      const phiPos = (activePosition / 273) * PHI % 1;
+      const coherency = Math.round((1 - Math.abs(phiPos - 0.618)) * 100);
+      document.getElementById('coherency').textContent = coherency + '%';
+      
+      // Update moon strip
+      document.querySelectorAll('.moon-bar').forEach((bar, i) => {
+        bar.classList.toggle('active', i === activeMoon);
+        if (isPlaying) {
+          bar.style.opacity = 0.3 + audio.bands[i] * 0.7;
+          bar.style.transform = `scaleY(${1 + audio.bands[i] * 0.5})`;
+        }
+      });
+      
+      // Update proto words
+      document.querySelectorAll('.pw').forEach((el, i) => {
+        el.classList.toggle('active', i === activeMoon);
+      });
+      
+      // Update state grid
+      document.querySelectorAll('.state-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === activeState);
+        if (isPlaying) {
+          const react = audio.bands[i % 13] || 0;
+          dot.style.background = `rgba(196, 160, 0, ${0.1 + react * 0.5})`;
+        }
+      });
+      
+      animId = requestAnimationFrame(animate);
+    }
+    
+    // ===== EVENT LISTENERS =====
+    document.getElementById('rotSpeed').addEventListener('input', function() {
+      document.getElementById('speedLabel').textContent = this.value + '%';
+    });
+    
+    // ===== INIT =====
+    initUI();
+    animate();
+  </script>
+</body>
+</html>

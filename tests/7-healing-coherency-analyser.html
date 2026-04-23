@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFT — Healing Coherency Analyser</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#070710;
+    color:#e0e0f0;
+    font-family:'Courier New',monospace;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+    padding:20px 14px; gap:16px;
+  }
+  h1 { font-size:1em; color:#7b8cde; letter-spacing:5px; text-transform:uppercase; }
+  .sub { font-size:0.7em; color:#333355; letter-spacing:3px; }
+
+  button {
+    padding:10px 36px;
+    background:#0f0f1e; border:1px solid #7b8cde; color:#7b8cde;
+    font-family:'Courier New',monospace; font-size:.9em;
+    cursor:pointer; letter-spacing:2px; transition:background .2s;
+  }
+  button:hover { background:#1a1a3a; }
+  button.active { border-color:#4ade80; color:#4ade80; }
+
+  .grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px; width:100%; max-width:1100px;
+  }
+  .card {
+    background:#0c0c1a; border:1px solid #1a1a30;
+    padding:16px; display:flex; flex-direction:column; gap:8px;
+  }
+  .card-title {
+    font-size:.65em; color:#333355; letter-spacing:3px;
+    text-transform:uppercase; border-bottom:1px solid #1a1a30; padding-bottom:6px;
+  }
+  .span2 { grid-column:span 2; }
+  .span3 { grid-column:span 3; }
+
+  /* DETECTED */
+  #detHz   { font-size:2.8em; color:#4ade80; line-height:1; transition:color .1s; }
+  #detHz.weak { color:#222240; }
+  #detNote { font-size:1em; color:#aaaacc; }
+  #sigLevel { font-size:.7em; color:#333355; }
+
+  /* CENTS METER */
+  #centsVal { font-size:1.8em; text-align:center; }
+  .meter-bar {
+    position:relative; height:14px;
+    background:#0a0a18; border:1px solid #1a1a30;
+  }
+  .meter-center { position:absolute; left:50%; top:0; bottom:0; width:1px; background:#222240; }
+  #meterFill { position:absolute; top:2px; bottom:2px; background:#4ade80; }
+  .meter-labels { display:flex; justify-content:space-between; font-size:.6em; color:#222240; }
+
+  /* HEALING PANEL — full row */
+  .healing-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+  }
+  .h-item { display:flex; flex-direction:column; gap:3px; padding:10px; background:#090916; border:1px solid #141428; }
+  .h-label { font-size:.6em; color:#333355; letter-spacing:2px; text-transform:uppercase; }
+  .h-val   { font-size:1em; line-height:1.3; }
+  .h-sub   { font-size:.7em; color:#444466; }
+
+  /* GEOMETRY */
+  #geoCanvas { display:block; background:#050510; width:100%; height:320px; }
+  .geo-label { font-size:.7em; color:#333355; letter-spacing:2px; text-align:center; margin-top:4px; }
+
+  /* SPECTRUM */
+  #spectrum  { display:block; background:#050510; width:100%; height:100px; }
+
+  /* INTERVAL PANEL */
+  .interval-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .int-badge {
+    padding:4px 12px; font-size:.8em; border:1px solid #222244;
+    background:#090916; color:#7b8cde;
+  }
+  .int-badge.consonant { border-color:#4ade80; color:#4ade80; }
+  .int-badge.dissonant { border-color:#f87171; color:#f87171; }
+  #intervalDesc { font-size:.75em; color:#555577; }
+
+  /* OPHIUCHUS alert */
+  .oph-alert {
+    display:none; background:#0a1a18; border:1px solid #36D9B8;
+    color:#36D9B8; padding:10px 16px; font-size:.8em; letter-spacing:2px; text-align:center;
+  }
+  .oph-alert.visible { display:block; }
+</style>
+</head>
+<body>
+<h1>UFT · Healing Coherency Analyser</h1>
+<div class="sub">Bass Input → 432 Hz Tuning → UFT Source Mappings</div>
+<button id="startBtn" onclick="startAudio()">▶ START MIC INPUT</button>
+
+<div class="grid">
+
+  <!-- DETECTED -->
+  <div class="card">
+    <div class="card-title">Detected Frequency</div>
+    <div id="detHz" class="weak">— Hz</div>
+    <div id="detNote">No signal</div>
+    <div id="sigLevel">Signal: — dB</div>
+  </div>
+
+  <!-- CENTS -->
+  <div class="card">
+    <div class="card-title">Tuning Deviation</div>
+    <div id="centsVal" style="color:#333355">— ¢</div>
+    <div class="meter-bar">
+      <div class="meter-center"></div>
+      <div id="meterFill" style="left:50%;width:0"></div>
+    </div>
+    <div class="meter-labels"><span>−50¢</span><span>in tune</span><span>+50¢</span></div>
+  </div>
+
+  <!-- 432 TARGET -->
+  <div class="card">
+    <div class="card-title">432 Hz Target</div>
+    <div id="target432" style="font-size:2em;color:#7b8cde">—</div>
+    <div id="target432hz" style="font-size:.85em;color:#444466">— Hz</div>
+  </div>
+
+  <!-- HEALING COHERENCIES — full row -->
+  <div class="card span3">
+    <div class="card-title">Healing Coherencies · UFT Source (REFERENCE.md)</div>
+    <div class="healing-grid" id="healingGrid">
+      <!-- populated by JS -->
+    </div>
+    <div class="oph-alert" id="ophAlert">⬡ OPHIUCHUS ACTIVE · G# · 334.02 Hz · PHI INTERVAL · THE WOUND AS PORTAL · Fib 55</div>
+  </div>
+
+  <!-- GEOMETRY -->
+  <div class="card span2">
+    <div class="card-title">Sacred Geometry · Note Form · Detuning Distortion</div>
+    <canvas id="geoCanvas"></canvas>
+    <div class="geo-label" id="geoLabel">awaiting signal</div>
+  </div>
+
+  <!-- INTERVAL -->
+  <div class="card">
+    <div class="card-title">Harmonic Interval · Lunar × Solar</div>
+    <div class="interval-row" id="intervalRow">—</div>
+    <div id="intervalDesc" style="margin-top:6px">—</div>
+    <div style="margin-top:12px;font-size:.65em;color:#222240">
+      Today's lunar note × detected note interval
+    </div>
+  </div>
+
+  <!-- SPECTRUM -->
+  <div class="card span3">
+    <div class="card-title">Live Spectrum · 30–500 Hz · 432 Hz Grid</div>
+    <canvas id="spectrum"></canvas>
+  </div>
+
+</div>
+
+<script type="module">
+import { TUNING_ROOTS, NOTE_NAMES } from '../modules/tuning-constants.js';
+
+// ─── CANONICAL SOURCE DATA (REFERENCE.md §IV + §V) ─────────────────────────
+
+const ROOT_432 = TUNING_ROOTS['432'];   // 256.0000 Hz
+
+// Lunar Nikkal full scale — 13 tones, Moon root 210.4186 Hz
+// Source: REFERENCE.md §IV
+const LUNAR_SCALE = [
+  { pc:0,  note:'C',  hz:210.4186, fib:1,   tree:'Birch',    ogham:'Beith', sap:'Rising',     proto:'AH',  body:'Root',               color:'#60a5fa' },
+  { pc:1,  note:'C#', hz:222.9307, fib:2,   tree:'Rowan',    ogham:'Luis',  sap:'Rising',     proto:'SA',  body:'Throat',             color:'#818cf8' },
+  { pc:2,  note:'D',  hz:236.1869, fib:3,   tree:'Ash',      ogham:'Nion',  sap:'Rising',     proto:'LA',  body:'Hands & Lungs',      color:'#a78bfa' },
+  { pc:3,  note:'D#', hz:250.2313, fib:5,   tree:'Alder',    ogham:'Fearn', sap:'Peak',       proto:'RA',  body:'Stomach',            color:'#c084fc' },
+  { pc:4,  note:'E',  hz:265.1108, fib:8,   tree:'Willow',   ogham:'Sail',  sap:'Peak',       proto:'DA',  body:'Solar Plexus',       color:'#e879f9' },
+  { pc:5,  note:'F',  hz:280.8751, fib:13,  tree:'Hawthorn', ogham:'Huath', sap:'Peak',       proto:'HA',  body:'Diaphragm',          color:'#f472b6' },
+  { pc:6,  note:'F#', hz:297.5768, fib:21,  tree:'Oak',      ogham:'Duir',  sap:'Zero Point', proto:'NA',  body:'Heart',              color:'#facc15' },
+  { pc:7,  note:'G',  hz:315.2717, fib:34,  tree:'Holly',    ogham:'Tinne', sap:'Descending', proto:'KA',  body:'Spine',              color:'#fb923c' },
+  { pc:8,  note:'G#', hz:334.0187, fib:55,  tree:'Hazel',    ogham:'Coll',  sap:'Descending', proto:'OM',  body:'The Wound as Portal', color:'#36D9B8' },
+  { pc:9,  note:'A',  hz:353.8805, fib:89,  tree:'Vine',     ogham:'Muin',  sap:'Descending', proto:'AH',  body:'The Blood',          color:'#4ade80' },
+  { pc:10, note:'A#', hz:374.9233, fib:144, tree:'Ivy',      ogham:'Gort',  sap:'Dormant',    proto:'EE',  body:'Deep Interior',      color:'#34d399' },
+  { pc:11, note:'B',  hz:397.2174, fib:233, tree:'Elder',    ogham:'Ruis',  sap:'Dormant',    proto:'UH',  body:'The Compost',        color:'#22d3ee' },
+  { pc:12, note:"C'", hz:420.8372, fib:377, tree:'Yew',      ogham:'Ioho',  sap:'Awakening',  proto:'TAO', body:'The Full System',    color:'#67e8f9' },
+];
+
+// Solar Keyserling-Lambdoma — 12 tones
+// Source: REFERENCE.md §V
+const SOLAR_SCALE = [
+  { pc:0,  note:'C',  zodiac:'Aries',       faculty:'Soul Will',       element:'Fire',  planet:'Sun',    proto:'RA'  },
+  { pc:1,  note:'C#', zodiac:'Taurus',      faculty:'Body Sensation',  element:'Earth', planet:'Venus',  proto:'SA'  },
+  { pc:2,  note:'D',  zodiac:'Gemini',      faculty:'Spirit Thinking', element:'Air',   planet:'Uranus', proto:'LA'  },
+  { pc:3,  note:'D#', zodiac:'Cancer',      faculty:'Soul Feeling',    element:'Water', planet:'Moon',   proto:'MA'  },
+  { pc:4,  note:'E',  zodiac:'Leo',         faculty:'Body Will',       element:'Fire',  planet:'Sun',    proto:'DA'  },
+  { pc:5,  note:'F',  zodiac:'Virgo',       faculty:'Spirit Sensation',element:'Earth', planet:'Mercury',proto:'HA'  },
+  { pc:6,  note:'F#', zodiac:'Libra',       faculty:'Soul Thinking',   element:'Air',   planet:'Neptune',proto:'NA'  },
+  { pc:7,  note:'G',  zodiac:'Scorpio',     faculty:'Body Feeling',    element:'Water', planet:'Mars',   proto:'KA'  },
+  { pc:8,  note:'G#', zodiac:'Ophiuchus',   faculty:'Liminal',         element:'Ether', planet:'—',      proto:'OM'  },
+  { pc:9,  note:'A',  zodiac:'Sagittarius', faculty:'Spirit Will',     element:'Fire',  planet:'Jupiter',proto:'AH'  },
+  { pc:10, note:'A#', zodiac:'Capricorn',   faculty:'Soul Sensation',  element:'Earth', planet:'Saturn', proto:'EE'  },
+  { pc:11, note:'B',  zodiac:'Aquarius',    faculty:'Body Thinking',   element:'Air',   planet:'Neptune',proto:'UH'  },
+];
+
+// Interval table — Source: REFERENCE.md §VII
+const INTERVALS = [
+  { semi:0,  name:'Unison',     cons:true,  sig:'Resonance day — both grammars on same note' },
+  { semi:1,  name:'Minor 2nd',  cons:false, sig:'Adjacent scale steps — maximum tension' },
+  { semi:2,  name:'Major 2nd',  cons:false, sig:'Two semitones apart' },
+  { semi:3,  name:'Minor 3rd',  cons:true,  sig:'Centripetal Kapha interval 6:5' },
+  { semi:4,  name:'Major 3rd',  cons:true,  sig:'Four semitones apart' },
+  { semi:5,  name:'Perfect 4th',cons:true,  sig:'Five semitones apart' },
+  { semi:6,  name:'Tritone',    cons:false, sig:'Zero Point — maximum tension F# axis diabolus' },
+  { semi:7,  name:'Perfect 5th',cons:true,  sig:'Most stable Circle of 5ths 3:2' },
+  { semi:8,  name:'Minor 6th',  cons:true,  sig:'8:13 — phi interval · Ophiuchus closest to golden ratio' },
+  { semi:9,  name:'Major 6th',  cons:true,  sig:'Nine semitones' },
+  { semi:10, name:'Minor 7th',  cons:false, sig:'Ten semitones' },
+  { semi:11, name:'Major 7th',  cons:false, sig:'Leading tone — strong tension' },
+];
+
+// Geometry: pitch class → polygon
+const NOTE_GEOMETRY = [
+  { pc:0,  sides:3,  name:'Triangle',       color:'#60a5fa' },
+  { pc:1,  sides:4,  name:'Square',         color:'#818cf8' },
+  { pc:2,  sides:5,  name:'Pentagon',       color:'#a78bfa' },
+  { pc:3,  sides:6,  name:'Hexagon',        color:'#c084fc' },
+  { pc:4,  sides:7,  name:'Heptagon',       color:'#e879f9' },
+  { pc:5,  sides:8,  name:'Octagon',        color:'#f472b6' },
+  { pc:6,  sides:0,  name:'Zero Point Star',color:'#facc15' },
+  { pc:7,  sides:9,  name:'Nonagon',        color:'#fb923c' },
+  { pc:8,  sides:10, name:'Decagon',        color:'#36D9B8' },
+  { pc:9,  sides:11, name:'Hendecagon',     color:'#4ade80' },
+  { pc:10, sides:12, name:'Dodecagon',      color:'#34d399' },
+  { pc:11, sides:13, name:'Triskaidecagon', color:'#22d3ee' },
+];
+
+// ─── TODAY'S LUNAR MONTH (for interval calc) ─────────────────────────────────
+function todayLunarPc() {
+  const ANCHOR = new Date('2000-07-26');  // July 26 anchor
+  const today  = new Date();
+  const elapsed = Math.floor((today - ANCHOR) / 86400000);
+  const moon    = Math.min(Math.floor((elapsed % 364) / 28), 12);
+  return moon; // 0-12 → pitch class 0-12
+}
+const TODAY_LUNAR_PC = todayLunarPc();
+
+// ─── PITCH HELPERS ────────────────────────────────────────────────────────────
+function freqToNearest432(freq) {
+  if (freq <= 0) return null;
+  const n_raw     = 12 * Math.log2(freq / ROOT_432);
+  const n         = Math.round(n_raw);
+  const pc        = ((n % 12) + 12) % 12;
+  const targetFreq = ROOT_432 * Math.pow(2, n / 12);
+  const cents     = 1200 * Math.log2(freq / targetFreq);
+  const octave    = Math.floor(n / 12) + 4;
+  return { n, pc, noteName: NOTE_NAMES[pc], octave, targetFreq, cents };
+}
+
+function parabolicPeak(data, k) {
+  if (k <= 0 || k >= data.length - 1) return k;
+  const y1 = data[k-1], y2 = data[k], y3 = data[k+1];
+  const d = 2*y2 - y1 - y3;
+  return d === 0 ? k : k + (y3 - y1) / (2 * d);
+}
+
+// ─── HEALING PANEL RENDER ─────────────────────────────────────────────────────
+function renderHealing(pc) {
+  const lunar  = LUNAR_SCALE[pc];
+  const solar  = SOLAR_SCALE[Math.min(pc, 11)];
+  const grid   = document.getElementById('healingGrid');
+  const c      = lunar.color;
+
+  const items = [
+    { label:'Body',      val: lunar.body,    sub:'Lunar Nikkal §IV' },
+    { label:'Sap Phase', val: lunar.sap,     sub:'Vitality current' },
+    { label:'Proto-Word',val: lunar.proto,   sub:'Healing sound' },
+    { label:'Fibonacci', val: `${lunar.fib}`,sub:`Ratio → 1/φ` },
+    { label:'Ogham Tree',val: lunar.tree,    sub: lunar.ogham },
+    { label:'Element',   val: solar.element, sub: solar.planet },
+    { label:'Zodiac',    val: solar.zodiac,  sub: solar.faculty },
+    { label:'Solar Proto',val:solar.proto,   sub:'Solar sound' },
+  ];
+
+  grid.innerHTML = items.map(item => `
+    <div class="h-item">
+      <span class="h-label">${item.label}</span>
+      <span class="h-val" style="color:${c}">${item.val}</span>
+      <span class="h-sub">${item.sub}</span>
+    </div>
+  `).join('');
+
+  // Ophiuchus alert
+  document.getElementById('ophAlert').className = pc === 8 ? 'oph-alert visible' : 'oph-alert';
+}
+
+function renderInterval(pc) {
+  // Interval between today's lunar pc and detected pc
+  const semi = ((pc - TODAY_LUNAR_PC) + 12) % 12;
+  const iv   = INTERVALS[semi];
+  const row  = document.getElementById('intervalRow');
+  row.innerHTML = `
+    <span class="int-badge ${iv.cons ? 'consonant' : 'dissonant'}">${iv.name}</span>
+    <span class="int-badge">${semi} st</span>
+    <span class="int-badge">${iv.cons ? 'consonant' : 'dissonant'}</span>
+  `;
+  document.getElementById('intervalDesc').textContent = iv.sig;
+}
+
+// ─── GEOMETRY ─────────────────────────────────────────────────────────────────
+const geoCanvas = document.getElementById('geoCanvas');
+const geoCtx    = geoCanvas.getContext('2d');
+let geoAngle = 0, geoAlpha = 0, prevPc = -1, morphR = [];
+
+function resizeGeo() {
+  const r = geoCanvas.parentElement.getBoundingClientRect();
+  geoCanvas.width  = Math.floor(r.width - 32);
+  geoCanvas.height = 320;
+}
+resizeGeo();
+window.addEventListener('resize', resizeGeo);
+
+function hexAlpha(hex, a) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a.toFixed(3)})`;
+}
+
+function drawGeometry(pc, cents, ampNorm) {
+  const W=geoCanvas.width, H=geoCanvas.height, CX=W/2, CY=H/2;
+  const geo = NOTE_GEOMETRY[pc];
+  const maxR = Math.min(W,H)*0.36;
+  const R    = maxR * (0.45 + ampNorm * 0.55);
+
+  geoAlpha += (ampNorm > 0.04 ? 1 : -geoAlpha) * 0.07;
+  geoAlpha  = Math.max(0, Math.min(1, geoAlpha));
+
+  if (pc !== prevPc) {
+    const s = geo.sides || 12;
+    morphR = Array.from({length:s}, ()=>0);
+    prevPc = pc;
+  }
+
+  const detuneAmt = Math.abs(cents) / 50;
+  if (geo.sides > 0) {
+    morphR = morphR.map(r => {
+      const t = (Math.random()-0.5)*2*detuneAmt*0.4;
+      return r + (t - r) * 0.1;
+    });
+  }
+
+  geoAngle += 0.003 + detuneAmt * 0.012;
+
+  geoCtx.fillStyle = 'rgba(5,5,16,0.22)';
+  geoCtx.fillRect(0,0,W,H);
+
+  if (geoAlpha < 0.02) return;
+
+  const color = geo.color;
+  const al    = geoAlpha;
+
+  // Glow
+  const glow = geoCtx.createRadialGradient(CX,CY,0,CX,CY,R*1.3);
+  glow.addColorStop(0,  hexAlpha(color, 0.09*al));
+  glow.addColorStop(0.6,hexAlpha(color, 0.04*al));
+  glow.addColorStop(1,  'transparent');
+  geoCtx.fillStyle = glow;
+  geoCtx.beginPath(); geoCtx.arc(CX,CY,R*1.3,0,Math.PI*2); geoCtx.fill();
+
+  if (geo.sides === 0) {
+    // F# Zero Point: dual counter-rotating hexagrams
+    for (let ring=0; ring<2; ring++) {
+      const rot = ring===0 ? geoAngle : -geoAngle*0.618;
+      for (let s=0; s<2; s++) {
+        const off = s*(Math.PI/6)*(1+detuneAmt*0.3);
+        geoCtx.beginPath();
+        for (let i=0; i<6; i++) {
+          const a = rot+off+(i/6)*Math.PI*2;
+          const r = R*(ring===0?1:0.618);
+          i===0 ? geoCtx.moveTo(CX+r*Math.cos(a),CY+r*Math.sin(a))
+                : geoCtx.lineTo(CX+r*Math.cos(a),CY+r*Math.sin(a));
+        }
+        geoCtx.closePath();
+        geoCtx.strokeStyle = hexAlpha(color,(ring===0?0.9:0.5)*al);
+        geoCtx.lineWidth = ring===0?1.5:1; geoCtx.stroke();
+      }
+    }
+    geoCtx.fillStyle=hexAlpha(color,0.5*al);
+    geoCtx.font='11px Courier New'; geoCtx.textAlign='center';
+    geoCtx.fillText('× √2',CX,CY+5); geoCtx.textAlign='left';
+  } else {
+    const S = geo.sides;
+    // Outer polygon
+    geoCtx.beginPath();
+    for (let i=0;i<S;i++) {
+      const a=geoAngle+(i/S)*Math.PI*2-Math.PI/2;
+      const r=R*(1+morphR[i]);
+      i===0?geoCtx.moveTo(CX+r*Math.cos(a),CY+r*Math.sin(a))
+           :geoCtx.lineTo(CX+r*Math.cos(a),CY+r*Math.sin(a));
+    }
+    geoCtx.closePath();
+    geoCtx.strokeStyle=hexAlpha(color,0.85*al); geoCtx.lineWidth=1.5; geoCtx.stroke();
+
+    // Inner counter-rotating
+    const iR = R*0.5;
+    geoCtx.beginPath();
+    for (let i=0;i<S;i++) {
+      const a=-geoAngle*0.7+(i/S)*Math.PI*2-Math.PI/2;
+      const r=iR*(1+(morphR[i]||0)*0.5);
+      i===0?geoCtx.moveTo(CX+r*Math.cos(a),CY+r*Math.sin(a))
+           :geoCtx.lineTo(CX+r*Math.cos(a),CY+r*Math.sin(a));
+    }
+    geoCtx.closePath();
+    geoCtx.strokeStyle=hexAlpha(color,0.3*al); geoCtx.lineWidth=0.8; geoCtx.stroke();
+
+    // Spoke lines
+    for (let i=0;i<S;i++) {
+      const ao=geoAngle+(i/S)*Math.PI*2-Math.PI/2;
+      const ai=-geoAngle*0.7+(i/S)*Math.PI*2-Math.PI/2;
+      geoCtx.beginPath();
+      geoCtx.moveTo(CX+R*(1+morphR[i])*Math.cos(ao), CY+R*(1+morphR[i])*Math.sin(ao));
+      geoCtx.lineTo(CX+iR*(1+(morphR[i]||0)*0.5)*Math.cos(ai), CY+iR*(1+(morphR[i]||0)*0.5)*Math.sin(ai));
+      geoCtx.strokeStyle=hexAlpha(color,0.12*al); geoCtx.lineWidth=0.5; geoCtx.stroke();
+    }
+    geoCtx.beginPath(); geoCtx.arc(CX,CY,3,0,Math.PI*2);
+    geoCtx.fillStyle=hexAlpha(color,0.6*al); geoCtx.fill();
+  }
+
+  // Cents ring
+  if (ampNorm > 0.04) {
+    const ringR=R*1.15;
+    geoCtx.beginPath();
+    geoCtx.arc(CX,CY,ringR,-Math.PI/2,-Math.PI/2+(cents/50)*Math.PI, cents<0);
+    const cColor=Math.abs(cents)<5?'#4ade80':Math.abs(cents)<20?'#facc15':'#f87171';
+    geoCtx.strokeStyle=hexAlpha(cColor,0.7*al); geoCtx.lineWidth=2; geoCtx.stroke();
+  }
+}
+
+// ─── SPECTRUM ─────────────────────────────────────────────────────────────────
+const specCanvas = document.getElementById('spectrum');
+const specCtx    = specCanvas.getContext('2d');
+const FREQ_MIN=30, FREQ_MAX=500;
+const FFT_SIZE=4096, SAMPLE_RATE=48000;
+const BIN_HZ=SAMPLE_RATE/FFT_SIZE;
+
+function freqToX(f,w){ return w*Math.log2(f/FREQ_MIN)/Math.log2(FREQ_MAX/FREQ_MIN); }
+
+const MARKERS = (() => {
+  const m=[];
+  for(let n=-36;n<=6;n++){
+    const f=ROOT_432*Math.pow(2,n/12);
+    if(f>=FREQ_MIN&&f<=FREQ_MAX){ const pc=((n%12)+12)%12; m.push({f,name:NOTE_NAMES[pc],n}); }
+  }
+  return m;
+})();
+
+function resizeSpec() {
+  const r=specCanvas.parentElement.getBoundingClientRect();
+  specCanvas.width=Math.floor(r.width-32); specCanvas.height=100;
+}
+resizeSpec();
+window.addEventListener('resize',resizeSpec);
+
+function drawSpectrum(dataArray, analyser, detFreq) {
+  const W=specCanvas.width, H=specCanvas.height;
+  specCtx.clearRect(0,0,W,H);
+  specCtx.fillStyle='#050510'; specCtx.fillRect(0,0,W,H);
+
+  for(const m of MARKERS){
+    const x=freqToX(m.f,W);
+    specCtx.strokeStyle=m.name==='C'?'#1a1a40':m.name==='F#'?'#1a0a28':'#0d0d20';
+    specCtx.lineWidth=m.name==='C'||m.name==='F#'?1:0.5;
+    specCtx.beginPath(); specCtx.moveTo(x,0); specCtx.lineTo(x,H-12); specCtx.stroke();
+    if(m.name==='C'||m.name==='F#'||m.name==='A'){
+      specCtx.fillStyle=m.name==='C'?'#222260':m.name==='F#'?'#302010':'#1a3020';
+      specCtx.font='8px Courier New'; specCtx.fillText(m.name,x+2,H-2);
+    }
+  }
+  const grad=specCtx.createLinearGradient(0,0,0,H-14);
+  grad.addColorStop(0,'#4ade80'); grad.addColorStop(0.5,'#7b8cde'); grad.addColorStop(1,'#1a1a3a');
+  specCtx.fillStyle=grad;
+  for(let i=1;i<dataArray.length;i++){
+    const f=i*BIN_HZ; if(f<FREQ_MIN||f>FREQ_MAX) continue;
+    const x1=freqToX(f,W), x0=freqToX((i-1)*BIN_HZ||FREQ_MIN,W);
+    const normH=Math.max(0,(dataArray[i]-analyser.minDecibels)/(analyser.maxDecibels-analyser.minDecibels));
+    specCtx.fillRect(x0,H-14-normH*(H-14),Math.max(x1-x0,1),normH*(H-14));
+  }
+  if(detFreq>FREQ_MIN&&detFreq<FREQ_MAX){
+    const x=freqToX(detFreq,W);
+    specCtx.strokeStyle='#facc15'; specCtx.lineWidth=1.5; specCtx.setLineDash([3,3]);
+    specCtx.beginPath(); specCtx.moveTo(x,0); specCtx.lineTo(x,H-12); specCtx.stroke();
+    specCtx.setLineDash([]);
+  }
+}
+
+// ─── WEB AUDIO ────────────────────────────────────────────────────────────────
+let ctx, analyser, dataArray, animId;
+
+window.startAudio = async function() {
+  const btn=document.getElementById('startBtn');
+  if(ctx){ ctx.close(); ctx=null; cancelAnimationFrame(animId);
+    btn.textContent='▶ START MIC INPUT'; btn.classList.remove('active'); return; }
+  try {
+    const stream=await navigator.mediaDevices.getUserMedia(
+      {audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    ctx=new AudioContext({sampleRate:SAMPLE_RATE});
+    analyser=ctx.createAnalyser();
+    analyser.fftSize=FFT_SIZE; analyser.smoothingTimeConstant=0.78;
+    analyser.minDecibels=-90; analyser.maxDecibels=-10;
+    ctx.createMediaStreamSource(stream).connect(analyser);
+    dataArray=new Float32Array(analyser.frequencyBinCount);
+    btn.textContent='■ STOP'; btn.classList.add('active');
+    loop();
+  } catch(e) { btn.textContent='MIC ERROR — '+e.message; }
+};
+
+// ─── MAIN LOOP ────────────────────────────────────────────────────────────────
+const elHz    = document.getElementById('detHz');
+const elNote  = document.getElementById('detNote');
+const elSig   = document.getElementById('sigLevel');
+const elT432  = document.getElementById('target432');
+const elT432z = document.getElementById('target432hz');
+const elCents = document.getElementById('centsVal');
+const elFill  = document.getElementById('meterFill');
+const elGeoLbl= document.getElementById('geoLabel');
+
+const THRESH_DB = -55;
+let lastPc = 0;
+
+function loop() {
+  animId=requestAnimationFrame(loop);
+  if(!dataArray) return;
+  analyser.getFloatFrequencyData(dataArray);
+
+  const binMin=Math.ceil(FREQ_MIN/BIN_HZ), binMax=Math.floor(FREQ_MAX/BIN_HZ);
+  let peakBin=binMin, peakVal=-Infinity;
+  for(let i=binMin;i<=binMax;i++) if(dataArray[i]>peakVal){peakVal=dataArray[i];peakBin=i;}
+
+  elSig.textContent=`Signal: ${peakVal.toFixed(1)} dB`;
+  let detFreq=0;
+
+  if(peakVal>THRESH_DB){
+    detFreq=(parabolicPeak(dataArray,peakBin))*BIN_HZ;
+    const r=freqToNearest432(detFreq);
+
+    elHz.textContent=detFreq.toFixed(2)+' Hz'; elHz.className='';
+    elNote.textContent=`${r.noteName}${r.octave}  ·  n=${r.n>=0?'+':''}${r.n}`;
+    elT432.textContent=r.noteName+r.octave;
+    elT432z.textContent=`${r.targetFreq.toFixed(4)} Hz`;
+
+    const c=r.cents;
+    elCents.textContent=`${c>=0?'+':''}${c.toFixed(1)} ¢`;
+    elCents.style.color=Math.abs(c)<5?'#4ade80':Math.abs(c)<20?'#facc15':'#f87171';
+    const pct=Math.max(0,Math.min(100,50+c));
+    elFill.style.left=(pct<50?pct:'50')+'%';
+    elFill.style.width=Math.abs(pct-50)+'%';
+    elFill.style.background=Math.abs(c)<5?'#4ade80':Math.abs(c)<20?'#facc15':'#f87171';
+
+    const ampNorm=Math.max(0,Math.min(1,(peakVal-analyser.minDecibels)/(analyser.maxDecibels-analyser.minDecibels)));
+    drawGeometry(r.pc, c, ampNorm);
+
+    if(r.pc!==lastPc){ renderHealing(r.pc); renderInterval(r.pc); lastPc=r.pc; }
+
+    const lunar=LUNAR_SCALE[r.pc];
+    const geo=NOTE_GEOMETRY[r.pc];
+    elGeoLbl.textContent=`${lunar.note}  ·  ${geo.name}  ·  ${lunar.sap}  ·  ${Math.abs(c)<5?'✦ IN TUNE':c.toFixed(1)+'¢'}`;
+    elGeoLbl.style.color=LUNAR_SCALE[r.pc].color;
+  } else {
+    elHz.textContent='— Hz'; elHz.className='weak';
+    elNote.textContent='No signal above threshold';
+    elT432.textContent='—'; elT432z.textContent='—';
+    elCents.textContent='— ¢'; elCents.style.color='#333355';
+    elFill.style.width='0';
+    drawGeometry(lastPc,0,0);
+    elGeoLbl.textContent='awaiting signal'; elGeoLbl.style.color='#333355';
+  }
+
+  drawSpectrum(dataArray, analyser, detFreq);
+}
+
+// Init static display
+renderHealing(0);
+renderInterval(0);
+</script>
+</body>
+</html>

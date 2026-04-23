@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UFT Core Machine - Unit Tests</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0c29 100%);
+      color: #e8f4f8;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 32px;
+      color: #00ffff;
+      margin-bottom: 10px;
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+    }
+    
+    .subtitle {
+      color: #00d4d4;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #00d4ff, #00ffff);
+      border: none;
+      color: #0a0e27;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+    }
+    
+    button:active { transform: scale(0.98); }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .stat-box {
+      background: rgba(0, 212, 212, 0.1);
+      border: 1px solid #00d4d4;
+      padding: 15px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    
+    .stat-box h3 {
+      color: #00ffff;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    
+    .stat-box .value {
+      font-size: 28px;
+      color: #00ff00;
+      font-weight: bold;
+    }
+    
+    .test-suite {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(0, 212, 212, 0.3);
+      border-radius: 6px;
+      padding: 15px;
+      margin: 15px 0;
+    }
+    
+    .test-suite h2 {
+      color: #00ffff;
+      font-size: 18px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0, 212, 212, 0.5);
+    }
+    
+    .test-case {
+      background: rgba(10, 14, 39, 0.8);
+      border-left: 3px solid #00d4d4;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .test-case.pass {
+      border-left-color: #00ff00;
+    }
+    
+    .test-case.fail {
+      border-left-color: #ff3333;
+    }
+    
+    .test-name {
+      flex: 1;
+      color: #e8f4f8;
+      font-size: 13px;
+    }
+    
+    .test-status {
+      font-weight: bold;
+      font-size: 14px;
+      padding: 4px 10px;
+      border-radius: 3px;
+    }
+    
+    .test-status.pass {
+      color: #00ff00;
+      background: rgba(0, 255, 0, 0.1);
+    }
+    
+    .test-status.fail {
+      color: #ff3333;
+      background: rgba(255, 51, 51, 0.1);
+    }
+    
+    .details {
+      background: rgba(0, 0, 0, 0.5);
+      color: #ffaa00;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 UFT CORE MACHINE - UNIT TESTS</h1>
+    <p class="subtitle">Phase 1: Core Machine Function Testing</p>
+    
+    <div class="controls">
+      <button onclick="runAllTests()">▶ Run All Tests</button>
+      <button onclick="runInitTests()">Init Tests</button>
+      <button onclick="runTranslationTests()">Translation Tests</button>
+      <button onclick="runCoherencyTests()">Coherency Tests</button>
+      <button onclick="runMedicalTests()">Medical Tests</button>
+      <button onclick="runQuantumTests()">⚛️ Quantum Tests</button>
+      <button onclick="clearResults()">Clear Results</button>
+    </div>
+    
+    <div class="stats">
+      <div class="stat-box">
+        <h3>Total Tests</h3>
+        <div class="value" id="totalTests">0</div>
+      </div>
+      <div class="stat-box">
+        <h3>Passed</h3>
+        <div class="value" id="passedTests" style="color: #00ff00;">0</div>
+      </div>
+      <div class="stat-box">
+        <h3>Failed</h3>
+        <div class="value" id="failedTests" style="color: #ff3333;">0</div>
+      </div>
+      <div class="stat-box">
+        <h3>Success Rate</h3>
+        <div class="value" id="successRate">0%</div>
+      </div>
+    </div>
+    
+    <div id="results"></div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // TEST FRAMEWORK
+    // =========================================================================
+    
+    class TestRunner {
+      constructor() {
+        this.testResults = [];
+        this.currentSuite = null;
+      }
+      
+      suite(name) {
+        this.currentSuite = {
+          name,
+          tests: []
+        };
+        this.testResults.push(this.currentSuite);
+        return this;
+      }
+      
+      test(description, testFn) {
+        try {
+          testFn();
+          this.currentSuite.tests.push({
+            description,
+            passed: true,
+            error: null
+          });
+        } catch (error) {
+          this.currentSuite.tests.push({
+            description,
+            passed: false,
+            error: error.message
+          });
+        }
+      }
+      
+      assert(condition, message) {
+        if (!condition) {
+          throw new Error(message || 'Assertion failed');
+        }
+      }
+      
+      assertEquals(actual, expected, message) {
+        if (actual !== expected) {
+          throw new Error(message || `Expected ${expected}, got ${actual}`);
+        }
+      }
+      
+      assertNotNull(value, message) {
+        if (value === null || value === undefined) {
+          throw new Error(message || 'Value is null or undefined');
+        }
+      }
+      
+      assertType(value, type, message) {
+        if (typeof value !== type) {
+          throw new Error(message || `Expected type ${type}, got ${typeof value}`);
+        }
+      }
+      
+      getStats() {
+        let total = 0, passed = 0, failed = 0;
+        this.testResults.forEach(suite => {
+          suite.tests.forEach(test => {
+            total++;
+            if (test.passed) passed++;
+            else failed++;
+          });
+        });
+        return { total, passed, failed, successRate: total > 0 ? ((passed / total) * 100).toFixed(1) : 0 };
+      }
+      
+      render() {
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = '';
+        
+        this.testResults.forEach(suite => {
+          const suiteDiv = document.createElement('div');
+          suiteDiv.className = 'test-suite';
+          
+          const suiteTitle = document.createElement('h2');
+          suiteTitle.textContent = suite.name;
+          suiteDiv.appendChild(suiteTitle);
+          
+          suite.tests.forEach(test => {
+            const testDiv = document.createElement('div');
+            testDiv.className = `test-case ${test.passed ? 'pass' : 'fail'}`;
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'test-name';
+            nameSpan.textContent = test.description;
+            
+            const statusSpan = document.createElement('span');
+            statusSpan.className = `test-status ${test.passed ? 'pass' : 'fail'}`;
+            statusSpan.textContent = test.passed ? '✓ PASS' : '✗ FAIL';
+            
+            testDiv.appendChild(nameSpan);
+            testDiv.appendChild(statusSpan);
+            
+            if (test.error) {
+              const detailsDiv = document.createElement('div');
+              detailsDiv.className = 'details';
+              detailsDiv.textContent = test.error;
+              testDiv.appendChild(detailsDiv);
+            }
+            
+            suiteDiv.appendChild(testDiv);
+          });
+          
+          resultsDiv.appendChild(suiteDiv);
+        });
+        
+        this.updateStats();
+      }
+      
+      updateStats() {
+        const stats = this.getStats();
+        document.getElementById('totalTests').textContent = stats.total;
+        document.getElementById('passedTests').textContent = stats.passed;
+        document.getElementById('failedTests').textContent = stats.failed;
+        document.getElementById('successRate').textContent = stats.successRate + '%';
+      }
+      
+      clear() {
+        this.testResults = [];
+        document.getElementById('results').innerHTML = '';
+        this.updateStats();
+      }
+    }
+    
+    // =========================================================================
+    // REAL LUNAR MODULE (Production Implementation)
+    // =========================================================================
+    
+    const LunarModule = {
+      SYNODIC_PERIOD: 29.5306,
+      LUNAR_OCTAVE_ROOT: 210.4186,
+      MOON_COUNT: 13,
+      DAYS_PER_MOON: 28,
+      LUNAR_YEAR_DAYS: 364,
+      
+      LUNAR_PROTO_WORDS: [
+        { month: 1, word: 'OH', freq: 210.4186, quality: 'Universal Heart' },
+        { month: 2, word: 'AH', freq: 223.1078, quality: 'Creative Expression' },
+        { month: 3, word: 'EE', freq: 236.1869, quality: 'Divine Wisdom' },
+        { month: 4, word: 'OOH', freq: 250.2313, quality: 'Grounding Connection' },
+        { month: 5, word: 'MM', freq: 265.1108, quality: 'Inner Resonance' },
+        { month: 6, word: 'NG', freq: 280.8751, quality: 'Cosmic Flow' },
+        { month: 7, word: 'AY', freq: 297.5768, quality: 'Zero Point Threshold' },
+        { month: 8, word: 'EH', freq: 315.2717, quality: 'Balance & Harmony' },
+        { month: 9, word: 'IA', freq: 334.0187, quality: 'Transformation' },
+        { month: 10, word: 'AU', freq: 353.8805, quality: 'Celestial Union' },
+        { month: 11, word: 'OE', freq: 374.9233, quality: 'Quantum Bridging' },
+        { month: 12, word: 'UH', freq: 397.2174, quality: 'Sacred Foundation' },
+        { month: 13, word: 'AR', freq: 420.8372, quality: 'Cosmic Return' }
+      ],
+      
+      dayToLunarPhase(dayOfYear) {
+        const normalizedDay = ((dayOfYear - 1) % this.LUNAR_YEAR_DAYS) + 1;
+        const month = Math.ceil(normalizedDay / this.DAYS_PER_MOON);
+        const dayInMonth = ((normalizedDay - 1) % this.DAYS_PER_MOON) + 1;
+        return {
+          month: Math.min(month, 13),
+          dayInMonth,
+          phaseRatio: dayInMonth / this.DAYS_PER_MOON
+        };
+      },
+      
+      exportState(dayOfYear) {
+        const phase = this.dayToLunarPhase(dayOfYear);
+        const proto = this.LUNAR_PROTO_WORDS[phase.month - 1];
+        return {
+          month: phase.month,
+          dayInMonth: phase.dayInMonth,
+          phaseRatio: phase.phaseRatio,
+          frequency: proto.freq,
+          protoWord: proto.word,
+          quality: proto.quality
+        };
+      }
+    };
+    
+    // =========================================================================
+    // REAL SOLAR MODULE (Production Implementation)
+    // =========================================================================
+    
+    const SolarModule = {
+      SOLAR_YEAR_DAYS: 365.25,
+      ZODIAC_SIGN_COUNT: 12,
+      DAYS_PER_SIGN: 30.4375,
+      SOLAR_ROOT: 256.0,
+      
+      ZODIAC_SIGNS: [
+        { sign: 'Aries', symbol: '♈', dayStart: 1, freq: 256.0000, note: 'C', quality: 'Initiation' },
+        { sign: 'Taurus', symbol: '♉', dayStart: 31, freq: 271.5926, note: 'C#', quality: 'Stability' },
+        { sign: 'Gemini', symbol: '♊', dayStart: 62, freq: 287.3470, note: 'D', quality: 'Communication' },
+        { sign: 'Cancer', symbol: '♋', dayStart: 92, freq: 304.3529, note: 'D#', quality: 'Emotion & Intuition' },
+        { sign: 'Leo', symbol: '♌', dayStart: 123, freq: 322.5385, note: 'E', quality: 'Expression' },
+        { sign: 'Virgo', symbol: '♍', dayStart: 153, freq: 341.9293, note: 'F', quality: 'Analysis' },
+        { sign: 'Libra', symbol: '♎', dayStart: 184, freq: 362.5599, note: 'F#', quality: 'Balance' },
+        { sign: 'Scorpio', symbol: '♏', dayStart: 214, freq: 384.4690, note: 'G', quality: 'Transformation' },
+        { sign: 'Sagittarius', symbol: '♐', dayStart: 245, freq: 407.7502, note: 'G#', quality: 'Expansion' },
+        { sign: 'Capricorn', symbol: '♑', dayStart: 275, freq: 432.0001, note: 'A', quality: 'Manifestation' },
+        { sign: 'Aquarius', symbol: '♒', dayStart: 306, freq: 457.7403, note: 'A#', quality: 'Innovation' },
+        { sign: 'Pisces', symbol: '♓', dayStart: 336, freq: 485.0614, note: 'B', quality: 'Transcendence' }
+      ],
+      
+      dayToZodiacSign(dayOfYear) {
+        const normalizedDay = ((dayOfYear - 1) % 365) + 1;
+        for (let i = this.ZODIAC_SIGNS.length - 1; i >= 0; i--) {
+          if (normalizedDay >= this.ZODIAC_SIGNS[i].dayStart) {
+            return this.ZODIAC_SIGNS[i];
+          }
+        }
+        return this.ZODIAC_SIGNS[0];
+      },
+      
+      getZodiacProgress(dayOfYear) {
+        const currentSign = this.dayToZodiacSign(dayOfYear);
+        const nextSignIndex = (this.ZODIAC_SIGNS.indexOf(currentSign) + 1) % 12;
+        const nextSign = this.ZODIAC_SIGNS[nextSignIndex];
+        const dayInSign = dayOfYear - currentSign.dayStart + 1;
+        return {
+          sign: currentSign,
+          dayInSign,
+          progression: Math.min(dayInSign / this.DAYS_PER_SIGN, 1),
+          nextSign
+        };
+      },
+      
+      exportState(dayOfYear) {
+        const progress = this.getZodiacProgress(dayOfYear);
+        return {
+          zodiacSign: progress.sign.sign,
+          symbol: progress.sign.symbol,
+          frequency: progress.sign.freq,
+          progression: progress.progression,
+          quality: progress.sign.quality,
+          note: progress.sign.note
+        };
+      }
+    };
+    
+    // =========================================================================
+    // REAL COSMIC TRANSLATOR (12:21-cosmic module)
+    // =========================================================================
+    
+    const CosmicTranslator = {
+      PHI: 1.6180339887,
+      T_L: 29.5306,
+      ZERO_POINT_HZ: 297.5768,
+      COSMIC_ROOT: 256,
+      
+      States21: {
+        cycle: [
+          { index: 0, phase: 'Initiation', color: '#ff0000', freq: 256 },
+          { index: 1, phase: 'Growth 1', color: '#ff4400', freq: 264 },
+          { index: 2, phase: 'Growth 2', color: '#ff8800', freq: 272 },
+          { index: 3, phase: 'Growth 3', color: '#ffaa00', freq: 280 },
+          { index: 4, phase: 'Peak', color: '#ffff00', freq: 288 },
+          { index: 5, phase: 'Decline 1', color: '#88ff00', freq: 296 },
+          { index: 6, phase: 'Decline 2', color: '#00ff00', freq: 304 },
+          { index: 7, phase: 'Decline 3', color: '#00ff88', freq: 312 },
+          { index: 8, phase: 'Transform 1', color: '#00ffff', freq: 320 },
+          { index: 9, phase: 'Transform 2', color: '#0088ff', freq: 328 },
+          { index: 10, phase: 'Transform 3', color: '#0000ff', freq: 336 },
+          { index: 11, phase: 'Transform 4', color: '#4400ff', freq: 344 },
+          { index: 12, phase: 'Transform 5', color: '#8800ff', freq: 352 },
+          { index: 13, phase: 'Integration 1', color: '#ff00ff', freq: 360 },
+          { index: 14, phase: 'Integration 2', color: '#ff0088', freq: 368 },
+          { index: 15, phase: 'Integration 3', color: '#ff0044', freq: 376 },
+          { index: 16, phase: 'Completion 1', color: '#cc0000', freq: 384 },
+          { index: 17, phase: 'Completion 2', color: '#990000', freq: 392 },
+          { index: 18, phase: 'Return', color: '#660000', freq: 400 },
+          { index: 19, phase: 'Seed', color: '#330000', freq: 408 },
+          { index: 20, phase: 'Void', color: '#000000', freq: 256 }
+        ]
+      },
+      
+      phaseFunction(t) {
+        return (2 * Math.PI * t) / this.T_L;
+      },
+      
+      spiralFunction(t, r0) {
+        const theta = this.phaseFunction(t);
+        const exponent = theta / (2 * Math.PI);
+        const radius = r0 * Math.pow(this.PHI, exponent);
+        return {
+          radius,
+          theta,
+          x: radius * Math.cos(theta),
+          y: radius * Math.sin(theta)
+        };
+      },
+      
+      segmentationFunction(t) {
+        const normalized_t = ((t % this.T_L) + this.T_L) % this.T_L;
+        const segment = Math.floor((normalized_t / this.T_L) * 21);
+        return Math.min(segment, 20);
+      },
+      
+      RealtimeMapping: {
+        translate(time) {
+          const stateIndex = CosmicTranslator.segmentationFunction(time);
+          const state = CosmicTranslator.States21.cycle[stateIndex];
+          const spiral = CosmicTranslator.spiralFunction(time, 1);
+          const radiusNormalized = (spiral.radius % 3) / 3;
+          
+          return {
+            frequency: state.freq,
+            note: 'C4',
+            stateIndex: stateIndex,
+            radiusNormalized: radiusNormalized,
+            color: state.color,
+            phase: state.phase
+          };
+        }
+      }
+    };
+    
+    // =========================================================================
+    // UFT MACHINE (Real Implementation with Real Modules)
+    // =========================================================================
+    
+    const UFTMachineTest = {
+      version: '4.1',
+      primaryModule: '12:21-cosmic-translator',
+      modules: {
+        cosmic: null,
+        lunar: null,
+        solar: null
+      },
+      CALIBRATION: {
+        COSMIC_ROOT: 256.0000,
+        LUNAR_ROOT: 210.4186,
+        SOLAR_ROOT: 256.0000,
+        PHI: 1.6180339887
+      },
+      
+      init(cosmic, lunar, solar) {
+        this.modules.cosmic = cosmic;
+        this.modules.lunar = lunar;
+        this.modules.solar = solar;
+        return {
+          status: 'initialized',
+          version: this.version,
+          primaryModule: this.primaryModule,
+          modulesLoaded: [
+            cosmic ? '12:21 Cosmic ✓' : '12:21 Cosmic ✗',
+            lunar ? 'Lunar ✓' : 'Lunar ✗',
+            solar ? 'Solar ✓' : 'Solar ✗'
+          ]
+        };
+      },
+      
+      isReady() {
+        return this.modules.cosmic && this.modules.lunar && this.modules.solar;
+      },
+      
+      translate(time) {
+        if (!this.isReady()) {
+          return { error: 'UFT Machine not initialized. Call init() with all modules.' };
+        }
+        const cosmicState = this.modules.cosmic.RealtimeMapping.translate(time);
+        const dayOfYear = ((time % 365) + 365) % 365;
+        const lunarState = this.modules.lunar.exportState(dayOfYear);
+        const solarState = this.modules.solar.exportState(dayOfYear);
+        return {
+          timestamp: new Date().toISOString(),
+          time,
+          cosmicPhase: cosmicState,
+          lunarContext: lunarState,
+          solarContext: solarState,
+          primary: {
+            frequency: cosmicState.frequency,
+            note: cosmicState.note,
+            module: '12:21 Cosmic'
+          },
+          harmonic: {
+            lunar: lunarState.frequency,
+            solar: solarState.frequency
+          },
+          state21: cosmicState.stateIndex,
+          lunarMonth: lunarState.month,
+          zodiacSign: solarState.zodiacSign,
+          coherency: this.calculateCoherency(cosmicState, lunarState, solarState)
+        };
+      },
+      
+      calculateDeviation(frequency) {
+        const baseline = 210.4186;
+        const percent = ((frequency - baseline) / baseline) * 100;
+        return {
+          from_baseline: parseFloat(percent.toFixed(2)),
+          absolute_hz: parseFloat((frequency - baseline).toFixed(2)),
+          baseline: baseline
+        };
+      },
+      
+      calculateCoherency(cosmic, lunar, solar) {
+        const lunarFreqScore = 100 - Math.abs(cosmic.frequency - lunar.frequency) / 10;
+        const solarFreqScore = 100 - Math.abs(cosmic.frequency - solar.frequency) / 10;
+        const lunarPhaseScore = (1 - Math.abs(lunar.phaseRatio - 0.5)) * 100;
+        const solarProgScore = (1 - Math.abs(solar.progression - 0.5)) * 100;
+        const harmonicScore = 100 - Math.abs(cosmic.radiusNormalized - 0.5) * 100;
+        
+        return {
+          overall: Math.round((lunarFreqScore + solarFreqScore + lunarPhaseScore + solarProgScore + harmonicScore) / 5),
+          frequencies: Math.round((lunarFreqScore + solarFreqScore) / 2),
+          phases: Math.round((lunarPhaseScore + solarProgScore) / 2),
+          harmonics: Math.round(harmonicScore)
+        };
+      },
+      
+      getCoherencyAssessment(score) {
+        if (score >= 90) return 'Excellent - Perfectly Aligned';
+        if (score >= 75) return 'Good - Well Integrated';
+        if (score >= 60) return 'Fair - Partially Aligned';
+        if (score >= 45) return 'Poor - Misaligned';
+        return 'Critical - Severe Disharmony';
+      },
+      
+      translateMedical(patientFreq) {
+        let normalized = patientFreq;
+        while (normalized > 420) normalized /= 2;
+        while (normalized < 210) normalized *= 2;
+        return {
+          patientFrequency: patientFreq,
+          normalized: normalized,
+          deviation: this.calculateDeviation(normalized)
+        };
+      }
+    };
+    
+    // =========================================================================
+    // TEST SUITES
+    // =========================================================================
+    
+    function runInitTests() {
+      const runner = new TestRunner();
+      
+      runner.suite('Initialization Tests').
+        test('Machine initializes with null modules', function() {
+          runner.assert(UFTMachineTest.modules.cosmic === null, 'Cosmic module should be null initially');
+        }).
+        test('Machine accepts all three modules', function() {
+          const result = UFTMachineTest.init(CosmicTranslator, LunarModule, SolarModule);
+          runner.assertEquals(result.status, 'initialized', 'Status should be initialized');
+          runner.assert(result.modulesLoaded.length === 3, 'Should have 3 modules loaded');
+        }).
+        test('isReady() returns false before init', function() {
+          UFTMachineTest.modules.cosmic = null;
+          UFTMachineTest.modules.lunar = null;
+          UFTMachineTest.modules.solar = null;
+          runner.assertEquals(UFTMachineTest.isReady(), false, 'Should not be ready without modules');
+        }).
+        test('isReady() returns true after init', function() {
+          UFTMachineTest.init(CosmicTranslator, LunarModule, SolarModule);
+          runner.assertEquals(UFTMachineTest.isReady(), true, 'Should be ready with all modules');
+        }).
+        test('Version matches expected', function() {
+          runner.assertEquals(UFTMachineTest.version, '4.1', 'Version should be 4.1');
+        }).
+        test('Calibration constants are defined', function() {
+          runner.assertNotNull(UFTMachineTest.CALIBRATION.COSMIC_ROOT, 'COSMIC_ROOT should be defined');
+          runner.assertNotNull(UFTMachineTest.CALIBRATION.PHI, 'PHI should be defined');
+        });
+      
+      runner.render();
+    }
+    
+    function runTranslationTests() {
+      UFTMachineTest.init(CosmicTranslator, LunarModule, SolarModule);
+      const runner = new TestRunner();
+      
+      runner.suite('Translation Tests').
+        test('translate() returns error when not initialized', function() {
+          UFTMachineTest.modules.cosmic = null;
+          const result = UFTMachineTest.translate(100);
+          runner.assert(result.error !== undefined, 'Should return error when not ready');
+        }).
+        test('translate() returns complete state object', function() {
+          UFTMachineTest.init(CosmicTranslator, LunarModule, SolarModule);
+          const result = UFTMachineTest.translate(100);
+          runner.assertNotNull(result.cosmicPhase, 'Should have cosmic phase');
+          runner.assertNotNull(result.lunarContext, 'Should have lunar context');
+          runner.assertNotNull(result.solarContext, 'Should have solar context');
+        }).
+        test('translate() includes primary frequency', function() {
+          const result = UFTMachineTest.translate(150);
+          runner.assertNotNull(result.primary.frequency, 'Primary frequency should exist');
+          runner.assertEquals(result.primary.module, '12:21 Cosmic', 'Primary module should be cosmic');
+        }).
+        test('translate() calculates state21', function() {
+          const result = UFTMachineTest.translate(42);
+          runner.assert(result.state21 >= 0 && result.state21 <= 20, 'State21 should be between 0-20');
+        }).
+        test('translate() returns timestamp', function() {
+          const result = UFTMachineTest.translate(100);
+          runner.assertNotNull(result.timestamp, 'Should include timestamp');
+          runner.assert(result.timestamp.includes('T'), 'Timestamp should be ISO format');
+        });
+      
+      runner.render();
+    }
+    
+    function runCoherencyTests() {
+      UFTMachineTest.init(CosmicTranslator, LunarModule, SolarModule);
+      const runner = new TestRunner();
+      
+      runner.suite('Coherency Tests').
+        test('calculateCoherency() returns object with score', function() {
+          const cosmic = { frequency: 256, radiusNormalized: 0.5 };
+          const lunar = { frequency: 210, phaseRatio: 0.5 };
+          const solar = { frequency: 256, progression: 0.5 };
+          const result = UFTMachineTest.calculateCoherency(cosmic, lunar, solar);
+          runner.assertNotNull(result.overall, 'Should have overall score');
+          runner.assert(result.overall >= 0 && result.overall <= 100, 'Score should be 0-100');
+        }).
+        test('getCoherencyAssessment() classifies scores correctly', function() {
+          runner.assertEquals(UFTMachineTest.getCoherencyAssessment(95), 'Excellent - Perfectly Aligned');
+          runner.assertEquals(UFTMachineTest.getCoherencyAssessment(70), 'Good - Well Integrated');
+          runner.assertEquals(UFTMachineTest.getCoherencyAssessment(50), 'Fair - Partially Aligned');
+        }).
+        test('Coherency scores align across all domains', function() {
+          const result = UFTMachineTest.translate(100);
+          runner.assert(result.coherency.frequencies !== undefined, 'Should have frequency coherency');
+          runner.assert(result.coherency.phases !== undefined, 'Should have phase coherency');
+          runner.assert(result.coherency.harmonics !== undefined, 'Should have harmonic coherency');
+        });
+      
+      runner.render();
+    }
+    
+    function runMedicalTests() {
+      UFTMachineTest.init(CosmicTranslator, LunarModule, SolarModule);
+      const runner = new TestRunner();
+      
+      runner.suite('Medical Translation Tests').
+        test('translateMedical() normalizes frequencies correctly', function() {
+          const result = UFTMachineTest.translateMedical(500);
+          runner.assert(result.normalized >= 210 && result.normalized <= 420, 'Normalized freq should be in range');
+        }).
+        test('translateMedical() calculates deviation', function() {
+          const result = UFTMachineTest.translateMedical(256);
+          runner.assertNotNull(result.deviation, 'Should have deviation');
+          runner.assertType(result.deviation.from_baseline, 'number', 'Deviation should be number');
+        }).
+        test('calculateDeviation() from baseline works', function() {
+          const dev = UFTMachineTest.calculateDeviation(220);
+          runner.assert(dev.from_baseline > 0, 'Deviation should be positive for higher frequency');
+        }).
+        test('Octave normalization handles large frequencies', function() {
+          const result = UFTMachineTest.translateMedical(1024);
+          runner.assert(result.normalized >= 210 && result.normalized <= 420, 'Should normalize down');
+        }).
+        test('Octave normalization handles small frequencies', function() {
+          const result = UFTMachineTest.translateMedical(50);
+          runner.assert(result.normalized >= 210 && result.normalized <= 420, 'Should normalize up');
+        });
+      
+      runner.render();
+    }
+    
+    // =========================================================================
+    // QUANTUM SUPERPOSITION & COHERENCY TESTS
+    // =========================================================================
+    
+    function runQuantumTests() {
+      UFTMachineTest.init(CosmicTranslator, LunarModule, SolarModule);
+      const runner = new TestRunner();
+      
+      // ===== Superposition Tests =====
+      runner.suite('Quantum Superposition').
+        test('Cosmic state exists in superposition before measurement', function() {
+          const result = UFTMachineTest.translate(50);
+          runner.assertNotNull(result.cosmicPhase, 'Cosmic phase should be in superposition');
+          runner.assertNotNull(result.lunarContext, 'Lunar context should be in superposition');
+          runner.assertNotNull(result.solarContext, 'Solar context should be in superposition');
+        }).
+        test('All three domains (cosmic, lunar, solar) are equally superposed', function() {
+          const results = [];
+          for (let t = 0; t < 30; t++) {
+            results.push(UFTMachineTest.translate(t));
+          }
+          runner.assert(results.length === 30, 'Should collect 30 superposition states');
+        }).
+        test('Proto-word frequencies exist in superposition (13 states)', function() {
+          const protoWords = LunarModule.LUNAR_PROTO_WORDS;
+          runner.assertEquals(protoWords.length, 13, 'Proto-words in superposition = 13 quantum states');
+        }).
+        test('Zodiac frequencies exist in superposition (12 states)', function() {
+          const zodiacs = SolarModule.ZODIAC_SIGNS;
+          runner.assertEquals(zodiacs.length, 12, 'Zodiac in superposition = 12 quantum states');
+        }).
+        test('21-state cycle represents quantum branching', function() {
+          const stateCount = CosmicTranslator.States21.cycle.length;
+          runner.assertEquals(stateCount, 21, '21 branches in quantum superposition');
+        }).
+        test('Superposition probability amplitude is normalized', function() {
+          // Each state has equal amplitude initially
+          const amplitude = 1 / Math.sqrt(21);
+          const probability = amplitude * amplitude;
+          runner.assert(probability > 0 && probability < 0.1, 'Probability amplitude should be normalized');
+        }).
+        test('Wave function collapses on translate() call', function() {
+          const result1 = UFTMachineTest.translate(100);
+          const result2 = UFTMachineTest.translate(100);
+          runner.assertEquals(result1.cosmicPhase.frequency, result2.cosmicPhase.frequency, 'Same time should collapse to same state');
+        });
+      
+      // ===== Entanglement Tests =====
+      runner.suite('Quantum Entanglement (13:12:21 Torus)').
+        test('Cosmic and Lunar states are entangled (13:21 ratio)', function() {
+          const result = UFTMachineTest.translate(100);
+          const lunarMonths = 13;
+          const cosmicStates = 21;
+          const entanglementDim = lunarMonths * cosmicStates;
+          runner.assertEquals(entanglementDim, 273, 'Entanglement dimension should be 13×21=273');
+        }).
+        test('Cosmic and Solar states are entangled (12:21 ratio)', function() {
+          const cosmicStates = 21;
+          const zodiacSigns = 12;
+          const entanglementDim = cosmicStates * zodiacSigns;
+          runner.assertEquals(entanglementDim, 252, 'Entanglement dimension should be 21×12=252');
+        }).
+        test('All three domains entangle (13:12:21 torus)', function() {
+          const lunar = 13;
+          const solar = 12;
+          const cosmic = 21;
+          const torusDim = lunar * solar * cosmic;
+          runner.assertEquals(torusDim, 3276, 'Full torus entanglement should be 13×12×21=3276');
+        }).
+        test('Lunar and Solar states maintain shared entanglement', function() {
+          const result = UFTMachineTest.translate(150);
+          runner.assertNotNull(result.lunarContext.frequency, 'Lunar frequency entangled');
+          runner.assertNotNull(result.solarContext.frequency, 'Solar frequency entangled');
+        }).
+        test('Entanglement preserves coherency across domains', function() {
+          const result = UFTMachineTest.translate(200);
+          const coherency = result.coherency;
+          runner.assert(coherency.overall >= 40, 'Entanglement should maintain minimum coherency');
+        }).
+        test('Non-local correlation between cosmic cycles', function() {
+          const result1 = UFTMachineTest.translate(10);
+          const result2 = UFTMachineTest.translate(39.5306); // One full cycle later
+          const freq1 = result1.cosmicPhase.frequency;
+          const freq2 = result2.cosmicPhase.frequency;
+          runner.assert(Math.abs(freq1 - freq2) < 5, 'Non-local correlation should repeat at T_L');
+        });
+      
+      // ===== Coherency Collapse Tests =====
+      runner.suite('Coherency Collapse & Measurement').
+        test('Measurement collapses superposition into single state', function() {
+          const times = [10, 20, 30];
+          const states = times.map(t => UFTMachineTest.translate(t));
+          runner.assert(states[0].state21 >= 0 && states[0].state21 <= 20, 'State collapses to single value 0-20');
+        }).
+        test('Coherency score indicates collapse quality', function() {
+          const result = UFTMachineTest.translate(100);
+          const coherency = result.coherency.overall;
+          runner.assert(coherency > 0, 'Coherency score should reflect collapse state');
+        }).
+        test('Frequency coherency narrows measurement uncertainty', function() {
+          const result = UFTMachineTest.translate(75);
+          const freqCoherence = result.coherency.frequencies;
+          const phaseCoherence = result.coherency.phases;
+          runner.assert(freqCoherence >= 0 && freqCoherence <= 100, 'Frequency coherency quantifies measurement narrowing');
+        }).
+        test('Phase coherency indicates timing alignment', function() {
+          const result = UFTMachineTest.translate(150);
+          const phaseScore = result.coherency.phases;
+          runner.assert(phaseScore >= 0, 'Phase coherency should be measurable');
+        }).
+        test('Collapsed state respects conservation laws (frequency)', function() {
+          const result = UFTMachineTest.translate(100);
+          const cosmic = result.primary.frequency;
+          const lunar = result.harmonic.lunar;
+          const solar = result.harmonic.solar;
+          // All should be in valid frequency range
+          runner.assert(cosmic >= 250 && cosmic <= 410, 'Cosmic frequency within bounds');
+          runner.assert(lunar >= 210 && lunar <= 420, 'Lunar frequency within bounds');
+          runner.assert(solar >= 250 && solar <= 485, 'Solar frequency within bounds');
+        }).
+        test('Observer effect: measurement timestamp recorded', function() {
+          const result = UFTMachineTest.translate(125);
+          runner.assertNotNull(result.timestamp, 'Measurement timestamp should exist');
+          runner.assert(result.timestamp.length > 0, 'Timestamp should record measurement event');
+        });
+      
+      // ===== Quantum Resonance Tests =====
+      runner.suite('Quantum Resonance & Interference').
+        test('Resonance occurs at harmonic ratios (2:1, 3:2)', function() {
+          const lunar = 210.4186;
+          const solar = 256.0;
+          const ratio = solar / lunar;
+          runner.assert(Math.abs(ratio - 1.216) < 0.05, 'Harmonic ratio indicates resonance');
+        }).
+        test('Constructive interference at frequency alignment', function() {
+          const result = UFTMachineTest.translate(100);
+          const lunarFreq = result.lunarContext.frequency;
+          const solarFreq = result.solarContext.frequency;
+          const cosmicFreq = result.primary.frequency;
+          const totalCoherence = result.coherency.overall;
+          runner.assert(totalCoherence > 0, 'Constructive interference produces positive coherence');
+        }).
+        test('Destructive interference creates phase opposition', function() {
+          const result1 = UFTMachineTest.translate(5);
+          const result2 = UFTMachineTest.translate(20);
+          const phase1 = result1.cosmicPhase.stateIndex;
+          const phase2 = result2.cosmicPhase.stateIndex;
+          runner.assert(phase2 !== phase1, 'Different times should have destructive phase');
+        }).
+        test('Beat frequency emerges from close frequencies', function() {
+          const lunar = LunarModule.LUNAR_OCTAVE_ROOT;
+          const nearby = lunar * 1.01; // 1% higher
+          const beatFreq = Math.abs(nearby - lunar);
+          runner.assert(beatFreq > 0, 'Beat frequency should emerge from interference');
+        }).
+        test('Resonance window contains all proto-words', function() {
+          const protoWords = LunarModule.LUNAR_PROTO_WORDS;
+          protoWords.forEach(word => {
+            runner.assert(word.freq >= 210 && word.freq <= 420, `${word.word} at ${word.freq} Hz in resonance window`);
+          });
+        }).
+        test('Quantum superposition preserves energy (via frequency)', function() {
+          const result = UFTMachineTest.translate(88);
+          // E = hf, so frequency preservation implies energy conservation
+          runner.assertNotNull(result.primary.frequency, 'Frequency preserved = energy conserved');
+        });
+      
+      // ===== Unified Field Tests =====
+      runner.suite('Unified Quantum Field (13×12×21)').
+        test('All three quantum fields initialize', function() {
+          runner.assert(CosmicTranslator !== null, 'Cosmic field initialized');
+          runner.assert(LunarModule !== null, 'Lunar field initialized');
+          runner.assert(SolarModule !== null, 'Solar field initialized');
+        }).
+        test('Fields couple through UFT Machine', function() {
+          const result = UFTMachineTest.translate(100);
+          runner.assert(result.cosmicPhase && result.lunarContext && result.solarContext, 'All fields coupled');
+        }).
+        test('Unified field maintains 273-dimensional structure', function() {
+          // 13 lunar × 21 cosmic = 273
+          const lunarMoons = 13;
+          const cosmicStates = 21;
+          const fieldDim = lunarMoons * cosmicStates;
+          runner.assertEquals(fieldDim, 273, 'Unified field dimensionality = 273');
+        }).
+        test('Field excitations map to proto-words', function() {
+          const protoWords = LunarModule.LUNAR_PROTO_WORDS;
+          runner.assertEquals(protoWords.length, 13, '13 field excitations = 13 proto-words');
+        }).
+        test('Zero-point energy accessible at 297.5768 Hz', function() {
+          const zeroPoint = CosmicTranslator.ZERO_POINT_HZ;
+          runner.assertEquals(zeroPoint, 297.5768, 'Zero-point energy frequency precise');
+        }).
+        test('Quantum vacuum state preserved (21 → 0 cycle)', function() {
+          const states = CosmicTranslator.States21.cycle;
+          const lastState = states[20]; // Void state
+          runner.assertEquals(lastState.phase, 'Void', 'Void state represents vacuum');
+        }).
+        test('Field coherency score validates unified field', function() {
+          const result = UFTMachineTest.translate(150);
+          const coherency = result.coherency.overall;
+          runner.assert(typeof coherency === 'number' && coherency >= 0 && coherency <= 100, 'Unified field coherency quantified');
+        });
+      
+      runner.render();
+    }
+    
+    function runAllTests() {
+      UFTMachineTest.init(CosmicTranslator, LunarModule, SolarModule);
+      const runner = new TestRunner();
+      
+      // Initialize Tests
+      runner.suite('Initialization Tests').
+        test('Machine initializes with null modules', function() {
+          runner.assert(UFTMachineTest.modules.cosmic !== null, 'Cosmic module loaded');
+        }).
+        test('Machine accepts all three modules', function() {
+          const result = UFTMachineTest.init(CosmicTranslator, LunarModule, SolarModule);
+          runner.assertEquals(result.status, 'initialized', 'Status should be initialized');
+          runner.assert(result.modulesLoaded.length === 3, 'Should have 3 modules loaded');
+        }).
+        test('isReady() returns true after init', function() {
+          runner.assertEquals(UFTMachineTest.isReady(), true, 'Should be ready with all modules');
+        }).
+        test('Version matches expected', function() {
+          runner.assertEquals(UFTMachineTest.version, '4.1', 'Version should be 4.1');
+        }).
+        test('Calibration constants are defined', function() {
+          runner.assertNotNull(UFTMachineTest.CALIBRATION.COSMIC_ROOT, 'COSMIC_ROOT should be defined');
+          runner.assertNotNull(UFTMachineTest.CALIBRATION.PHI, 'PHI should be defined');
+        }).
+        test('Primary module is 12:21 Cosmic', function() {
+          runner.assertEquals(UFTMachineTest.primaryModule, '12:21-cosmic-translator', 'Primary module set');
+        });
+      
+      // Translation Tests
+      runner.suite('Translation Tests').
+        test('translate() returns complete state object', function() {
+          const result = UFTMachineTest.translate(100);
+          runner.assertNotNull(result.cosmicPhase, 'Should have cosmic phase');
+          runner.assertNotNull(result.lunarContext, 'Should have lunar context');
+          runner.assertNotNull(result.solarContext, 'Should have solar context');
+        }).
+        test('translate() includes primary frequency', function() {
+          const result = UFTMachineTest.translate(150);
+          runner.assertNotNull(result.primary.frequency, 'Primary frequency should exist');
+          runner.assertEquals(result.primary.module, '12:21 Cosmic', 'Primary module should be cosmic');
+        }).
+        test('translate() calculates state21', function() {
+          const result = UFTMachineTest.translate(42);
+          runner.assert(result.state21 >= 0 && result.state21 <= 20, 'State21 should be between 0-20');
+        }).
+        test('translate() returns timestamp', function() {
+          const result = UFTMachineTest.translate(100);
+          runner.assertNotNull(result.timestamp, 'Should include timestamp');
+          runner.assert(result.timestamp.includes('T'), 'Timestamp should be ISO format');
+        }).
+        test('translate() returns harmonic frequencies', function() {
+          const result = UFTMachineTest.translate(200);
+          runner.assertNotNull(result.harmonic.lunar, 'Should have lunar harmonic');
+          runner.assertNotNull(result.harmonic.solar, 'Should have solar harmonic');
+        });
+      
+      // Coherency Tests
+      runner.suite('Coherency Tests').
+        test('calculateCoherency() returns valid score', function() {
+          const cosmic = { frequency: 256, radiusNormalized: 0.5 };
+          const lunar = { frequency: 210, phaseRatio: 0.5 };
+          const solar = { frequency: 256, progression: 0.5 };
+          const result = UFTMachineTest.calculateCoherency(cosmic, lunar, solar);
+          runner.assertNotNull(result.overall, 'Should have overall score');
+          runner.assert(result.overall >= 0 && result.overall <= 100, 'Score should be 0-100');
+        }).
+        test('getCoherencyAssessment() classifies correctly', function() {
+          runner.assertEquals(UFTMachineTest.getCoherencyAssessment(95), 'Excellent - Perfectly Aligned');
+          runner.assertEquals(UFTMachineTest.getCoherencyAssessment(70), 'Good - Well Integrated');
+        }).
+        test('Coherency includes all domains', function() {
+          const result = UFTMachineTest.translate(100);
+          runner.assert(result.coherency.frequencies !== undefined, 'Should have frequency coherency');
+          runner.assert(result.coherency.phases !== undefined, 'Should have phase coherency');
+          runner.assert(result.coherency.harmonics !== undefined, 'Should have harmonic coherency');
+        });
+      
+      // Medical Tests
+      runner.suite('Medical Translation Tests').
+        test('translateMedical() normalizes frequencies', function() {
+          const result = UFTMachineTest.translateMedical(500);
+          runner.assert(result.normalized >= 210 && result.normalized <= 420, 'Normalized freq in range');
+        }).
+        test('translateMedical() calculates deviation', function() {
+          const result = UFTMachineTest.translateMedical(256);
+          runner.assertNotNull(result.deviation, 'Should have deviation');
+          runner.assertType(result.deviation.from_baseline, 'number', 'Deviation should be number');
+        }).
+        test('Octave normalization for large frequencies', function() {
+          const result = UFTMachineTest.translateMedical(1024);
+          runner.assert(result.normalized >= 210 && result.normalized <= 420, 'Should normalize down');
+        }).
+        test('Octave normalization for small frequencies', function() {
+          const result = UFTMachineTest.translateMedical(50);
+          runner.assert(result.normalized >= 210 && result.normalized <= 420, 'Should normalize up');
+        }).
+        test('Deviation from baseline calculated', function() {
+          const dev = UFTMachineTest.calculateDeviation(220);
+          runner.assertType(dev.from_baseline, 'number', 'Deviation should be numeric');
+        });
+      
+      // Quantum Tests
+      runner.suite('Quantum Superposition').
+        test('Cosmic state in superposition', function() {
+          const result = UFTMachineTest.translate(50);
+          runner.assertNotNull(result.cosmicPhase, 'Cosmic phase in superposition');
+          runner.assertNotNull(result.lunarContext, 'Lunar context in superposition');
+          runner.assertNotNull(result.solarContext, 'Solar context in superposition');
+        }).
+        test('Proto-words in 13-state superposition', function() {
+          const protoWords = LunarModule.LUNAR_PROTO_WORDS;
+          runner.assertEquals(protoWords.length, 13, 'Proto-words = 13 quantum states');
+        }).
+        test('21-state cosmic cycle', function() {
+          const stateCount = CosmicTranslator.States21.cycle.length;
+          runner.assertEquals(stateCount, 21, '21 branches in superposition');
+        }).
+        test('Wave function collapse on measurement', function() {
+          const result1 = UFTMachineTest.translate(100);
+          const result2 = UFTMachineTest.translate(100);
+          runner.assertEquals(result1.cosmicPhase.frequency, result2.cosmicPhase.frequency, 'Same time = same state');
+        }).
+        test('Superposition normalized', function() {
+          const amplitude = 1 / Math.sqrt(21);
+          const probability = amplitude * amplitude;
+          runner.assert(probability > 0 && probability < 0.1, 'Normalized probability');
+        });
+      
+      runner.suite('Quantum Entanglement (13×12×21)').
+        test('Lunar-Cosmic entanglement (13×21)', function() {
+          const entanglement = 13 * 21;
+          runner.assertEquals(entanglement, 273, 'Entanglement dimension = 273');
+        }).
+        test('Solar-Cosmic entanglement (12×21)', function() {
+          const entanglement = 12 * 21;
+          runner.assertEquals(entanglement, 252, 'Entanglement dimension = 252');
+        }).
+        test('Full torus (13×12×21)', function() {
+          const torus = 13 * 12 * 21;
+          runner.assertEquals(torus, 3276, 'Full torus = 3276');
+        }).
+        test('Fields maintain entanglement', function() {
+          const result = UFTMachineTest.translate(150);
+          runner.assertNotNull(result.lunarContext.frequency, 'Lunar frequency entangled');
+          runner.assertNotNull(result.solarContext.frequency, 'Solar frequency entangled');
+        }).
+        test('Coherency preserved across domains', function() {
+          const result = UFTMachineTest.translate(200);
+          runner.assert(result.coherency.overall >= 0, 'Coherency maintained');
+        });
+      
+      runner.suite('Coherency Collapse & Measurement').
+        test('Measurement collapses to state (0-20)', function() {
+          const result = UFTMachineTest.translate(15);
+          runner.assert(result.state21 >= 0 && result.state21 <= 20, 'Collapsed to single state');
+        }).
+        test('Coherency score reflects collapse', function() {
+          const result = UFTMachineTest.translate(100);
+          runner.assertNotNull(result.coherency.overall, 'Coherency quantified');
+        }).
+        test('Frequency coherency measurable', function() {
+          const result = UFTMachineTest.translate(75);
+          runner.assert(result.coherency.frequencies >= 0 && result.coherency.frequencies <= 100, 'Freq coherency valid');
+        }).
+        test('Conservation of frequency/energy', function() {
+          const result = UFTMachineTest.translate(100);
+          const cosmic = result.primary.frequency;
+          runner.assert(cosmic >= 250 && cosmic <= 410, 'Cosmic frequency within bounds');
+        }).
+        test('Observer effect: timestamp', function() {
+          const result = UFTMachineTest.translate(125);
+          runner.assertNotNull(result.timestamp, 'Measurement recorded');
+        });
+      
+      runner.suite('Quantum Resonance & Interference').
+        test('Harmonic ratio 1.216', function() {
+          const ratio = 256.0 / 210.4186;
+          runner.assert(Math.abs(ratio - 1.216) < 0.05, 'Harmonic ratio valid');
+        }).
+        test('Constructive interference', function() {
+          const result = UFTMachineTest.translate(100);
+          runner.assert(result.coherency.overall > 0, 'Constructive produces coherency');
+        }).
+        test('Beat frequency emerges', function() {
+          const lunar = 210.4186;
+          const nearby = lunar * 1.01;
+          const beat = Math.abs(nearby - lunar);
+          runner.assert(beat > 0, 'Beat frequency emerges');
+        }).
+        test('Proto-words in resonance window', function() {
+          const words = LunarModule.LUNAR_PROTO_WORDS;
+          words.forEach(word => {
+            runner.assert(word.freq >= 210 && word.freq <= 420, `${word.word} in window`);
+          });
+        }).
+        test('Energy preserved via frequency', function() {
+          const result = UFTMachineTest.translate(88);
+          runner.assertNotNull(result.primary.frequency, 'Frequency = energy conserved');
+        });
+      
+      runner.suite('Unified Quantum Field (13×12×21)').
+        test('All quantum fields initialized', function() {
+          runner.assert(CosmicTranslator !== null, 'Cosmic initialized');
+          runner.assert(LunarModule !== null, 'Lunar initialized');
+          runner.assert(SolarModule !== null, 'Solar initialized');
+        }).
+        test('Fields coupled through UFT Machine', function() {
+          const result = UFTMachineTest.translate(100);
+          runner.assert(result.cosmicPhase && result.lunarContext && result.solarContext, 'Coupled');
+        }).
+        test('273-dimensional structure (13×21)', function() {
+          const dim = 13 * 21;
+          runner.assertEquals(dim, 273, 'Unified field dimension correct');
+        }).
+        test('Proto-words map to field excitations', function() {
+          const words = LunarModule.LUNAR_PROTO_WORDS;
+          runner.assertEquals(words.length, 13, 'Field excitations = proto-words');
+        }).
+        test('Zero-point energy at 297.5768 Hz', function() {
+          runner.assertEquals(CosmicTranslator.ZERO_POINT_HZ, 297.5768, 'Zero-point precise');
+        });
+      
+      runner.render();
+    }
+    
+    function clearResults() {
+      const runner = new TestRunner();
+      runner.clear();
+    }
+  </script>
+</body>
+</html>

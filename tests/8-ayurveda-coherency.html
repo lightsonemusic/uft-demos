@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFT — Ayurveda Coherency Analyser</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#070710;
+    color:#e0e0f0;
+    font-family:'Courier New',monospace;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+    padding:20px 14px; gap:16px;
+  }
+  h1 { font-size:1em; color:#f97316; letter-spacing:5px; text-transform:uppercase; }
+  .sub { font-size:0.7em; color:#333322; letter-spacing:3px; }
+
+  button {
+    padding:10px 36px;
+    background:#0f0f1e; border:1px solid #f97316; color:#f97316;
+    font-family:'Courier New',monospace; font-size:.9em;
+    cursor:pointer; letter-spacing:2px; transition:background .2s;
+  }
+  button:hover { background:#1a110a; }
+  button.active { border-color:#4ade80; color:#4ade80; }
+
+  .grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px; width:100%; max-width:1100px;
+  }
+  .card {
+    background:#0c0c0a; border:1px solid #1a1a10;
+    padding:16px; display:flex; flex-direction:column; gap:8px;
+  }
+  .card-title {
+    font-size:.65em; color:#33330a; letter-spacing:3px;
+    text-transform:uppercase; border-bottom:1px solid #1a1a10; padding-bottom:6px;
+  }
+  .span2 { grid-column:span 2; }
+  .span3 { grid-column:span 3; }
+
+  /* DETECTED */
+  #detHz   { font-size:2.8em; color:#4ade80; line-height:1; transition:color .1s; }
+  #detHz.weak { color:#222220; }
+  #detNote { font-size:1em; color:#aaaa88; }
+  #sigLevel { font-size:.7em; color:#333322; }
+
+  /* CENTS METER */
+  #centsVal { font-size:1.8em; text-align:center; }
+  .meter-bar {
+    position:relative; height:14px;
+    background:#0a0a08; border:1px solid #1a1a10;
+  }
+  .meter-center { position:absolute; left:50%; top:0; bottom:0; width:1px; background:#222220; }
+  #meterFill { position:absolute; top:2px; bottom:2px; background:#4ade80; }
+  .meter-labels { display:flex; justify-content:space-between; font-size:.6em; color:#222220; }
+
+  /* DOSHA BADGE */
+  .dosha-badge {
+    display:inline-block; padding:4px 14px; font-size:.8em;
+    letter-spacing:2px; font-weight:bold; border-radius:2px;
+  }
+  .vata    { background:#1a1428; color:#a78bfa; border:1px solid #a78bfa; }
+  .pitta   { background:#281408; color:#fb923c; border:1px solid #fb923c; }
+  .kapha   { background:#0a1e14; color:#4ade80; border:1px solid #4ade80; }
+  .tridosha{ background:#141428; color:#facc15; border:1px solid #facc15; }
+
+  /* AYURVEDA PANEL */
+  .ayur-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+  }
+  .a-item { display:flex; flex-direction:column; gap:3px; padding:10px; background:#08080a; border:1px solid #141410; }
+  .a-label { font-size:.6em; color:#33330a; letter-spacing:2px; text-transform:uppercase; }
+  .a-val   { font-size:1em; line-height:1.3; }
+  .a-sub   { font-size:.7em; color:#333322; }
+
+  /* CHAKRA row */
+  .chakra-row { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .chakra-dot {
+    width:10px; height:10px; border-radius:50%;
+    border:1px solid currentColor; opacity:.3; transition:all .3s;
+  }
+  .chakra-dot.active { opacity:1; box-shadow:0 0 8px currentColor; }
+  .chakra-name { font-size:.75em; }
+
+  /* GEOMETRY */
+  #geoCanvas { display:block; background:#050508; width:100%; height:320px; }
+  .geo-label { font-size:.7em; color:#333322; letter-spacing:2px; text-align:center; margin-top:4px; }
+
+  /* SPECTRUM */
+  #spectrum  { display:block; background:#050508; width:100%; height:100px; }
+
+  /* INTERVAL PANEL */
+  .interval-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .int-badge {
+    padding:4px 12px; font-size:.8em; border:1px solid #222210;
+    background:#080808; color:#7b7b4e;
+  }
+  .int-badge.consonant { border-color:#4ade80; color:#4ade80; }
+  .int-badge.dissonant { border-color:#f87171; color:#f87171; }
+  #intervalDesc { font-size:.75em; color:#555533; }
+
+  /* PRANA CURRENT */
+  .prana-bar {
+    height:8px; background:#080808; border:1px solid #1a1a10; border-radius:4px; overflow:hidden;
+  }
+  .prana-fill { height:100%; transition:width .15s, background .3s; border-radius:4px; }
+</style>
+</head>
+<body>
+<h1>UFT · Ayurveda Coherency Analyser</h1>
+<div class="sub">Bass Input → 432 Hz Tuning → Dosha · Chakra · Dhatu · Vayu</div>
+<button id="startBtn" onclick="startAudio()">▶ START MIC INPUT</button>
+
+<div class="grid">
+
+  <!-- DETECTED -->
+  <div class="card">
+    <div class="card-title">Detected Frequency</div>
+    <div id="detHz" class="weak">— Hz</div>
+    <div id="detNote">No signal</div>
+    <div id="sigLevel">Signal: — dB</div>
+  </div>
+
+  <!-- CENTS -->
+  <div class="card">
+    <div class="card-title">Tuning Deviation</div>
+    <div id="centsVal" style="color:#333322">— ¢</div>
+    <div class="meter-bar">
+      <div class="meter-center"></div>
+      <div id="meterFill" style="left:50%;width:0"></div>
+    </div>
+    <div class="meter-labels"><span>−50¢</span><span>in tune</span><span>+50¢</span></div>
+  </div>
+
+  <!-- DOSHA -->
+  <div class="card">
+    <div class="card-title">Active Dosha</div>
+    <div id="doshaBadge"><span class="dosha-badge tridosha">—</span></div>
+    <div id="doshaDesc" style="font-size:.75em;color:#555533;margin-top:4px">—</div>
+    <!-- Prana current bar -->
+    <div class="card-title" style="margin-top:8px">Prana Current</div>
+    <div class="prana-bar"><div id="pranaFill" class="prana-fill" style="width:0"></div></div>
+    <div id="pranaLabel" style="font-size:.65em;color:#333322">—</div>
+  </div>
+
+  <!-- AYURVEDA COHERENCIES — full row -->
+  <div class="card span3">
+    <div class="card-title">Ayurveda Coherencies · Classical Mapping → 432 Hz Lunar Scale</div>
+    <div class="ayur-grid" id="ayurGrid"><!-- populated by JS --></div>
+  </div>
+
+  <!-- CHAKRA ROW -->
+  <div class="card span3">
+    <div class="card-title">Chakra Activation · 7 Energy Centres</div>
+    <div class="chakra-row" id="chakraRow"><!-- populated by JS --></div>
+  </div>
+
+  <!-- GEOMETRY -->
+  <div class="card span2">
+    <div class="card-title">Sacred Geometry · Note Form · Detuning Distortion</div>
+    <canvas id="geoCanvas"></canvas>
+    <div class="geo-label" id="geoLabel">awaiting signal</div>
+  </div>
+
+  <!-- INTERVAL -->
+  <div class="card">
+    <div class="card-title">Harmonic Interval · Lunar × Solar</div>
+    <div class="interval-row" id="intervalRow">—</div>
+    <div id="intervalDesc" style="margin-top:6px">—</div>
+    <div style="margin-top:12px;font-size:.65em;color:#222210">
+      Kapha interval = Minor 3rd 6:5<br>
+      (REFERENCE.md §VII)
+    </div>
+  </div>
+
+  <!-- SPECTRUM -->
+  <div class="card span3">
+    <div class="card-title">Live Spectrum · 30–500 Hz · 432 Hz Grid</div>
+    <canvas id="spectrum"></canvas>
+  </div>
+
+</div>
+
+<script type="module">
+import { TUNING_ROOTS, NOTE_NAMES } from '../modules/tuning-constants.js';
+
+const ROOT_432 = TUNING_ROOTS['432'];
+
+// ─── AYURVEDA SCALE MAP (13 tones — lunar Nikkal) ────────────────────────────
+// Classical Ayurveda: Doshas, Chakras, Dhatus, Mahabhutas, Rasas, Vayus, Gunas
+// Mapped to 13-tone lunar scale (C=210.4186 Hz → C'=420.8372 Hz in Moon tuning)
+// Note: Sharps/flats are chromatic extensions of the main swara mappings.
+
+const AYUR = [
+  {
+    pc:0, note:'C', hz:210.4186,
+    dosha:'Kapha',      doshaClass:'kapha',
+    desc:'Earth & Water — grounding, stability, nourishment',
+    dhatu:'Rasa',       dhatuDesc:'Plasma / lymph — primary nourishment',
+    mahabhuta:'Prithvi',mahabDesc:'Earth — density, structure',
+    rasa:'Madhura',     rasaDesc:'Sweet — builds tissue, calms Vata & Pitta',
+    vayu:'Apana Vayu',  vayuDesc:'Downward current — elimination, grounding',
+    guna:'Sthira',      gunaDesc:'Stable · Guru (heavy) · Snigdha (oily)',
+    chakra:0,           sattva:'Tamas → Sattva — grounding to clarity',
+    nadi:'Ida',         nadiDesc:'Moon channel — left nostril, cooling',
+    action:'Builds immunity · Tonifies tissues · Stabilises nervous system',
+    color:'#4ade80',
+  },
+  {
+    pc:1, note:'C#', hz:222.9307,
+    dosha:'Kapha-Vata', doshaClass:'kapha',
+    desc:'Earth transitioning to Water — moistening, binding',
+    dhatu:'Rasa',       dhatuDesc:'Plasma enrichment — lymphatic current',
+    mahabhuta:'Jala',   mahabDesc:'Water — cohesion, fluidity',
+    rasa:'Lavana',      rasaDesc:'Salty — retains water, supports Kapha',
+    vayu:'Apana Vayu',  vayuDesc:'Downward — excretion, reproductive flow',
+    guna:'Snigdha',     gunaDesc:'Oily · Guru · Manda (slow)',
+    chakra:0,           sattva:'Tamas — inertia seeking movement',
+    nadi:'Ida',         nadiDesc:'Moon channel — receptive',
+    action:'Lubricates joints · Supports kidneys · Soothes mucous membranes',
+    color:'#60a5fa',
+  },
+  {
+    pc:2, note:'D', hz:236.1869,
+    dosha:'Kapha',      doshaClass:'kapha',
+    desc:'Water — fluid, creative, reproductive vitality',
+    dhatu:'Rakta',      dhatuDesc:'Blood — vitality, oxygenation, Pitta seat',
+    mahabhuta:'Jala',   mahabDesc:'Water — flow, nourishment',
+    rasa:'Kashaya',     rasaDesc:'Astringent — drying, toning, haemostatic',
+    vayu:'Samana Vayu', vayuDesc:'Equalising — digestion, nutrient assimilation',
+    guna:'Guru',        gunaDesc:'Heavy · Manda · Shlakshna (smooth)',
+    chakra:1,           sattva:'Rajas — creative activation',
+    nadi:'Ida',         nadiDesc:'Moon channel — emotional depth',
+    action:'Purifies blood · Supports liver · Enhances creative energy',
+    color:'#a78bfa',
+  },
+  {
+    pc:3, note:'D#', hz:250.2313,
+    dosha:'Vata',       doshaClass:'vata',
+    desc:'Air & Space — movement, lightness, transition',
+    dhatu:'Mamsa',      dhatuDesc:'Muscle — strength, locomotion',
+    mahabhuta:'Vayu',   mahabDesc:'Air — movement, lightness, breath',
+    rasa:'Tikta',       rasaDesc:'Bitter — detoxifying, reduces Kapha & Pitta',
+    vayu:'Vyana Vayu',  vayuDesc:'Pervading — circulation, distribution',
+    guna:'Laghu',       gunaDesc:'Light · Ruksha (dry) · Chala (mobile)',
+    chakra:1,           sattva:'Rajas → Sattva — movement toward clarity',
+    nadi:'Sushumna',    nadiDesc:'Central channel — awakening',
+    action:'Stimulates circulation · Dries excess Kapha · Awakens lymph',
+    color:'#c084fc',
+  },
+  {
+    pc:4, note:'E', hz:265.1108,
+    dosha:'Pitta',      doshaClass:'pitta',
+    desc:'Fire & Water — transformation, metabolism, will',
+    dhatu:'Mamsa',      dhatuDesc:'Muscle refinement → strength & power',
+    mahabhuta:'Agni',   mahabDesc:'Fire — transformation, heat, light',
+    rasa:'Katu',        rasaDesc:'Pungent — stimulates digestion, clears congestion',
+    vayu:'Samana Vayu', vayuDesc:'Equalising — Jatharagni, digestive fire',
+    guna:'Ushna',       gunaDesc:'Hot · Tikshna (sharp) · Sukshma (subtle)',
+    chakra:2,           sattva:'Rajas — assertive Pitta will',
+    nadi:'Pingala',     nadiDesc:'Sun channel — right nostril, heating',
+    action:'Ignites Jatharagni · Drives metabolism · Sharpens intellect',
+    color:'#fb923c',
+  },
+  {
+    pc:5, note:'F', hz:280.8751,
+    dosha:'Pitta',      doshaClass:'pitta',
+    desc:'Fire — peak metabolic fire, purification, discernment',
+    dhatu:'Meda',       dhatuDesc:'Adipose / fat — insulation, energy reserve',
+    mahabhuta:'Agni',   mahabDesc:'Fire — purification, luminosity',
+    rasa:'Amla',        rasaDesc:'Sour — kindling Agni, light, warming',
+    vayu:'Prana Vayu',  vayuDesc:'Inward — inhalation, life force intake',
+    guna:'Tikshna',     gunaDesc:'Sharp · Vishada (clear) · Ushna (hot)',
+    chakra:2,           sattva:'Sattva — luminous clarity',
+    nadi:'Pingala',     nadiDesc:'Sun channel — solar intelligence',
+    action:'Purifies liver · Sharpens vision · Elevates Tejas (inner fire)',
+    color:'#f472b6',
+  },
+  {
+    pc:6, note:'F#', hz:297.5768,
+    dosha:'Vata',       doshaClass:'vata',
+    desc:'Zero Point — Air & Space unified · √2 · Heart axis',
+    dhatu:'Asthi',      dhatuDesc:'Bone — structural foundation, Vata seat',
+    mahabhuta:'Vayu',   mahabDesc:'Air-Space junction · Zero Point field',
+    rasa:'Tikta',       rasaDesc:'Bitter-astringent — Zero Point clarity',
+    vayu:'Prana Vayu',  vayuDesc:'Prana at Zero Point — breath of the universe',
+    guna:'Sukshma',     gunaDesc:'Subtle · Vishada (clear) · Laghu (light)',
+    chakra:3,           sattva:'Sattva — pure heart-centred awareness',
+    nadi:'Sushumna',    nadiDesc:'Central channel — Zero Point axis F#',
+    action:'Opens heart · Balances all three Doshas · Zero Point field coherence',
+    color:'#facc15',
+  },
+  {
+    pc:7, note:'G', hz:315.2717,
+    dosha:'Vata',       doshaClass:'vata',
+    desc:'Ether & Air — spacious, communicative, expressive',
+    dhatu:'Asthi',      dhatuDesc:'Bone → Majja: structural to nervous transition',
+    mahabhuta:'Akasha', mahabDesc:'Ether / Space — the container of all sound',
+    rasa:'Kashaya',     rasaDesc:'Astringent — toning, drawing inward',
+    vayu:'Udana Vayu',  vayuDesc:'Upward — speech, expression, memory, will',
+    guna:'Vishada',     gunaDesc:'Clear · Laghu · Khara (rough)',
+    chakra:4,           sattva:'Sattva — clear spacious expression',
+    nadi:'Ida',         nadiDesc:'Moon channel — receptive listening',
+    action:'Clears throat · Opens Vishuddha · Supports memory & speech',
+    color:'#fb923c',
+  },
+  {
+    pc:8, note:'G#', hz:334.0187,
+    dosha:'Tridosha',   doshaClass:'tridosha',
+    desc:'Ophiuchus · Liminal · The Wound as Portal — all Doshas',
+    dhatu:'Majja',      dhatuDesc:'Marrow & nerve tissue — consciousness carrier',
+    mahabhuta:'Akasha', mahabDesc:'Pure Ether — the void between forms',
+    rasa:'Tikta',       rasaDesc:'Bitter — deep purification of marrow',
+    vayu:'Vyana Vayu',  vayuDesc:'Pervading — all five Vayus unified',
+    guna:'Vishada',     gunaDesc:'Supremely clear · Sukshma · all Gunas',
+    chakra:5,           sattva:'Sattva-Turiya — witness consciousness',
+    nadi:'Sushumna',    nadiDesc:'Central channel — Kundalini Ophiuchus node',
+    action:'Purifies marrow · Activates Ajna · Portal: wound transmutes to Ojas',
+    color:'#36D9B8',
+  },
+  {
+    pc:9, note:'A', hz:353.8805,
+    dosha:'Vata-Pitta',doshaClass:'pitta',
+    desc:'Fiery Air — blood intelligence, insight, swift perception',
+    dhatu:'Majja',      dhatuDesc:'Marrow → Shukra: highest refinement',
+    mahabhuta:'Vayu',   mahabDesc:'Air in ascent — Prana rising',
+    rasa:'Katu',        rasaDesc:'Pungent — penetrating, kindles Tejas',
+    vayu:'Udana Vayu',  vayuDesc:'Upward — elevation, expression, liberation',
+    guna:'Laghu',       gunaDesc:'Light · Ruksha · Chala (mobile-ascending)',
+    chakra:5,           sattva:'Sattva — illuminated perception',
+    nadi:'Pingala',     nadiDesc:'Sun channel — solar rising intelligence',
+    action:'Elevates Prana · Sharpens Ajna · Bridges body to higher mind',
+    color:'#4ade80',
+  },
+  {
+    pc:10, note:'A#', hz:374.9233,
+    dosha:'Kapha-Pitta',doshaClass:'pitta',
+    desc:'Earth-Fire — Ojas building, deep immunity, reservoir',
+    dhatu:'Shukra',     dhatuDesc:'Reproductive essence — Ojas precursor',
+    mahabhuta:'Jala',   mahabDesc:'Water cooling Fire — Ojas reservoir',
+    rasa:'Madhura',     rasaDesc:'Sweet — builds Ojas, nourishes deep tissues',
+    vayu:'Apana Vayu',  vayuDesc:'Downward — reproductive current, Ojas root',
+    guna:'Snigdha',     gunaDesc:'Oily · Guru · Mridu (soft) — Ojas quality',
+    chakra:6,           sattva:'Sattva — deep reservoir of clarity',
+    nadi:'Ida',         nadiDesc:'Moon channel — receptive, Ojas accumulation',
+    action:'Builds Ojas · Strengthens reproductive tissue · Deepens sleep & recovery',
+    color:'#34d399',
+  },
+  {
+    pc:11, note:'B', hz:397.2174,
+    dosha:'Kapha',      doshaClass:'kapha',
+    desc:'Water-Earth completing — cosmic seed, dissolution, return',
+    dhatu:'Shukra',     dhatuDesc:'Shukra/Artava — seed, final tissue quintessence',
+    mahabhuta:'Prithvi',mahabDesc:'Earth closing the cycle — compost & seed',
+    rasa:'Madhura',     rasaDesc:'Sweet — ultimate nourishment, saturation',
+    vayu:'Apana Vayu',  vayuDesc:'Descending — completion, return to earth',
+    guna:'Mridu',       gunaDesc:'Soft · Sthira · Snigdha — saturation',
+    chakra:6,           sattva:'Tamas → deep Sattva — dissolution to purity',
+    nadi:'Ida',         nadiDesc:'Moon channel — deep rest, seed sleep',
+    action:'Completes cycle · Prepares renewal · Deepens Ojas to cosmic seed',
+    color:'#22d3ee',
+  },
+  {
+    pc:12, note:"C'", hz:420.8372,
+    dosha:'Tridosha',   doshaClass:'tridosha',
+    desc:'Octave return — all three Doshas unified in Prakruti',
+    dhatu:'Ojas',       dhatuDesc:'Ojas-Tejas-Prana unified — the three subtle essences',
+    mahabhuta:'All',    mahabDesc:'Five elements in perfect proportion — Panchamahabhuta',
+    rasa:'Samana',      rasaDesc:'Balanced — all six Rasas in harmony',
+    vayu:'All Vayus',   vayuDesc:'Five Vayus unified — Prana at octave completion',
+    guna:'Sattvic',     gunaDesc:'Pure Sattva — all Gunas balanced',
+    chakra:6,           sattva:'Pure Sattva — Prakruti, original nature',
+    nadi:'Sushumna',    nadiDesc:'Central channel — full Sushumna awakening',
+    action:'Full system integration · Prakruti restoration · Samadhi support',
+    color:'#67e8f9',
+  },
+];
+
+// Chakra data
+const CHAKRAS = [
+  { name:'Muladhara', en:'Root',        color:'#ef4444', hz:'C  210 Hz' },
+  { name:'Svadhisthana',en:'Sacral',    color:'#f97316', hz:'D  236 Hz' },
+  { name:'Manipura',  en:'Solar Plexus',color:'#facc15', hz:'E  265 Hz' },
+  { name:'Anahata',   en:'Heart',       color:'#4ade80', hz:'F# 298 Hz · Zero Point' },
+  { name:'Vishuddha', en:'Throat',      color:'#60a5fa', hz:'G  315 Hz' },
+  { name:'Ajna',      en:'Third Eye',   color:'#818cf8', hz:'A  354 Hz' },
+  { name:'Sahasrara', en:'Crown',       color:'#c084fc', hz:'B/C\' 397–421 Hz' },
+];
+
+// Interval table (from REFERENCE.md §VII)
+const INTERVALS = [
+  { semi:0,  name:'Unison',     cons:true,  sig:'Resonance — same swara, Dosha amplified' },
+  { semi:1,  name:'Minor 2nd',  cons:false, sig:'Adjacent swaras — Vata agitation, tension' },
+  { semi:2,  name:'Major 2nd',  cons:false, sig:'Two semitones — mild Vata movement' },
+  { semi:3,  name:'Minor 3rd',  cons:true,  sig:'Centripetal Kapha interval 6:5 (REFERENCE.md §VII)' },
+  { semi:4,  name:'Major 3rd',  cons:true,  sig:'Pitta harmony — metabolic clarity' },
+  { semi:5,  name:'Perfect 4th',cons:true,  sig:'Samana Vayu stabiliser — digestive balance' },
+  { semi:6,  name:'Tritone',    cons:false, sig:'Zero Point F# axis — Tridosha liminal gate' },
+  { semi:7,  name:'Perfect 5th',cons:true,  sig:'Most stable — Prana–Apana axis 3:2' },
+  { semi:8,  name:'Minor 6th',  cons:true,  sig:'8:13 phi interval — Ophiuchus Ojas activation' },
+  { semi:9,  name:'Major 6th',  cons:true,  sig:'Vata-Pitta consonance — ascending clarity' },
+  { semi:10, name:'Minor 7th',  cons:false, sig:'Vata tension — Udana Vayu agitation' },
+  { semi:11, name:'Major 7th',  cons:false, sig:'Leading tone — Pitta sharpness, seeking resolution' },
+];
+
+// Geometry: pitch class → polygon (same as file 7)
+const NOTE_GEOMETRY = [
+  { pc:0,  sides:3,  name:'Triangle',       color:'#60a5fa' },
+  { pc:1,  sides:4,  name:'Square',         color:'#818cf8' },
+  { pc:2,  sides:5,  name:'Pentagon',       color:'#a78bfa' },
+  { pc:3,  sides:6,  name:'Hexagon',        color:'#c084fc' },
+  { pc:4,  sides:7,  name:'Heptagon',       color:'#e879f9' },
+  { pc:5,  sides:8,  name:'Octagon',        color:'#f472b6' },
+  { pc:6,  sides:0,  name:'Zero Point Star',color:'#facc15' },
+  { pc:7,  sides:9,  name:'Nonagon',        color:'#fb923c' },
+  { pc:8,  sides:10, name:'Decagon',        color:'#36D9B8' },
+  { pc:9,  sides:11, name:'Hendecagon',     color:'#4ade80' },
+  { pc:10, sides:12, name:'Dodecagon',      color:'#34d399' },
+  { pc:11, sides:13, name:'Triskaidecagon', color:'#22d3ee' },
+];
+
+// Today's lunar pc (for interval calc)
+function todayLunarPc() {
+  const ANCHOR = new Date('2000-07-26');
+  const elapsed = Math.floor((new Date() - ANCHOR) / 86400000);
+  return Math.min(Math.floor((elapsed % 364) / 28), 12);
+}
+const TODAY_LUNAR_PC = todayLunarPc();
+
+// ─── PITCH HELPERS ────────────────────────────────────────────────────────────
+function freqToNearest432(freq) {
+  if (freq <= 0) return null;
+  const n_raw     = 12 * Math.log2(freq / ROOT_432);
+  const n         = Math.round(n_raw);
+  const pc        = ((n % 12) + 12) % 12;
+  const targetFreq = ROOT_432 * Math.pow(2, n / 12);
+  const cents     = 1200 * Math.log2(freq / targetFreq);
+  const octave    = Math.floor(n / 12) + 4;
+  return { n, pc, noteName: NOTE_NAMES[pc], octave, targetFreq, cents };
+}
+function parabolicPeak(data, k) {
+  if (k <= 0 || k >= data.length - 1) return k;
+  const y1=data[k-1], y2=data[k], y3=data[k+1];
+  const d=2*y2-y1-y3; return d===0?k:k+(y3-y1)/(2*d);
+}
+
+// ─── AYURVEDA PANEL ───────────────────────────────────────────────────────────
+function renderAyurveda(pc) {
+  const a = AYUR[pc];
+  const c = a.color;
+
+  // Dosha badge
+  document.getElementById('doshaBadge').innerHTML =
+    `<span class="dosha-badge ${a.doshaClass}">${a.dosha}</span>`;
+  document.getElementById('doshaDesc').textContent = a.desc;
+
+  // Prana bar
+  const pranaLevel = [0.7,0.55,0.65,0.8,0.75,0.85,1.0,0.9,1.0,0.85,0.7,0.6,1.0][pc];
+  const pranaColor = a.doshaClass==='vata'?'#a78bfa':a.doshaClass==='pitta'?'#fb923c':a.doshaClass==='kapha'?'#4ade80':'#facc15';
+  document.getElementById('pranaFill').style.width  = (pranaLevel*100)+'%';
+  document.getElementById('pranaFill').style.background = pranaColor;
+  document.getElementById('pranaLabel').textContent = `${a.vayu}  —  ${a.vayuDesc}`;
+
+  // Grid
+  const items = [
+    { label:'Dhatu',     val:a.dhatu,     sub:a.dhatuDesc },
+    { label:'Mahabhuta', val:a.mahabhuta, sub:a.mahabDesc },
+    { label:'Rasa',      val:a.rasa,      sub:a.rasaDesc  },
+    { label:'Guna',      val:a.guna,      sub:a.gunaDesc  },
+    { label:'Nadi',      val:a.nadi,      sub:a.nadiDesc  },
+    { label:'Sattva',    val:a.sattva.split('—')[0].trim(), sub:a.sattva },
+    { label:'Vayu',      val:a.vayu,      sub:a.vayuDesc  },
+    { label:'Healing Action', val:a.action.split('·')[0].trim(), sub:a.action },
+  ];
+  document.getElementById('ayurGrid').innerHTML = items.map(it => `
+    <div class="a-item">
+      <span class="a-label">${it.label}</span>
+      <span class="a-val" style="color:${c}">${it.val}</span>
+      <span class="a-sub">${it.sub}</span>
+    </div>
+  `).join('');
+
+  // Chakra row
+  const activeChakra = a.chakra;
+  document.getElementById('chakraRow').innerHTML = CHAKRAS.map((ch,i) => `
+    <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid ${i===activeChakra?ch.color:'#141410'};background:${i===activeChakra?'#0a0a10':'transparent'};transition:all .3s">
+      <div class="chakra-dot ${i===activeChakra?'active':''}" style="background:${i===activeChakra?ch.color:'transparent'};border-color:${ch.color}"></div>
+      <div>
+        <div style="font-size:.75em;color:${i===activeChakra?ch.color:'#333322'}">${ch.name}</div>
+        <div style="font-size:.6em;color:#222210">${ch.hz}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderInterval(pc) {
+  const semi = ((pc - TODAY_LUNAR_PC) + 12) % 12;
+  const iv   = INTERVALS[semi];
+  document.getElementById('intervalRow').innerHTML = `
+    <span class="int-badge ${iv.cons?'consonant':'dissonant'}">${iv.name}</span>
+    <span class="int-badge">${semi} st</span>
+    <span class="int-badge">${iv.cons?'consonant':'dissonant'}</span>
+  `;
+  document.getElementById('intervalDesc').textContent = iv.sig;
+}
+
+// ─── GEOMETRY ENGINE (identical to file 7) ───────────────────────────────────
+const geoCanvas = document.getElementById('geoCanvas');
+const geoCtx    = geoCanvas.getContext('2d');
+let geoAngle=0, geoAlpha=0, prevPc=-1, morphR=[];
+
+function resizeGeo() {
+  const r=geoCanvas.parentElement.getBoundingClientRect();
+  geoCanvas.width=Math.floor(r.width-32); geoCanvas.height=320;
+}
+resizeGeo(); window.addEventListener('resize',resizeGeo);
+
+function hexAlpha(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a.toFixed(3)})`;
+}
+
+function drawGeometry(pc, cents, ampNorm) {
+  const W=geoCanvas.width,H=geoCanvas.height,CX=W/2,CY=H/2;
+  const geo=NOTE_GEOMETRY[pc];
+  const maxR=Math.min(W,H)*0.36;
+  const R=maxR*(0.45+ampNorm*0.55);
+  geoAlpha+=(ampNorm>0.04?1:-geoAlpha)*0.07;
+  geoAlpha=Math.max(0,Math.min(1,geoAlpha));
+  if(pc!==prevPc){const s=geo.sides||12;morphR=Array.from({length:s},()=>0);prevPc=pc;}
+  const detuneAmt=Math.abs(cents)/50;
+  if(geo.sides>0) morphR=morphR.map(r=>{const t=(Math.random()-0.5)*2*detuneAmt*0.4;return r+(t-r)*0.1;});
+  geoAngle+=0.003+detuneAmt*0.012;
+  geoCtx.fillStyle='rgba(5,5,8,0.22)'; geoCtx.fillRect(0,0,W,H);
+  if(geoAlpha<0.02) return;
+  const color=geo.color,al=geoAlpha;
+  const glow=geoCtx.createRadialGradient(CX,CY,0,CX,CY,R*1.3);
+  glow.addColorStop(0,hexAlpha(color,0.09*al)); glow.addColorStop(0.6,hexAlpha(color,0.04*al)); glow.addColorStop(1,'transparent');
+  geoCtx.fillStyle=glow; geoCtx.beginPath(); geoCtx.arc(CX,CY,R*1.3,0,Math.PI*2); geoCtx.fill();
+  if(geo.sides===0){
+    for(let ring=0;ring<2;ring++){
+      const rot=ring===0?geoAngle:-geoAngle*0.618;
+      for(let s=0;s<2;s++){
+        const off=s*(Math.PI/6)*(1+detuneAmt*0.3);
+        geoCtx.beginPath();
+        for(let i=0;i<6;i++){const a=rot+off+(i/6)*Math.PI*2,r=R*(ring===0?1:0.618);i===0?geoCtx.moveTo(CX+r*Math.cos(a),CY+r*Math.sin(a)):geoCtx.lineTo(CX+r*Math.cos(a),CY+r*Math.sin(a));}
+        geoCtx.closePath(); geoCtx.strokeStyle=hexAlpha(color,(ring===0?0.9:0.5)*al); geoCtx.lineWidth=ring===0?1.5:1; geoCtx.stroke();
+      }
+    }
+    geoCtx.fillStyle=hexAlpha(color,0.5*al); geoCtx.font='11px Courier New'; geoCtx.textAlign='center'; geoCtx.fillText('× √2',CX,CY+5); geoCtx.textAlign='left';
+  } else {
+    const S=geo.sides;
+    geoCtx.beginPath();
+    for(let i=0;i<S;i++){const a=geoAngle+(i/S)*Math.PI*2-Math.PI/2,r=R*(1+morphR[i]);i===0?geoCtx.moveTo(CX+r*Math.cos(a),CY+r*Math.sin(a)):geoCtx.lineTo(CX+r*Math.cos(a),CY+r*Math.sin(a));}
+    geoCtx.closePath(); geoCtx.strokeStyle=hexAlpha(color,0.85*al); geoCtx.lineWidth=1.5; geoCtx.stroke();
+    const iR=R*0.5;
+    geoCtx.beginPath();
+    for(let i=0;i<S;i++){const a=-geoAngle*0.7+(i/S)*Math.PI*2-Math.PI/2,r=iR*(1+(morphR[i]||0)*0.5);i===0?geoCtx.moveTo(CX+r*Math.cos(a),CY+r*Math.sin(a)):geoCtx.lineTo(CX+r*Math.cos(a),CY+r*Math.sin(a));}
+    geoCtx.closePath(); geoCtx.strokeStyle=hexAlpha(color,0.3*al); geoCtx.lineWidth=0.8; geoCtx.stroke();
+    for(let i=0;i<S;i++){
+      const ao=geoAngle+(i/S)*Math.PI*2-Math.PI/2,ai=-geoAngle*0.7+(i/S)*Math.PI*2-Math.PI/2;
+      geoCtx.beginPath(); geoCtx.moveTo(CX+R*(1+morphR[i])*Math.cos(ao),CY+R*(1+morphR[i])*Math.sin(ao)); geoCtx.lineTo(CX+iR*(1+(morphR[i]||0)*0.5)*Math.cos(ai),CY+iR*(1+(morphR[i]||0)*0.5)*Math.sin(ai));
+      geoCtx.strokeStyle=hexAlpha(color,0.12*al); geoCtx.lineWidth=0.5; geoCtx.stroke();
+    }
+    geoCtx.beginPath(); geoCtx.arc(CX,CY,3,0,Math.PI*2); geoCtx.fillStyle=hexAlpha(color,0.6*al); geoCtx.fill();
+  }
+  if(ampNorm>0.04){
+    const ringR=R*1.15;
+    geoCtx.beginPath(); geoCtx.arc(CX,CY,ringR,-Math.PI/2,-Math.PI/2+(cents/50)*Math.PI,cents<0);
+    const cColor=Math.abs(cents)<5?'#4ade80':Math.abs(cents)<20?'#facc15':'#f87171';
+    geoCtx.strokeStyle=hexAlpha(cColor,0.7*al); geoCtx.lineWidth=2; geoCtx.stroke();
+  }
+}
+
+// ─── SPECTRUM ─────────────────────────────────────────────────────────────────
+const specCanvas=document.getElementById('spectrum'),specCtx=specCanvas.getContext('2d');
+const FREQ_MIN=30,FREQ_MAX=500,FFT_SIZE=4096,SAMPLE_RATE=48000,BIN_HZ=SAMPLE_RATE/FFT_SIZE;
+function freqToX(f,w){return w*Math.log2(f/FREQ_MIN)/Math.log2(FREQ_MAX/FREQ_MIN);}
+const MARKERS=(()=>{const m=[];for(let n=-36;n<=6;n++){const f=ROOT_432*Math.pow(2,n/12);if(f>=FREQ_MIN&&f<=FREQ_MAX){const pc=((n%12)+12)%12;m.push({f,name:NOTE_NAMES[pc]});}}return m;})();
+function resizeSpec(){const r=specCanvas.parentElement.getBoundingClientRect();specCanvas.width=Math.floor(r.width-32);specCanvas.height=100;}
+resizeSpec(); window.addEventListener('resize',resizeSpec);
+function drawSpectrum(dataArray,analyser,detFreq){
+  const W=specCanvas.width,H=specCanvas.height;
+  specCtx.clearRect(0,0,W,H); specCtx.fillStyle='#050508'; specCtx.fillRect(0,0,W,H);
+  for(const m of MARKERS){const x=freqToX(m.f,W);specCtx.strokeStyle=m.name==='C'?'#1a1a18':m.name==='F#'?'#1a1008':'#0d0d08';specCtx.lineWidth=m.name==='C'||m.name==='F#'?1:0.5;specCtx.beginPath();specCtx.moveTo(x,0);specCtx.lineTo(x,H-12);specCtx.stroke();if(m.name==='C'||m.name==='F#'||m.name==='A'){specCtx.fillStyle=m.name==='C'?'#222220':m.name==='F#'?'#201808':'#102010';specCtx.font='8px Courier New';specCtx.fillText(m.name,x+2,H-2);}}
+  const grad=specCtx.createLinearGradient(0,0,0,H-14);
+  grad.addColorStop(0,'#fb923c');grad.addColorStop(0.5,'#facc15');grad.addColorStop(1,'#1a1408');
+  specCtx.fillStyle=grad;
+  for(let i=1;i<dataArray.length;i++){const f=i*BIN_HZ;if(f<FREQ_MIN||f>FREQ_MAX)continue;const x1=freqToX(f,W),x0=freqToX((i-1)*BIN_HZ||FREQ_MIN,W);const normH=Math.max(0,(dataArray[i]-analyser.minDecibels)/(analyser.maxDecibels-analyser.minDecibels));specCtx.fillRect(x0,H-14-normH*(H-14),Math.max(x1-x0,1),normH*(H-14));}
+  if(detFreq>FREQ_MIN&&detFreq<FREQ_MAX){const x=freqToX(detFreq,W);specCtx.strokeStyle='#facc15';specCtx.lineWidth=1.5;specCtx.setLineDash([3,3]);specCtx.beginPath();specCtx.moveTo(x,0);specCtx.lineTo(x,H-12);specCtx.stroke();specCtx.setLineDash([]);}
+}
+
+// ─── WEB AUDIO ────────────────────────────────────────────────────────────────
+let ctx,analyser,dataArray,animId;
+window.startAudio=async function(){
+  const btn=document.getElementById('startBtn');
+  if(ctx){ctx.close();ctx=null;cancelAnimationFrame(animId);btn.textContent='▶ START MIC INPUT';btn.classList.remove('active');return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    ctx=new AudioContext({sampleRate:SAMPLE_RATE});
+    analyser=ctx.createAnalyser();
+    analyser.fftSize=FFT_SIZE;analyser.smoothingTimeConstant=0.78;analyser.minDecibels=-90;analyser.maxDecibels=-10;
+    ctx.createMediaStreamSource(stream).connect(analyser);
+    dataArray=new Float32Array(analyser.frequencyBinCount);
+    btn.textContent='■ STOP';btn.classList.add('active');
+    loop();
+  }catch(e){btn.textContent='MIC ERROR — '+e.message;}
+};
+
+// ─── MAIN LOOP ────────────────────────────────────────────────────────────────
+const elHz=document.getElementById('detHz'),elNote=document.getElementById('detNote'),elSig=document.getElementById('sigLevel');
+const elCents=document.getElementById('centsVal'),elFill=document.getElementById('meterFill');
+const elGeoLbl=document.getElementById('geoLabel');
+const THRESH_DB=-55;
+let lastPc=0;
+
+function loop(){
+  animId=requestAnimationFrame(loop);
+  if(!dataArray)return;
+  analyser.getFloatFrequencyData(dataArray);
+  const binMin=Math.ceil(FREQ_MIN/BIN_HZ),binMax=Math.floor(FREQ_MAX/BIN_HZ);
+  let peakBin=binMin,peakVal=-Infinity;
+  for(let i=binMin;i<=binMax;i++)if(dataArray[i]>peakVal){peakVal=dataArray[i];peakBin=i;}
+  elSig.textContent=`Signal: ${peakVal.toFixed(1)} dB`;
+  let detFreq=0;
+  if(peakVal>THRESH_DB){
+    detFreq=parabolicPeak(dataArray,peakBin)*BIN_HZ;
+    const r=freqToNearest432(detFreq);
+    elHz.textContent=detFreq.toFixed(2)+' Hz';elHz.className='';
+    elNote.textContent=`${r.noteName}${r.octave}  ·  n=${r.n>=0?'+':''}${r.n}`;
+    const c=r.cents;
+    elCents.textContent=`${c>=0?'+':''}${c.toFixed(1)} ¢`;
+    elCents.style.color=Math.abs(c)<5?'#4ade80':Math.abs(c)<20?'#facc15':'#f87171';
+    const pct=Math.max(0,Math.min(100,50+c));
+    elFill.style.left=(pct<50?pct:'50')+'%';elFill.style.width=Math.abs(pct-50)+'%';
+    elFill.style.background=Math.abs(c)<5?'#4ade80':Math.abs(c)<20?'#facc15':'#f87171';
+    const ampNorm=Math.max(0,Math.min(1,(peakVal-analyser.minDecibels)/(analyser.maxDecibels-analyser.minDecibels)));
+    drawGeometry(r.pc,c,ampNorm);
+    if(r.pc!==lastPc){renderAyurveda(r.pc);renderInterval(r.pc);lastPc=r.pc;}
+    const a=AYUR[r.pc],geo=NOTE_GEOMETRY[r.pc];
+    elGeoLbl.textContent=`${a.note}  ·  ${geo.name}  ·  ${a.dosha}  ·  ${Math.abs(c)<5?'✦ IN TUNE':c.toFixed(1)+'¢'}`;
+    elGeoLbl.style.color=a.color;
+  } else {
+    elHz.textContent='— Hz';elHz.className='weak';elNote.textContent='No signal above threshold';
+    elCents.textContent='— ¢';elCents.style.color='#333322';elFill.style.width='0';
+    drawGeometry(lastPc,0,0);
+    elGeoLbl.textContent='awaiting signal';elGeoLbl.style.color='#333322';
+  }
+  drawSpectrum(dataArray,analyser,detFreq);
+}
+
+renderAyurveda(0);
+renderInterval(0);
+</script>
+</body>
+</html>

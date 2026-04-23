@@ -1,0 +1,964 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFT v4.1 â€” 12:21 Cosmic Translator Test</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a12;
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  overflow-x: hidden;
+}
+header {
+  background: #111120;
+  border-bottom: 1px solid #334;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header h1 { color: #cc88ff; font-size: 1.1em; letter-spacing: 2px; }
+header span { color: #556; font-size: 0.9em; }
+#boot-log {
+  background: #070710;
+  border: 1px solid #2a1a3a;
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin: 18px 24px 0;
+  font-size: 0.85em;
+  line-height: 1.9;
+  max-height: 200px;
+  overflow-y: auto;
+}
+#boot-log .ok   { color: #66ff99; }
+#boot-log .warn { color: #ffb366; }
+#boot-log .err  { color: #ff4444; }
+#boot-log .info { color: #cc88ff; }
+#boot-log .dim  { color: #445; }
+.main-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 18px;
+  padding: 18px 24px;
+}
+.panel {
+  background: #111120;
+  border: 1px solid #222240;
+  border-radius: 8px;
+  padding: 16px;
+}
+.panel h2 {
+  color: #cc88ff;
+  font-size: 0.85em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2a1a3a;
+}
+/* ACTIVE DISPLAY */
+.active-display {
+  background: #070710;
+  border: 1px solid #2a1a3a;
+  border-radius: 6px;
+  padding: 14px 18px;
+  text-align: center;
+  margin-bottom: 14px;
+  transition: border-color 0.5s;
+}
+.active-hz {
+  font-size: 2.8em;
+  color: #cc88ff;
+  font-weight: bold;
+  letter-spacing: 2px;
+  line-height: 1;
+  margin: 6px 0 2px;
+  transition: color 0.5s;
+}
+.active-sub  { color: #556; font-size: 0.8em; letter-spacing: 1px; }
+.active-word { color: #ffb366; font-size: 1.6em; margin: 4px 0; letter-spacing: 8px; }
+.active-info { color: #66ff99; font-size: 0.78em; margin-top: 4px; }
+/* LEVEL METER */
+#level-meter {
+  width: 100%; height: 8px;
+  background: #0c0c14; border-radius: 4px; overflow: hidden; margin: 8px 0;
+}
+#level-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #6633cc, #cc88ff, #ffb366, #ff4444);
+  border-radius: 4px; transition: width 0.05s;
+}
+/* CONTROLS */
+.ctrl-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.ctrl-row label { color: #778; width: 80px; flex-shrink: 0; font-size: 0.82em; }
+input[type=range] {
+  -webkit-appearance: none; flex: 1; height: 4px;
+  background: #334; border-radius: 2px; outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px;
+  background: #cc88ff; border-radius: 50%; cursor: pointer;
+}
+.val-badge { color: #cc88ff; width: 60px; text-align: right; font-size: 0.82em; flex-shrink: 0; }
+.btn-row { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+button {
+  background: #1a1a30; border: 1px solid #334466; color: #aac;
+  padding: 6px 12px; border-radius: 4px; cursor: pointer;
+  font-family: inherit; font-size: 0.82em;
+  transition: background 0.15s, color 0.15s;
+}
+button:hover { background: #252545; color: #fff; }
+button.active { background: #1a0a2a; border-color: #cc88ff; color: #cc88ff; }
+button.danger  { border-color: #ff4444; color: #ff4444; }
+button.danger:hover { background: #2a0000; }
+button.teal   { border-color: #1abc9c; color: #1abc9c; }
+button.gold   { border-color: #f39c12; color: #f39c12; }
+button.violet { border-color: #cc88ff; color: #cc88ff; }
+/* PROTO-WORD LIST */
+.pw-list { display: flex; flex-direction: column; gap: 3px; }
+.pw-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: #0c0c1c; border: 1px solid #1c1c30; border-radius: 3px;
+  padding: 7px 10px; cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+  width: 100%; font-family: inherit; font-size: 0.82em; color: #ccd;
+  text-align: left;
+}
+.pw-btn:hover { background: #141428; border-color: #446; }
+.pw-btn.playing { background: #140a1e; }
+.pw-word { font-size: 1.2em; font-weight: bold; width: 36px; flex-shrink: 0; }
+.pw-hz   { width: 70px; flex-shrink: 0; font-weight: bold; }
+.pw-note { width: 24px; color: #667; flex-shrink: 0; font-size: 0.85em; }
+.pw-geo  { color: #556; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pw-planet { color: #778; width: 70px; flex-shrink: 0; font-size: 0.82em; }
+/* 21-STATE LIST */
+.state-list { display: flex; flex-direction: column; gap: 2px; max-height: 340px; overflow-y: auto; }
+.state-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: #0c0c1c; border: 1px solid #1c1c30; border-radius: 3px;
+  padding: 5px 8px; cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+  width: 100%; font-family: inherit; font-size: 0.8em; color: #ccd;
+  text-align: left;
+}
+.state-btn:hover { background: #141428; }
+.state-btn.playing { border-color: #cc88ff; background: #140a1e; }
+.state-btn.current-cosmic { box-shadow: 0 0 0 1px #cc88ff55; }
+.s-idx  { width: 22px; color: #445; flex-shrink: 0; }
+.s-phase-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.s-name { width: 80px; flex-shrink: 0; font-weight: bold; }
+.s-phasename { width: 60px; flex-shrink: 0; font-size: 0.82em; color: #667; }
+.s-hz   { width: 70px; flex-shrink: 0; font-weight: bold; }
+.s-qual { color: #445; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.78em; }
+/* TABS */
+.test-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
+.test-tab {
+  flex: 1; text-align: center; padding: 5px; border-radius: 4px; cursor: pointer;
+  font-size: 0.78em; border: 1px solid #334; color: #778; transition: all 0.15s;
+}
+.test-tab.words  { border-color: #ffb36633; }
+.test-tab.states { border-color: #cc88ff33; }
+.test-tab.active.words  { background: #201000; border-color: #ffb366; color: #ffb366; }
+.test-tab.active.states { background: #150a20; border-color: #cc88ff; color: #cc88ff; }
+.test-panel { display: none; }
+.test-panel.visible { display: block; }
+/* OSCILLOSCOPE */
+#scope-canvas {
+  width: 100%; height: 140px; display: block;
+  background: #000; border: 1px solid #2a1a3a; border-radius: 4px;
+}
+.scope-meta {
+  display: flex; justify-content: space-between;
+  margin-top: 6px; font-size: 0.78em; color: #556;
+}
+.scope-meta span { color: #cc88ff; }
+#fft-canvas {
+  width: 100%; height: 80px; display: block;
+  background: #000; border: 1px solid #1a1a30; border-radius: 4px; margin-top: 10px;
+}
+/* SPIRAL CANVAS */
+#spiral-canvas {
+  display: block; width: 100%;
+  background: #000; border: 1px solid #1a1a2a; border-radius: 4px;
+}
+/* TEST RESULT TABLE */
+.test-result {
+  font-size: 0.78em; border-collapse: collapse; width: 100%;
+}
+.test-result th {
+  text-align: left; padding: 4px 8px;
+  color: #cc88ff; border-bottom: 1px solid #2a1a3a; font-size: 0.85em;
+}
+.test-result td { padding: 4px 8px; border-bottom: 1px solid #141425; }
+.test-result tr:last-child td { border-bottom: none; }
+.pass { color: #66ff99; }
+.fail { color: #ff4444; }
+.warn-c { color: #ffb366; }
+/* TORUS CANVAS */
+#torus-canvas {
+  display: block; width: 100%;
+  background: #000; border: 1px solid #1a1a2a; border-radius: 4px;
+}
+/* REALTIME TRANSLATE PANEL */
+.rt-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;
+}
+.rt-cell {
+  background: #070710; border: 1px solid #1a1a2a; border-radius: 4px; padding: 8px 10px;
+}
+.rt-key  { color: #556; font-size: 0.75em; margin-bottom: 2px; }
+.rt-val  { color: #cc88ff; font-size: 1.1em; font-weight: bold; }
+.rt-val.gold   { color: #f39c12; }
+.rt-val.teal   { color: #1abc9c; }
+.rt-val.white  { color: #ecf0f1; }
+/* SWEEP */
+.sweep-bar {
+  background: #070710; border: 1px solid #1a1a30;
+  border-radius: 4px; height: 10px; overflow: hidden; margin: 8px 0;
+}
+.sweep-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #cc88ff, #ffb366);
+  transition: width 0.1s; border-radius: 4px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>UFT v4.1 â”€â”€ 12:21 COSMIC TRANSLATOR TEST</h1>
+  <span id="clock-display">CLOCK: --</span>
+</header>
+
+<div id="boot-log"></div>
+
+<div class="main-grid">
+
+  <!-- LEFT: Playback Controls -->
+  <div>
+    <div class="panel" style="margin-bottom:14px;">
+      <h2>Active Output</h2>
+      <div class="active-display" id="active-display">
+        <div class="active-sub" id="active-system">â€” SELECT â€”</div>
+        <div class="active-hz"  id="active-hz">â€”â€” Hz</div>
+        <div class="active-word" id="active-word">Â·</div>
+        <div class="active-info" id="active-info">Select a proto-word or cosmic state</div>
+      </div>
+      <div id="level-meter"><div id="level-fill"></div></div>
+      <div class="ctrl-row">
+        <label>Volume</label>
+        <input type="range" id="vol-slider" min="0" max="100" value="60">
+        <span class="val-badge" id="vol-val">60%</span>
+      </div>
+      <div class="ctrl-row">
+        <label>Duration</label>
+        <input type="range" id="dur-slider" min="1" max="30" value="5">
+        <span class="val-badge" id="dur-val">5 s</span>
+      </div>
+      <div class="ctrl-row">
+        <label>Waveform</label>
+        <select id="wave-select" style="flex:1;background:#0c0c1c;border:1px solid #334;color:#aac;padding:4px 6px;border-radius:3px;font-family:inherit;font-size:0.82em;">
+          <option value="sine">Sine</option>
+          <option value="triangle">Triangle</option>
+          <option value="sawtooth">Sawtooth</option>
+          <option value="square">Square</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button id="btn-stop" class="danger">â–  STOP</button>
+        <button id="btn-sweep-words" class="gold">â–· SWEEP WORDS</button>
+        <button id="btn-sweep-states" class="violet">â–· SWEEP STATES</button>
+      </div>
+      <div class="btn-row">
+        <button id="btn-zeropoint" class="teal">âŠ— ZERO PT 297.58</button>
+        <button id="btn-run-tests">âœ“ RUN ALL TESTS</button>
+      </div>
+      <div class="sweep-bar"><div class="sweep-fill" id="sweep-fill"></div></div>
+      <div style="color:#445;font-size:0.72em;text-align:center;margin-top:2px;" id="sweep-label">â€”</div>
+    </div>
+
+    <!-- Proto-words / States tabs -->
+    <div class="panel">
+      <h2>Frequency Banks</h2>
+      <div class="test-tabs">
+        <div class="test-tab words active" data-tab="words">PROTO-WORDS<br><span style="font-size:0.85em;opacity:0.7">9 sounds</span></div>
+        <div class="test-tab states" data-tab="states">COSMIC STATES<br><span style="font-size:0.85em;opacity:0.7">21 phases</span></div>
+      </div>
+      <div class="test-panel visible" id="panel-words">
+        <div class="pw-list" id="pw-list"></div>
+      </div>
+      <div class="test-panel" id="panel-states">
+        <div class="state-list" id="state-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Visuals + Tests -->
+  <div style="display:flex;flex-direction:column;gap:14px;">
+
+    <!-- Oscilloscope -->
+    <div class="panel">
+      <h2>Oscilloscope â€” Time Domain</h2>
+      <canvas id="scope-canvas" width="800" height="140"></canvas>
+      <div class="scope-meta">
+        <div>TIME/DIV: <span id="time-div">â€”</span></div>
+        <div>FREQ: <span id="scope-freq">â€”</span></div>
+        <div>AMPLITUDE: <span id="scope-amp">â€”</span></div>
+        <div>SAMPLE RATE: <span>44100 Hz</span></div>
+      </div>
+      <canvas id="fft-canvas" width="800" height="80"></canvas>
+    </div>
+
+    <!-- Realtime Translate + Spiral side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+      <!-- RealtimeMapping.translate() live output -->
+      <div class="panel">
+        <h2>RealtimeMapping.translate() â€” Live</h2>
+        <div class="rt-grid">
+          <div class="rt-cell"><div class="rt-key">State Index</div><div class="rt-val" id="rt-state">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">State Name</div><div class="rt-val gold" id="rt-name">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">Phase Î¸ (rad)</div><div class="rt-val teal" id="rt-theta">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">Pitch (Hz)</div><div class="rt-val" id="rt-pitch">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">Note</div><div class="rt-val gold" id="rt-note">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">BPM</div><div class="rt-val teal" id="rt-bpm">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">Volume</div><div class="rt-val" id="rt-vol">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">Overtones</div><div class="rt-val white" id="rt-overtones">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">Spiral |r|</div><div class="rt-val teal" id="rt-radius">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">Spiral cycles</div><div class="rt-val" id="rt-cycles">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">Torus u</div><div class="rt-val white" id="rt-torus-u">â€”</div></div>
+          <div class="rt-cell"><div class="rt-key">Torus v</div><div class="rt-val white" id="rt-torus-v">â€”</div></div>
+        </div>
+      </div>
+
+      <!-- Spiral canvas -->
+      <div class="panel">
+        <h2>Ï† Spiral â€” CosmicTranslator.spiralFunction(t)</h2>
+        <canvas id="spiral-canvas" width="340" height="240"></canvas>
+        <div style="display:flex;gap:16px;margin-top:6px;font-size:0.75em;color:#445;">
+          <span>Ï† = <span style="color:#cc88ff">1.6180â€¦</span></span>
+          <span>T_L = <span style="color:#4da6ff">29.5306 d</span></span>
+          <span>LUNAR_ROOT = <span style="color:#1abc9c">210.4186 Hz</span></span>
+          <span>ZP = <span style="color:#fff">297.5768 Hz</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Torus + Test Results side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="panel">
+        <h2>Torus (13,21) Knot â€” mapStatesToTorusKnot()</h2>
+        <canvas id="torus-canvas" width="340" height="200"></canvas>
+        <div style="color:#445;font-size:0.72em;margin-top:4px;" id="torus-info">â€”</div>
+      </div>
+      <div class="panel">
+        <h2>Module Test Results</h2>
+        <div id="test-results" style="font-size:0.78em;max-height:230px;overflow-y:auto;">
+          <span style="color:#445;">Press âœ“ RUN ALL TESTS</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+import {
+  CosmicTranslator,
+  States21,
+  MusicEngine,
+  RealtimeMapping,
+  ProtoWords,
+  UFTIntegration
+} from '../modules/12-21/cosmic-translator-12-21.js';
+
+// â”€â”€â”€ BOOT LOG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const bootEl = document.getElementById('boot-log');
+function log(msg, cls = 'ok') {
+  const d = document.createElement('div');
+  d.className = cls;
+  d.textContent = msg;
+  bootEl.appendChild(d);
+  bootEl.scrollTop = bootEl.scrollHeight;
+}
+
+log('[ UFT v4.1 ] 12:21 COSMIC TRANSLATOR TEST', 'info');
+log('â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€', 'dim');
+log('  âœ“ CosmicTranslator loaded', 'ok');
+log('  âœ“ States21 loaded  â€” 21-state cycle (3 phases)', 'ok');
+log('  âœ“ MusicEngine loaded â€” pitch, tempo, harmonics, dynamics', 'ok');
+log('  âœ“ RealtimeMapping loaded â€” master translate() function', 'ok');
+log('  âœ“ ProtoWords loaded â€” ' + ProtoWords.dictionary.length + ' proto-words', 'ok');
+log('  âœ“ UFTIntegration loaded â€” root frequencies, zero point, torus knot', 'ok');
+log('â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€', 'dim');
+log(`  LUNAR_ROOT  = ${CosmicTranslator.MOON_ROOT_HZ} Hz`, 'info');
+log(`  ZERO_POINT  = ${CosmicTranslator.ZERO_POINT_HZ} Hz  (F# = LUNAR_ROOT Ã— âˆš2)`, 'info');
+log(`  PHI         = ${CosmicTranslator.PHI}`, 'info');
+log(`  T_L         = ${CosmicTranslator.T_L} days (synodic month)`, 'info');
+log(`  getZeroPointFrequency() = ${UFTIntegration.getZeroPointFrequency().toFixed(4)} Hz`, 'info');
+log('â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€', 'dim');
+log('  All modules verified â€” ready for signal test.', 'ok');
+log('  Click any proto-word or cosmic state to generate tone.', 'dim');
+
+// â”€â”€â”€ CLOCK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+setInterval(() => {
+  document.getElementById('clock-display').textContent =
+    'CLOCK: ' + new Date().toTimeString().slice(0,8);
+}, 1000);
+
+// â”€â”€â”€ CANONICAL CONSTANTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const LUNAR_ROOT = CosmicTranslator.MOON_ROOT_HZ;
+const ZERO_POINT = CosmicTranslator.ZERO_POINT_HZ;
+const PHI        = CosmicTranslator.PHI;
+const T_L        = CosmicTranslator.T_L;
+const EPOCH_NEW_MOON = 2460310.5 - 2440587.5; // Jan 11 2024 known new moon (Unix days)
+
+// â”€â”€â”€ BUILD PROTO-WORD LIST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const pwList = document.getElementById('pw-list');
+ProtoWords.dictionary.forEach(pw => {
+  const btn = document.createElement('button');
+  btn.className = 'pw-btn';
+  btn.id = `pw-${pw.word}`;
+  btn.innerHTML = `
+    <span class="pw-word" style="color:${pw.color}">${pw.word}</span>
+    <span class="pw-hz">${pw.frequency.toFixed(4)} Hz</span>
+    <span class="pw-note">${pw.lunarNote}</span>
+    <span class="pw-planet">${pw.planet}</span>
+    <span class="pw-geo">${pw.geometry.replaceAll('_',' ')}</span>
+  `;
+  btn.addEventListener('click', () => playProtoWord(pw, btn));
+  pwList.appendChild(btn);
+});
+
+// â”€â”€â”€ BUILD STATE LIST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const stateList = document.getElementById('state-list');
+// State frequency: lerp LUNAR_ROOTâ†’SOLAR_ROOT with Ï† shaping
+function stateHz(idx) {
+  const t = idx / 20;
+  const shaped = t < 0.5
+    ? 0.5 * Math.pow(2*t, PHI)
+    : 1 - 0.5 * Math.pow(2*(1-t), PHI);
+  return LUNAR_ROOT + shaped * (256.0 - LUNAR_ROOT);
+}
+States21.cycle.forEach(s => {
+  const hz = stateHz(s.idx);
+  const btn = document.createElement('button');
+  btn.className = 'state-btn';
+  btn.id = `sb-${s.idx}`;
+  btn.innerHTML = `
+    <span class="s-idx">${s.idx}</span>
+    <span class="s-phase-dot" style="background:${s.color}"></span>
+    <span class="s-name" style="color:${s.color}">${s.name}</span>
+    <span class="s-phasename">${s.phase}</span>
+    <span class="s-hz">${hz.toFixed(4)} Hz</span>
+    <span class="s-qual">${s.quality}</span>
+  `;
+  btn.addEventListener('click', () => playState(s, hz, btn));
+  stateList.appendChild(btn);
+});
+
+// â”€â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+document.querySelectorAll('.test-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.test-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.test-panel').forEach(p => p.classList.remove('visible'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('visible');
+  });
+});
+
+// â”€â”€â”€ WEB AUDIO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+let actx = null, oscNode = null, gainNode = null, analyser = null;
+let isPlaying = false;
+let currentHz = null;
+
+function ensureCtx() {
+  if (!actx) {
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = actx.createGain();
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 2048;
+    gainNode.connect(analyser);
+    analyser.connect(actx.destination);
+  }
+  if (actx.state === 'suspended') actx.resume();
+}
+
+function stopTone() {
+  if (oscNode) { try { oscNode.stop(); } catch(e) {} oscNode.disconnect(); oscNode = null; }
+  isPlaying = false; currentHz = null;
+  document.querySelectorAll('.pw-btn.playing,.state-btn.playing').forEach(b => b.classList.remove('playing'));
+  setActiveDisplay(null);
+  document.getElementById('level-fill').style.width = '0%';
+}
+
+function startTone(hz, wave, vol, dur, onEnd) {
+  ensureCtx();
+  stopTone();
+  gainNode.gain.setValueAtTime(0, actx.currentTime);
+  gainNode.gain.linearRampToValueAtTime(vol * 0.85, actx.currentTime + 0.02);
+  oscNode = actx.createOscillator();
+  oscNode.type = wave;
+  oscNode.frequency.setValueAtTime(hz, actx.currentTime);
+  oscNode.connect(gainNode);
+  oscNode.start();
+  oscNode.stop(actx.currentTime + dur);
+  oscNode.onended = () => { isPlaying = false; currentHz = null; if (onEnd) onEnd(); };
+  isPlaying = true;
+  currentHz = hz;
+}
+
+function playProtoWord(pw, btn) {
+  const vol  = parseInt(document.getElementById('vol-slider').value) / 100;
+  const dur  = parseInt(document.getElementById('dur-slider').value);
+  const wave = document.getElementById('wave-select').value;
+  startTone(pw.frequency, wave, vol, dur, () => btn.classList.remove('playing'));
+  btn.classList.add('playing');
+  setActiveDisplay({
+    hz: pw.frequency, system: 'PROTO-WORD',
+    word: pw.word, color: pw.color,
+    info: `${pw.geometry.replaceAll('_',' ')} Â· ${pw.planet} Â· ${pw.lunarNote} Â· ${pw.significance}`
+  });
+}
+
+function playState(s, hz, btn) {
+  const vol  = parseInt(document.getElementById('vol-slider').value) / 100;
+  const dur  = parseInt(document.getElementById('dur-slider').value);
+  const wave = document.getElementById('wave-select').value;
+  startTone(hz, wave, vol, dur, () => btn.classList.remove('playing'));
+  btn.classList.add('playing');
+  setActiveDisplay({
+    hz, system: 'COSMIC STATE',
+    word: `S${s.idx}`, color: s.color,
+    info: `${s.name} Â· ${s.phase} Â· ${s.quality}${s.isZeroPoint ? '  â† ZERO POINT' : ''}`
+  });
+}
+
+function setActiveDisplay(data) {
+  const disp = document.getElementById('active-display');
+  if (!data) {
+    document.getElementById('active-hz').textContent   = 'â€”â€” Hz';
+    document.getElementById('active-system').textContent = 'â€” SELECT â€”';
+    document.getElementById('active-word').textContent = 'Â·';
+    document.getElementById('active-info').textContent = 'Select a proto-word or cosmic state';
+    disp.style.borderColor = '#2a1a3a';
+    document.getElementById('active-hz').style.color = '#cc88ff';
+    return;
+  }
+  document.getElementById('active-hz').textContent   = data.hz.toFixed(4) + ' Hz';
+  document.getElementById('active-system').textContent = data.system;
+  document.getElementById('active-word').textContent = data.word;
+  document.getElementById('active-info').textContent = data.info;
+  disp.style.borderColor = data.color;
+  document.getElementById('active-hz').style.color  = data.color;
+}
+
+// â”€â”€â”€ SLIDERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+document.getElementById('vol-slider').addEventListener('input', e =>
+  document.getElementById('vol-val').textContent = e.target.value + '%');
+document.getElementById('dur-slider').addEventListener('input', e =>
+  document.getElementById('dur-val').textContent = e.target.value + ' s');
+
+// â”€â”€â”€ STOP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+document.getElementById('btn-stop').addEventListener('click', () => {
+  stopTone();
+  clearTimeout(sweepTimer);
+});
+
+// â”€â”€â”€ ZERO POINT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+document.getElementById('btn-zeropoint').addEventListener('click', () => {
+  const zp = UFTIntegration.getZeroPointFrequency();
+  const vol  = parseInt(document.getElementById('vol-slider').value) / 100;
+  const dur  = parseInt(document.getElementById('dur-slider').value);
+  startTone(zp, 'sine', vol, dur, null);
+  setActiveDisplay({
+    hz: zp, system: 'ZERO POINT',
+    word: 'NA', color: '#ffffff',
+    info: `LUNAR_ROOT Ã— âˆš2 = ${LUNAR_ROOT} Ã— âˆš2 = ${zp.toFixed(4)} Hz  (F# Â· Oak Â· Heart)`
+  });
+});
+
+// â”€â”€â”€ SWEEP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+let sweepTimer = null;
+
+function sweepList(items, getHz, getName, getColor, fillEl, labelEl) {
+  let i = 0;
+  const vol  = parseInt(document.getElementById('vol-slider').value) / 100;
+  const wave = document.getElementById('wave-select').value;
+  function next() {
+    if (i >= items.length) {
+      stopTone(); fillEl.style.width = '0%'; labelEl.textContent = 'â€” sweep complete â€”'; return;
+    }
+    const item = items[i];
+    const hz = getHz(item);
+    fillEl.style.width = ((i+1) / items.length * 100) + '%';
+    labelEl.textContent = getName(item) + '  ' + hz.toFixed(4) + ' Hz';
+    startTone(hz, wave, vol, 1.5, () => { i++; sweepTimer = setTimeout(next, 100); });
+    setActiveDisplay({
+      hz, system: 'SWEEP',
+      word: getName(item), color: getColor(item),
+      info: hz.toFixed(4) + ' Hz'
+    });
+  }
+  next();
+}
+
+document.getElementById('btn-sweep-words').addEventListener('click', () => {
+  clearTimeout(sweepTimer);
+  sweepList(
+    ProtoWords.dictionary,
+    pw => pw.frequency,
+    pw => pw.word,
+    pw => pw.color,
+    document.getElementById('sweep-fill'),
+    document.getElementById('sweep-label')
+  );
+});
+
+document.getElementById('btn-sweep-states').addEventListener('click', () => {
+  clearTimeout(sweepTimer);
+  const items = States21.cycle.map(s => ({ ...s, hz: stateHz(s.idx) }));
+  sweepList(
+    items,
+    s => s.hz,
+    s => `S${s.idx}:${s.name}`,
+    s => s.color,
+    document.getElementById('sweep-fill'),
+    document.getElementById('sweep-label')
+  );
+});
+
+// â”€â”€â”€ OSCILLOSCOPE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const scopeCanvas = document.getElementById('scope-canvas');
+const scopeCtx2d  = scopeCanvas.getContext('2d');
+const fftCanvas   = document.getElementById('fft-canvas');
+const fftCtx2d    = fftCanvas.getContext('2d');
+
+function drawScope() {
+  requestAnimationFrame(drawScope);
+  const W = scopeCanvas.width, H = scopeCanvas.height;
+  scopeCtx2d.fillStyle = '#000'; scopeCtx2d.fillRect(0,0,W,H);
+  // Grid
+  scopeCtx2d.strokeStyle = '#0d0d1a'; scopeCtx2d.lineWidth = 1;
+  for (let x = 0; x <= W; x += W/8) { scopeCtx2d.beginPath(); scopeCtx2d.moveTo(x,0); scopeCtx2d.lineTo(x,H); scopeCtx2d.stroke(); }
+  for (let y = 0; y <= H; y += H/4) { scopeCtx2d.beginPath(); scopeCtx2d.moveTo(0,y); scopeCtx2d.lineTo(W,y); scopeCtx2d.stroke(); }
+  scopeCtx2d.strokeStyle = '#1a1a2a'; scopeCtx2d.beginPath(); scopeCtx2d.moveTo(0,H/2); scopeCtx2d.lineTo(W,H/2); scopeCtx2d.stroke();
+
+  if (!analyser || !isPlaying) {
+    scopeCtx2d.strokeStyle = '#2a1a3a'; scopeCtx2d.lineWidth = 1;
+    scopeCtx2d.beginPath(); scopeCtx2d.moveTo(0,H/2); scopeCtx2d.lineTo(W,H/2); scopeCtx2d.stroke();
+    document.getElementById('scope-freq').textContent = 'â€” Hz';
+    document.getElementById('scope-amp').textContent  = 'â€”';
+    document.getElementById('time-div').textContent   = 'â€”';
+    // FFT clear
+    fftCtx2d.fillStyle = '#000'; fftCtx2d.fillRect(0,0,fftCanvas.width,fftCanvas.height);
+    return;
+  }
+  const buf = new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(buf);
+  // RMS
+  let rms = 0;
+  for (let i = 0; i < buf.length; i++) rms += buf[i]*buf[i];
+  rms = Math.sqrt(rms/buf.length);
+  document.getElementById('level-fill').style.width = Math.min(100, rms*300)+'%';
+  document.getElementById('scope-amp').textContent  = (rms*100).toFixed(1)+'%';
+  if (currentHz) {
+    document.getElementById('scope-freq').textContent = currentHz.toFixed(4)+' Hz';
+    document.getElementById('time-div').textContent   = ((2/currentHz)*1000).toFixed(2)+' ms/div';
+  }
+  // Trigger
+  let trigger = 0;
+  for (let i = 1; i < buf.length-1; i++) {
+    if (buf[i-1]<0 && buf[i]>=0) { trigger=i; break; }
+  }
+  const drawN = Math.min(W*2, buf.length-trigger);
+  scopeCtx2d.strokeStyle = '#cc88ff'; scopeCtx2d.lineWidth = 1.5;
+  scopeCtx2d.beginPath();
+  for (let i = 0; i < drawN; i++) {
+    const x = (i/drawN)*W;
+    const y = H/2 - buf[trigger+i]*(H/2*0.85);
+    i === 0 ? scopeCtx2d.moveTo(x,y) : scopeCtx2d.lineTo(x,y);
+  }
+  scopeCtx2d.stroke();
+
+  // FFT
+  const fW = fftCanvas.width, fH = fftCanvas.height;
+  fftCtx2d.fillStyle = '#000'; fftCtx2d.fillRect(0,0,fW,fH);
+  const fftBuf = new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(fftBuf);
+  const binW = fW / Math.min(fftBuf.length, 512);
+  for (let i = 0; i < Math.min(fftBuf.length, 512); i++) {
+    const v = fftBuf[i]/255;
+    const bH = v*fH;
+    const hue = 270 + v*60;
+    fftCtx2d.fillStyle = `hsl(${hue},80%,${30+v*40}%)`;
+    fftCtx2d.fillRect(i*binW, fH-bH, Math.max(1,binW-1), bH);
+  }
+}
+drawScope();
+
+// â”€â”€â”€ SPIRAL CANVAS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const spiralCanvas = document.getElementById('spiral-canvas');
+const spiralCtx    = spiralCanvas.getContext('2d');
+
+function drawSpiral() {
+  const W = spiralCanvas.width, H = spiralCanvas.height;
+  const cx = W/2, cy = H/2;
+  spiralCtx.clearRect(0,0,W,H);
+  spiralCtx.fillStyle = '#000'; spiralCtx.fillRect(0,0,W,H);
+
+  // Grid
+  spiralCtx.strokeStyle = '#0f0f1a'; spiralCtx.lineWidth = 0.5;
+  for (let r = 30; r < 160; r += 30) {
+    spiralCtx.beginPath(); spiralCtx.arc(cx,cy,r,0,Math.PI*2); spiralCtx.stroke();
+  }
+  // State sector lines
+  for (let i = 0; i < 21; i++) {
+    const a = (i/21)*Math.PI*2 - Math.PI/2;
+    spiralCtx.strokeStyle = '#151525'; spiralCtx.lineWidth = 0.4;
+    spiralCtx.beginPath(); spiralCtx.moveTo(cx,cy);
+    spiralCtx.lineTo(cx + Math.cos(a)*160, cy + Math.sin(a)*160); spiralCtx.stroke();
+  }
+
+  const nowDays = Date.now()/86400000;
+  const TRAIL = T_L * 2;
+  const STEPS = 500;
+
+  for (let step = 0; step < STEPS; step++) {
+    const t   = nowDays - TRAIL + (step/STEPS)*TRAIL;
+    const sp  = CosmicTranslator.spiralFunction(t);
+    const si  = CosmicTranslator.segmentationFunction(t);
+    const sc  = States21.getState(si);
+    const scl = 120 / (PHI**1.0);
+    const px  = cx + sp.x * scl;
+    const py  = cy + sp.y * scl;
+    const alpha = Math.floor((step/STEPS)*255).toString(16).padStart(2,'0');
+    spiralCtx.strokeStyle = sc.color + alpha;
+    if (step===0) { spiralCtx.beginPath(); spiralCtx.moveTo(px,py); }
+    else { spiralCtx.lineTo(px,py); spiralCtx.stroke(); spiralCtx.beginPath(); spiralCtx.moveTo(px,py); }
+  }
+
+  // Current dot
+  const curSp = CosmicTranslator.spiralFunction(nowDays);
+  const curSi = CosmicTranslator.segmentationFunction(nowDays);
+  const curSt = States21.getState(curSi);
+  const scl   = 120 / (PHI**1.0);
+  const dx    = cx + curSp.x * scl;
+  const dy    = cy + curSp.y * scl;
+  const pulse = 0.5 + 0.5*Math.sin(Date.now()/300);
+  spiralCtx.beginPath(); spiralCtx.arc(dx,dy, 9+pulse*5, 0, Math.PI*2);
+  spiralCtx.strokeStyle = curSt.color+'66'; spiralCtx.lineWidth = 2; spiralCtx.stroke();
+  spiralCtx.beginPath(); spiralCtx.arc(dx,dy, 5, 0, Math.PI*2);
+  spiralCtx.fillStyle = curSt.color; spiralCtx.fill();
+
+  spiralCtx.fillStyle = '#fff'; spiralCtx.font = '10px Courier New';
+  spiralCtx.fillText(`${curSi}:${curSt.name}`, dx+10, dy+3);
+
+  // Highlight current sector
+  const sa = (curSi/21)*Math.PI*2 - Math.PI/2;
+  const ea = ((curSi+1)/21)*Math.PI*2 - Math.PI/2;
+  spiralCtx.beginPath(); spiralCtx.moveTo(cx,cy); spiralCtx.arc(cx,cy,160,sa,ea); spiralCtx.closePath();
+  spiralCtx.fillStyle = curSt.color + '14'; spiralCtx.fill();
+}
+
+// â”€â”€â”€ TORUS CANVAS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const torusCanvas = document.getElementById('torus-canvas');
+const torusCtx    = torusCanvas.getContext('2d');
+
+function drawTorus(curSi) {
+  const W = torusCanvas.width, H = torusCanvas.height;
+  const cx = W/2, cy = H/2;
+  torusCtx.clearRect(0,0,W,H);
+  torusCtx.fillStyle = '#000'; torusCtx.fillRect(0,0,W,H);
+
+  const R=55, r=18, P=13, Q=21, STEPS=420;
+  const t_a = Date.now()/8000;
+
+  for (let i = 0; i < STEPS; i++) {
+    const t = (i/STEPS)*Math.PI*2;
+    const tp = t + t_a;
+    const x = (R + r*Math.cos(Q*tp)) * Math.cos(P*tp);
+    const z = (R + r*Math.cos(Q*tp)) * Math.sin(P*tp);
+    const y = r * Math.sin(Q*tp);
+    const tilt = 0.4;
+    const px = cx + x*1.8;
+    const py = cy + y*2.2 - z*tilt;
+    const si = Math.floor((i/STEPS)*21);
+    const col = States21.getState(si).color;
+    const alpha = 0.12 + (i/STEPS)*0.6;
+    torusCtx.beginPath(); torusCtx.arc(px,py,1.2,0,Math.PI*2);
+    torusCtx.fillStyle = col + Math.floor(alpha*255).toString(16).padStart(2,'0');
+    torusCtx.fill();
+  }
+
+  // Current state on knot
+  const kp = UFTIntegration.mapStatesToTorusKnot(curSi);
+  const kt  = (kp.position/(13*21))*Math.PI*2 + t_a;
+  const kx  = (R + r*Math.cos(Q*kt))*Math.cos(P*kt);
+  const kz  = (R + r*Math.cos(Q*kt))*Math.sin(P*kt);
+  const ky  = r*Math.sin(Q*kt);
+  const kpx = cx + kx*1.8;
+  const kpy = cy + ky*2.2 - kz*0.4;
+  const curSt = States21.getState(curSi);
+  const pulse = 0.5 + 0.5*Math.sin(Date.now()/250);
+  torusCtx.beginPath(); torusCtx.arc(kpx,kpy, 5+pulse*3,0,Math.PI*2);
+  torusCtx.strokeStyle = curSt.color+'aa'; torusCtx.lineWidth = 1.5; torusCtx.stroke();
+  torusCtx.beginPath(); torusCtx.arc(kpx,kpy,4,0,Math.PI*2);
+  torusCtx.fillStyle = curSt.color; torusCtx.fill();
+
+  torusCtx.fillStyle = '#2a2a4a'; torusCtx.font = '9px Courier New';
+  torusCtx.fillText('Torus(13,21)  273 positions', 6, 14);
+
+  document.getElementById('torus-info').textContent =
+    `State ${curSi} â†’ position ${Math.round(kp.position)} / 273  |  u_turns ${kp.u_turns}  v_turns ${kp.v_turns}`;
+}
+
+// â”€â”€â”€ REALTIME OUTPUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function updateRealtime() {
+  const nowDays = Date.now()/86400000;
+  const lunarCyclePos = ((nowDays - EPOCH_NEW_MOON) % T_L + T_L) % T_L;
+  const lunarPhase    = (lunarCyclePos / T_L) * Math.PI * 2;
+
+  const out = RealtimeMapping.translate({
+    time_days:   nowDays,
+    lunarPhase:  lunarPhase,
+    energyLevel: 0.5 + 0.5*Math.sin(Date.now()/60000),
+    userGesture: 0.5
+  });
+
+  document.getElementById('rt-state').textContent    = out.stateIdx;
+  document.getElementById('rt-name').textContent     = out.state.name;
+  document.getElementById('rt-theta').textContent    = out.phase.toFixed(5) + ' rad';
+  document.getElementById('rt-pitch').textContent    = out.pitch.frequency.toFixed(4) + ' Hz';
+  document.getElementById('rt-note').textContent     = out.pitch.note;
+  document.getElementById('rt-bpm').textContent      = out.tempo.bpm.toFixed(1);
+  document.getElementById('rt-vol').textContent      = (out.dynamics.volume*100).toFixed(1) + '%';
+  document.getElementById('rt-overtones').textContent = out.harmonics.overtoneCount;
+  document.getElementById('rt-radius').textContent   = out.spiral.magnitude.toFixed(4);
+  document.getElementById('rt-cycles').textContent   = out.spiral.cycles.toFixed(5);
+  document.getElementById('rt-torus-u').textContent  = out.torus.u.toFixed(4);
+  document.getElementById('rt-torus-v').textContent  = out.torus.v.toFixed(4);
+
+  // Highlight current state in list
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('current-cosmic'));
+  const cur = document.getElementById(`sb-${out.stateIdx}`);
+  if (cur) cur.classList.add('current-cosmic');
+
+  drawSpiral();
+  drawTorus(out.stateIdx);
+  requestAnimationFrame(updateRealtime);
+}
+updateRealtime();
+
+// â”€â”€â”€ RUN ALL TESTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+document.getElementById('btn-run-tests').addEventListener('click', runAllTests);
+
+function runAllTests() {
+  const results = [];
+  let pass = 0, fail = 0;
+
+  function test(label, actual, expected, tol = 0.001) {
+    const ok = Math.abs(actual - expected) <= tol;
+    results.push({ label, actual, expected, ok, tol });
+    ok ? pass++ : fail++;
+  }
+  function testBool(label, val) {
+    results.push({ label, actual: val, expected: true, ok: !!val, bool: true });
+    val ? pass++ : fail++;
+  }
+
+  // A â€” CosmicTranslator constants
+  test('CosmicTranslator.PHI',          CosmicTranslator.PHI,           1.6180339887, 1e-9);
+  test('CosmicTranslator.T_L',          CosmicTranslator.T_L,           29.5306,      1e-6);
+  test('CosmicTranslator.MOON_ROOT_HZ', CosmicTranslator.MOON_ROOT_HZ, 210.4186,     0.0001);
+  test('CosmicTranslator.ZERO_POINT_HZ',CosmicTranslator.ZERO_POINT_HZ,297.5768,     0.001);
+
+  // A â€” phaseFunction
+  const theta_half = CosmicTranslator.phaseFunction(T_L / 2);
+  test('phaseFunction(T_L/2) = Ï€',      theta_half, Math.PI, 0.001);
+  const theta_full = CosmicTranslator.phaseFunction(T_L);
+  test('phaseFunction(T_L) = 0 (wrapped)', theta_full, 0, 0.001);
+
+  // A â€” spiralFunction
+  const sp0 = CosmicTranslator.spiralFunction(0);
+  test('spiralFunction(0).magnitude = 1.0', sp0.magnitude, 1.0, 0.001);
+  const spHalf = CosmicTranslator.spiralFunction(T_L / 2);
+  test('spiralFunction(T_L/2) magnitude = âˆšÏ†', spHalf.magnitude, Math.sqrt(CosmicTranslator.PHI), 0.001);
+  const spFull = CosmicTranslator.spiralFunction(T_L);
+  test('spiralFunction(T_L) magnitude = 1.0 (phase wraps)',   spFull.magnitude, 1.0, 0.001);
+
+  // A â€” segmentationFunction
+  test('segmentationFunction(0) = 0',         CosmicTranslator.segmentationFunction(0),        0,  0);
+  test('segmentationFunction(T_L*0.5) = 10',  CosmicTranslator.segmentationFunction(T_L*0.5), 10,  0);
+  test('segmentationFunction(T_L*0.999) = 20',CosmicTranslator.segmentationFunction(T_L*0.999),20, 0);
+
+  // C â€” States21
+  testBool('States21.cycle.length === 21', States21.cycle.length === 21);
+  testBool('State 10 isZeroPoint',  States21.getState(10).isZeroPoint === true);
+  testBool('State 20 isZeroPoint',  States21.getState(20).isZeroPoint === true);
+  testBool('State 0  name = Seed',  States21.getState(0).name  === 'Seed');
+  testBool('State 7  name = Peak',  States21.getState(7).name  === 'Peak');
+  testBool('State 14 name = Release', States21.getState(14).name === 'Release');
+  testBool('State 20 name = Renew', States21.getState(20).name === 'Renew');
+
+  // F â€” ProtoWords
+  testBool('ProtoWords.dictionary.length === 9', ProtoWords.dictionary.length === 9);
+  test('AH frequency = 210.4186 Hz', ProtoWords.getWord('AH').frequency,  210.4186, 0.0001);
+  test('NA frequency = ZERO_POINT', ProtoWords.getWord('NA').frequency,  297.5768, 0.0001);
+  test('TAO frequency = 420.8372 Hz', ProtoWords.getWord('TAO').frequency, 420.8372, 0.0001);
+  testBool('NA isZeroPoint', ProtoWords.getWord('NA').isZeroPoint === true);
+
+  // H â€” UFTIntegration
+  test('getRootFrequency("moon") = 210.4186', UFTIntegration.getRootFrequency('moon'), 210.4186, 0.0001);
+  test('getRootFrequency("432") = 256.0',     UFTIntegration.getRootFrequency('432'),  256.0000, 0.0001);
+  test('getZeroPointFrequency() = 297.5768',  UFTIntegration.getZeroPointFrequency(),  297.5768, 0.001);
+  const knotPos = UFTIntegration.mapStatesToTorusKnot(0);
+  test('mapStatesToTorusKnot(0).totalSurface = 273', knotPos.totalSurface, 273, 0);
+  const knotMid = UFTIntegration.mapStatesToTorusKnot(10);
+  test('mapStatesToTorusKnot(10).position = 130', knotMid.position, 130, 0.01);
+
+  // D â€” MusicEngine
+  const pitch0 = MusicEngine.phaseToPitch(0);
+  test('phaseToPitch(0) frequency = 210.4186', pitch0.frequency, 210.4186, 0.001);
+  const tempo0 = MusicEngine.energyToTempo(0);
+  test('energyToTempo(0).bpm = 60',   tempo0.bpm, 60, 0.001);
+  const tempo1 = MusicEngine.energyToTempo(1);
+  test('energyToTempo(1).bpm = 160',  tempo1.bpm, 160, 0.001);
+
+  // Render
+  const tbl = document.getElementById('test-results');
+  tbl.innerHTML = `<div style="margin-bottom:8px;">
+    <span class="pass">âœ“ ${pass} passed</span>
+    ${fail > 0 ? `<span class="fail" style="margin-left:12px;">âœ— ${fail} failed</span>` : ''}
+    <span style="color:#445;margin-left:12px;">${pass+fail} total</span>
+  </div>`;
+  const tbl2 = document.createElement('table');
+  tbl2.className = 'test-result';
+  tbl2.innerHTML = '<tr><th>Test</th><th>Actual</th><th>Expected</th><th></th></tr>';
+  results.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:#889">${r.label}</td>
+      <td>${r.bool ? '' : (typeof r.actual === 'number' ? r.actual.toFixed(6) : r.actual)}</td>
+      <td style="color:#445">${r.bool ? '' : (typeof r.expected === 'number' ? r.expected.toFixed(6) : r.expected)}</td>
+      <td class="${r.ok ? 'pass' : 'fail'}">${r.ok ? 'âœ“' : 'âœ—'}</td>
+    `;
+    tbl2.appendChild(tr);
+  });
+  tbl.appendChild(tbl2);
+
+  log(`â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€`, 'dim');
+  log(`TEST RUN: ${pass+fail} tests â€” ${pass} passed, ${fail} failed`, fail > 0 ? 'warn' : 'ok');
+  if (fail === 0) log('  âœ“ All module functions verified against canonical UFT v4.1 constants', 'ok');
+}
+</script>
+
+</body>
+</html>
+

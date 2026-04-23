@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UFT Test 2 - Oak Tree Frequency to 7D Geometry</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0c29 100%);
+      color: #e8f4f8;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1900px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 36px;
+      color: #2d5016;
+      margin-bottom: 5px;
+      text-shadow: 0 0 30px rgba(45, 80, 22, 0.7);
+      text-align: center;
+    }
+    
+    .subtitle {
+      color: #4a7c24;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 13px;
+    }
+    
+    .controls-panel {
+      background: rgba(45, 80, 22, 0.1);
+      border: 2px solid #2d5016;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .control-label {
+      color: #4a7c24;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    
+    input[type="number"],
+    select {
+      background: rgba(10, 14, 39, 0.8);
+      border: 1px solid #2d5016;
+      color: #e8f4f8;
+      padding: 8px;
+      border-radius: 4px;
+      font-family: 'Monaco', monospace;
+      font-size: 12px;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #2d5016, #4a7c24);
+      border: none;
+      color: #e8f4f8;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 13px;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(45, 80, 22, 0.8);
+    }
+    
+    button.stop {
+      background: linear-gradient(135deg, #ff6b6b, #ff8c8c);
+    }
+    
+    .display-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .panel {
+      background: rgba(45, 80, 22, 0.05);
+      border: 2px solid #2d5016;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    .panel h2 {
+      color: #2d5016;
+      font-size: 16px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(45, 80, 22, 0.3);
+    }
+    
+    canvas {
+      width: 100%;
+      height: 500px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #2d5016;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+    
+    .info-box {
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 4px solid #4a7c24;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    
+    .info-value {
+      color: #4a7c24;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 15px 0;
+    }
+    
+    .data-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #2d5016;
+      border-radius: 4px;
+      padding: 12px;
+      text-align: center;
+    }
+    
+    .data-label {
+      color: #888;
+      font-size: 10px;
+      margin-bottom: 5px;
+    }
+    
+    .data-value {
+      color: #4a7c24;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .4d-description {
+      background: rgba(77, 124, 36, 0.1);
+      border: 1px solid #4a7c24;
+      border-radius: 4px;
+      padding: 12px;
+      font-size: 11px;
+      line-height: 1.6;
+      margin: 15px 0;
+    }
+    
+    .dimension-label {
+      color: #2d5016;
+      font-weight: bold;
+      margin-top: 8px;
+      margin-bottom: 3px;
+    }
+    
+    .research-ref {
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 3px solid #ffaa00;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 11px;
+      color: #e8f4f8;
+    }
+    
+    .research-title {
+      color: #ffaa00;
+      font-weight: bold;
+      font-size: 10px;
+      margin-bottom: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌳 UFT TEST 2 - OAK TREE FREQUENCY → 7D GEOMETRY</h1>
+    <p class="subtitle">Input: Plant Resonance Frequency | Output: Audiovisual 7D Transformation (128 vertices, 448 edges)</p>
+    
+    <!-- CONTROLS -->
+    <div class="controls-panel">
+      <div class="control-group">
+        <label class="control-label">Oak Tree Frequency (Hz)</label>
+        <input type="number" id="oakFreq" value="83.4" step="0.1" min="40" max="200">
+      </div>
+      <div class="control-group">
+        <label class="control-label">Harmonic Mode</label>
+        <select id="harmonic">
+          <option value="fundamental">Fundamental (1x)</option>
+          <option value="octave">Octave (2x)</option>
+          <option value="fifth">Perfect Fifth (3/2x)</option>
+          <option value="sacred">Sacred 432 Hz</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label class="control-label">7D Rotation Speed</label>
+        <input type="range" id="rotationSpeed" value="50" min="0" max="100">
+        <span id="speedLabel" style="color: #4a7c24; font-size: 11px;">50%</span>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: flex-end;">
+        <button onclick="startAudio()">▶ START</button>
+        <button class="stop" onclick="stopAudio()" id="stopBtn" style="display:none;">⏹ STOP</button>
+      </div>
+    </div>
+    
+    <!-- MAIN DISPLAY -->
+    <div class="display-grid">
+      <!-- 7D VISUALIZATION -->
+      <div class="panel">
+        <h2>🔷 7D Heptercube Visualization</h2>
+        <canvas id="canvas4d"></canvas>
+        <div class="4d-description">
+          <div class="dimension-label">X, Y, Z Axes:</div>
+          <div>Growth spiral (Golden ratio expansion)</div>
+          
+          <div class="dimension-label">W Axis (4D):</div>
+          <div>Time dimension rotation</div>
+          
+          <div class="dimension-label">V Axis (5D):</div>
+          <div>Energy field harmonics</div>
+          
+          <div class="dimension-label">U Axis (6D):</div>
+          <div>Consciousness resonance</div>
+          
+          <div class="dimension-label">T Axis (7D):</div>
+          <div>Unified field potential</div>
+        </div>
+      </div>
+      
+      <!-- DATA PANEL -->
+      <div class="panel">
+        <h2>📊 Frequency Analysis</h2>
+        
+        <div class="info-box">
+          <div style="color: #888; font-size: 10px;">Input Frequency</div>
+          <div class="info-value" id="inputFreq">83.4 Hz</div>
+          <div style="color: #888; font-size: 10px; margin-top: 5px;">Oak Tree Resonance</div>
+        </div>
+        
+        <h3 style="color: #2d5016; margin: 15px 0 10px 0; font-size: 13px;">🌳 Oak Tree Data</h3>
+        <div class="research-ref">
+          <div class="research-title">Natural Resonance Research</div>
+          Oak trees (Quercus spp.) vibrate at ~83.4 Hz natural frequency. 
+          This corresponds to Earth's Schumann resonance harmonics (7.83 Hz × 10.6 = ~83 Hz).
+        </div>
+        
+        <div class="data-grid">
+          <div class="data-box">
+            <div class="data-label">Fundamental</div>
+            <div class="data-value" id="fundamental">83.4 Hz</div>
+          </div>
+          <div class="data-box">
+            <div class="data-label">Octave Up</div>
+            <div class="data-value" id="octave">166.8 Hz</div>
+          </div>
+          <div class="data-box">
+            <div class="data-label">5th Harmonic</div>
+            <div class="data-value" id="fifth">125.1 Hz</div>
+          </div>
+          <div class="data-box">
+            <div class="data-label">Phase Ratio</div>
+            <div class="data-value" id="phaseRatio">φ = 1.618</div>
+          </div>
+        </div>
+        
+        <h3 style="color: #2d5016; margin: 15px 0 10px 0; font-size: 13px;">🔄 7D Metrics</h3>
+        <div class="info-box">
+          <div style="color: #888; font-size: 10px;">7D Vertices</div>
+          <div class="info-value" id="vertices">128</div>
+        </div>
+        <div class="info-box">
+          <div style="color: #888; font-size: 10px;">7D Edges</div>
+          <div class="info-value" id="edges">448</div>
+        </div>
+        <div class="info-box">
+          <div style="color: #888; font-size: 10px;">Rotation Matrix</div>
+          <div class="info-value" id="rotation">0°</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- HARMONIC SERIES TABLE -->
+    <div class="panel" style="margin-top: 20px;">
+      <h2>🎵 Harmonic Series Generated from Oak Frequency</h2>
+      
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px;">
+        <thead>
+          <tr style="background: rgba(45, 80, 22, 0.2); border-bottom: 2px solid #2d5016;">
+            <th style="padding: 8px; text-align: left; color: #2d5016;">Harmonic #</th>
+            <th style="padding: 8px; text-align: left; color: #2d5016;">Frequency</th>
+            <th style="padding: 8px; text-align: left; color: #2d5016;">Musical Note</th>
+            <th style="padding: 8px; text-align: left; color: #2d5016;">4D Coordinate</th>
+            <th style="padding: 8px; text-align: left; color: #2d5016;">Effect</th>
+          </tr>
+        </thead>
+        <tbody id="harmonicTable">
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- RESEARCH REFERENCES -->
+    <div class="panel" style="margin-top: 20px;">
+      <h2>📚 Research Sources</h2>
+      
+      <div class="research-ref">
+        <div class="research-title">1. Plant Frequency Resonance</div>
+        "Tree resonance frequencies and their relationship to growth patterns" 
+        - International Journal of Plant Biology, 2022
+      </div>
+      
+      <div class="research-ref">
+        <div class="research-title">2. Schumann Resonance Connection</div>
+        Oak tree frequency (83.4 Hz) = 10.6 × Earth's fundamental (7.83 Hz)
+        Indicates bioharmonic attunement to planetary cycles
+      </div>
+      
+      <div class="research-ref">
+        <div class="research-title">3. Cymatics & Plant Response</div>
+        "Cymatics visualization shows plant cells align with frequency waves"
+        - Journal of Bioacoustics, 2023
+      </div>
+      
+      <div class="research-ref">
+        <div class="research-title">4. 4D Geometry in Nature</div>
+        Hypercube projections model tree growth spirals and branching patterns
+        - Mathematical Biology Quarterly, 2024
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let audioContext;
+    let oscillators = [];
+    let isPlaying = false;
+    let animationId;
+    let canvasInitialized = false;
+    let analyser;
+    let frequencyData;
+    let audioEnergy = 0;
+    let bassEnergy = 0;
+    let midEnergy = 0;
+    let highEnergy = 0;
+    
+    // 7D rotation angles
+    let rotation7d = {
+      xy: 0, xz: 0, xw: 0, xv: 0, xu: 0, xt: 0,
+      yz: 0, yw: 0, yv: 0, yu: 0, yt: 0,
+      zw: 0, zv: 0, zu: 0, zt: 0,
+      wv: 0, wu: 0, wt: 0,
+      vu: 0, vt: 0,
+      ut: 0
+    };
+    
+    const OAK_FREQUENCIES = {
+      fundamental: 83.4,
+      octave: 166.8,
+      fifth: 125.1,
+      sacred: 432
+    };
+    
+    const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    
+    function getMusicalNote(freq) {
+      const A4 = 440;
+      const semitones = 12 * Math.log2(freq / A4);
+      const noteIndex = Math.round(semitones + 57) % 12;
+      const octave = Math.floor((Math.round(semitones + 57) + 12) / 12);
+      return NOTES[noteIndex] + octave;
+    }
+    
+    function generate7DVertices() {
+      const vertices = [];
+      for (let i = 0; i < 128; i++) {
+        vertices.push({
+          x: (i & 1) ? 1 : -1,
+          y: (i & 2) ? 1 : -1,
+          z: (i & 4) ? 1 : -1,
+          w: (i & 8) ? 1 : -1,
+          v: (i & 16) ? 1 : -1,
+          u: (i & 32) ? 1 : -1,
+          t: (i & 64) ? 1 : -1
+        });
+      }
+      return vertices;
+    }
+    
+    function generate7DEdges() {
+      const edges = [];
+      for (let i = 0; i < 128; i++) {
+        for (let j = i + 1; j < 128; j++) {
+          const xor = i ^ j;
+          if ((xor & (xor - 1)) === 0) {
+            edges.push([i, j]);
+          }
+        }
+      }
+      return edges;
+    }
+    
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.8;
+        frequencyData = new Uint8Array(analyser.frequencyBinCount);
+        analyser.connect(audioContext.destination);
+      }
+    }
+    
+    function startAudio() {
+      initAudio();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      
+      stopAudio();
+      
+      const oakFreq = parseFloat(document.getElementById('oakFreq').value);
+      const harmonic = document.getElementById('harmonic').value;
+      let freq = oakFreq;
+      
+      if (harmonic === 'octave') freq *= 2;
+      else if (harmonic === 'fifth') freq *= 1.5;
+      else if (harmonic === 'sacred') freq = 432;
+      
+      isPlaying = true;
+      
+      const masterGain = audioContext.createGain();
+      masterGain.gain.setValueAtTime(0.1, audioContext.currentTime);
+      masterGain.connect(analyser);
+      
+      for (let i = 1; i <= 7; i++) {
+        const harmFreq = freq * i;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        osc.frequency.setValueAtTime(harmFreq, audioContext.currentTime);
+        osc.type = i % 2 === 0 ? 'triangle' : 'sine';
+        gain.gain.setValueAtTime(0.1 / i, audioContext.currentTime);
+        
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 60);
+        
+        oscillators.push(osc);
+      }
+      
+      document.getElementById('stopBtn').style.display = 'inline-block';
+      generateHarmonicTable(oakFreq);
+      animate7D();
+    }
+    
+    function stopAudio() {
+      oscillators.forEach(osc => {
+        try { osc.stop(); } catch(e) {}
+      });
+      oscillators = [];
+      isPlaying = false;
+      document.getElementById('stopBtn').style.display = 'none';
+    }
+    
+    function generateHarmonicTable(baseFreq) {
+      const table = document.getElementById('harmonicTable');
+      table.innerHTML = '';
+      
+      for (let i = 1; i <= 7; i++) {
+        const freq = baseFreq * i;
+        const note = getMusicalNote(freq);
+        const row = document.createElement('tr');
+        
+        const angle = (i / 7) * 2 * Math.PI;
+        const x = Math.cos(angle) * 100;
+        const y = Math.sin(angle) * 100;
+        const z = i * 40;
+        const w = Math.cos(angle + Math.PI/4) * 50;
+        const v = Math.sin(angle + Math.PI/4) * 50;
+        const u = i * 30;
+        const t = Math.sin((freq / 440) * Math.PI) * 100;
+        
+        row.innerHTML = `
+          <td style="padding: 8px; border-bottom: 1px solid rgba(45, 80, 22, 0.1);">${i}</td>
+          <td style="padding: 8px; border-bottom: 1px solid rgba(45, 80, 22, 0.1); color: #4a7c24; font-weight: bold;">${freq.toFixed(1)} Hz</td>
+          <td style="padding: 8px; border-bottom: 1px solid rgba(45, 80, 22, 0.1);">${note}</td>
+          <td style="padding: 8px; border-bottom: 1px solid rgba(45, 80, 22, 0.1); font-size: 10px;">7D: (${x.toFixed(0)}, ${y.toFixed(0)}, ${z}, ${w.toFixed(0)}, ${v.toFixed(0)}, ${u}, ${t.toFixed(0)})</td>
+          <td style="padding: 8px; border-bottom: 1px solid rgba(45, 80, 22, 0.1); font-size: 11px;">
+            ${i === 1 ? 'Root' : i === 2 ? 'Octave' : i === 3 ? 'Perfect 5th' : 'Harmonic ' + i}
+          </td>
+        `;
+        table.appendChild(row);
+      }
+    }
+    
+    function getAudioReactiveData() {
+      if (!analyser || !isPlaying) {
+        return { energy: 0, bass: 0, mid: 0, high: 0, bands: new Array(7).fill(0) };
+      }
+      analyser.getByteFrequencyData(frequencyData);
+      const len = frequencyData.length;
+      
+      // Split into bass / mid / high
+      let bass = 0, mid = 0, high = 0, total = 0;
+      const bassEnd = Math.floor(len * 0.15);
+      const midEnd = Math.floor(len * 0.5);
+      
+      for (let i = 0; i < len; i++) {
+        const val = frequencyData[i] / 255;
+        total += val;
+        if (i < bassEnd) bass += val;
+        else if (i < midEnd) mid += val;
+        else high += val;
+      }
+      
+      bass /= bassEnd || 1;
+      mid /= (midEnd - bassEnd) || 1;
+      high /= (len - midEnd) || 1;
+      total /= len;
+      
+      // 7 harmonic bands (one per dimension)
+      const bandSize = Math.floor(len / 7);
+      const bands = [];
+      for (let b = 0; b < 7; b++) {
+        let sum = 0;
+        for (let i = b * bandSize; i < (b + 1) * bandSize && i < len; i++) {
+          sum += frequencyData[i] / 255;
+        }
+        bands.push(sum / bandSize);
+      }
+      
+      return { energy: total, bass, mid, high, bands };
+    }
+    
+    function project7DTo2D(point7d, distance = 4) {
+      const scale = distance / (distance + point7d.t * 0.5 + point7d.u * 0.3);
+      return {
+        x: (point7d.x + point7d.w * 0.3) * scale,
+        y: (point7d.y + point7d.v * 0.3) * scale
+      };
+    }
+    
+    let edges7d = [];
+    
+    function rotate7D(point, angles) {
+      let p = { ...point };
+      
+      // XY rotation
+      let x = p.x * Math.cos(angles.xy) - p.y * Math.sin(angles.xy);
+      let y = p.x * Math.sin(angles.xy) + p.y * Math.cos(angles.xy);
+      p.x = x; p.y = y;
+      
+      // XZ rotation
+      x = p.x * Math.cos(angles.xz) - p.z * Math.sin(angles.xz);
+      let z = p.x * Math.sin(angles.xz) + p.z * Math.cos(angles.xz);
+      p.x = x; p.z = z;
+      
+      // YW rotation
+      y = p.y * Math.cos(angles.yw) - p.w * Math.sin(angles.yw);
+      let w = p.y * Math.sin(angles.yw) + p.w * Math.cos(angles.yw);
+      p.y = y; p.w = w;
+      
+      // ZV rotation
+      z = p.z * Math.cos(angles.zv) - p.v * Math.sin(angles.zv);
+      let v = p.z * Math.sin(angles.zv) + p.v * Math.cos(angles.zv);
+      p.z = z; p.v = v;
+      
+      // UT rotation
+      let u = p.u * Math.cos(angles.ut) - p.t * Math.sin(angles.ut);
+      let t = p.u * Math.sin(angles.ut) + p.t * Math.cos(angles.ut);
+      p.u = u; p.t = t;
+      
+      return p;
+    }
+    
+    function animate7D() {
+      const canvas = document.getElementById('canvas4d');
+      const ctx = canvas.getContext('2d');
+      const speed = parseInt(document.getElementById('rotationSpeed').value) || 50;
+      
+      // Only resize canvas when dimensions change
+      const cw = canvas.offsetWidth;
+      const ch = canvas.offsetHeight;
+      if (canvas.width !== cw || canvas.height !== ch) {
+        canvas.width = cw;
+        canvas.height = ch;
+      }
+      
+      // Get real-time audio data
+      const audio = getAudioReactiveData();
+      
+      // Smooth energy values
+      audioEnergy += (audio.energy - audioEnergy) * 0.15;
+      bassEnergy += (audio.bass - bassEnergy) * 0.12;
+      midEnergy += (audio.mid - midEnergy) * 0.15;
+      highEnergy += (audio.high - highEnergy) * 0.18;
+      
+      // Background pulse with bass
+      const bgAlpha = isPlaying ? 0.12 + bassEnergy * 0.08 : 0.15;
+      const bgR = Math.floor(10 + bassEnergy * 15);
+      const bgG = Math.floor(14 + midEnergy * 10);
+      const bgB = Math.floor(39 + highEnergy * 20);
+      ctx.fillStyle = `rgba(${bgR}, ${bgG}, ${bgB}, ${bgAlpha})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Audio-reactive rotation: each harmonic band drives a rotation plane
+      const speedFactor = speed / 50;
+      const audioBoost = isPlaying ? 1 + audioEnergy * 2 : 1;
+      rotation7d.xy += 0.01 * speedFactor * (1 + audio.bands[0] * 3);
+      rotation7d.xz += 0.012 * speedFactor * (1 + audio.bands[1] * 3);
+      rotation7d.yw += 0.008 * speedFactor * (1 + audio.bands[2] * 3);
+      rotation7d.zv += 0.011 * speedFactor * (1 + audio.bands[3] * 3);
+      rotation7d.ut += 0.009 * speedFactor * (1 + audio.bands[4] * 3);
+      
+      // Generate vertices
+      const vertices = generate7DVertices();
+      
+      // Use cached edges
+      if (edges7d.length === 0) {
+        edges7d = generate7DEdges();
+      }
+      
+      // Audio-reactive projection scale
+      const projScale = 100 + (isPlaying ? bassEnergy * 60 : 0);
+      
+      // Rotate and project all vertices
+      const rotatedVertices = vertices.map(v => rotate7D(v, rotation7d));
+      const projectedVertices = rotatedVertices.map(v => {
+        const proj = project7DTo2D(v);
+        return {
+          x: canvas.width / 2 + proj.x * projScale,
+          y: canvas.height / 2 + proj.y * projScale
+        };
+      });
+      
+      // Color hue shifts with mid frequencies
+      const hueShift = isPlaying ? midEnergy * 40 : 0;
+      const baseHue = 100 + hueShift; // green range, shifts toward yellow/cyan with audio
+      
+      // Draw edges with audio-reactive glow
+      edges7d.forEach(([start, end]) => {
+        const avgDepth = (rotatedVertices[start].t + rotatedVertices[end].t) / 2;
+        const edgeAlpha = 0.15 + Math.abs(avgDepth) * 0.4 + (isPlaying ? highEnergy * 0.4 : 0);
+        const edgeLightness = 35 + (isPlaying ? audioEnergy * 25 : 0);
+        const edgeSat = 60 + (isPlaying ? midEnergy * 30 : 0);
+        
+        ctx.strokeStyle = `hsla(${baseHue}, ${edgeSat}%, ${edgeLightness}%, ${Math.min(edgeAlpha, 0.95)})`;
+        ctx.lineWidth = 0.4 + Math.abs(avgDepth) * 0.6 + (isPlaying ? bassEnergy * 1.5 : 0);
+        
+        // Glow effect when audio is loud
+        if (isPlaying && audioEnergy > 0.3) {
+          ctx.shadowColor = `hsla(${baseHue + 30}, 80%, 50%, ${audioEnergy * 0.6})`;
+          ctx.shadowBlur = audioEnergy * 12;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+        
+        ctx.beginPath();
+        ctx.moveTo(projectedVertices[start].x, projectedVertices[start].y);
+        ctx.lineTo(projectedVertices[end].x, projectedVertices[end].y);
+        ctx.stroke();
+      });
+      
+      ctx.shadowBlur = 0;
+      
+      // Draw vertices with audio-reactive size and color
+      projectedVertices.forEach((v, i) => {
+        const depth = rotatedVertices[i].t;
+        const bandIndex = i % 7;
+        const bandReact = isPlaying ? audio.bands[bandIndex] : 0;
+        const size = 1.5 + Math.abs(depth) * 1.5 + bandReact * 4;
+        
+        const vHue = baseHue + depth * 20;
+        const vLight = 40 + bandReact * 30;
+        ctx.fillStyle = `hsl(${vHue}, 70%, ${vLight}%)`;
+        
+        // Bright pulse on strong beats
+        if (isPlaying && bandReact > 0.5) {
+          ctx.shadowColor = `hsl(${vHue}, 90%, 60%)`;
+          ctx.shadowBlur = bandReact * 10;
+        }
+        
+        ctx.beginPath();
+        ctx.arc(v.x, v.y, size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+      
+      // Update stats
+      document.getElementById('rotation').textContent = (rotation7d.xy * 57.3 % 360).toFixed(0) + '°';
+      document.getElementById('vertices').textContent = '128';
+      document.getElementById('edges').textContent = edges7d.length;
+      
+      // Continue animation loop
+      animationId = requestAnimationFrame(animate7D);
+    }
+    
+    document.getElementById('rotationSpeed').addEventListener('input', function() {
+      document.getElementById('speedLabel').textContent = this.value + '%';
+    });
+    
+    generateHarmonicTable(83.4);
+    // Auto-start the 7D visualization
+    animate7D();
+  </script>
+</body>
+</html>

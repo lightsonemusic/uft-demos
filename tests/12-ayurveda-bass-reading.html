@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ayurveda Bass Reading · UFT</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Georgia', serif;
+  background: #040810;
+  color: #c8d8e8;
+  min-height: 100vh;
+  padding: 20px 24px 32px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 30px;
+  letter-spacing: 6px;
+  color: #8aabcc;
+  margin-bottom: 6px;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+.subtitle {
+  text-align: center;
+  font-size: 18px;
+  color: #3a5060;
+  margin-bottom: 22px;
+  letter-spacing: 3px;
+}
+#startBtn {
+  display: block;
+  margin: 0 auto 26px;
+  padding: 16px 48px;
+  font-size: 20px;
+  background: rgba(70,110,150,0.12);
+  border: 1px solid #3a6080;
+  color: #70a8cc;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 3px;
+  font-family: 'Georgia', serif;
+}
+#startBtn:hover { background: rgba(70,110,150,0.28); }
+
+.grid {
+  display: grid;
+  grid-template-columns: 340px 1fr 340px;
+  gap: 16px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.panel {
+  background: rgba(6,12,26,0.92);
+  border: 1px solid #182840;
+  border-radius: 8px;
+  padding: 26px 24px;
+}
+
+/* ── LABELS ─────────────────────────────────────────── */
+.lbl {
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: #2a4050;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.divider { border:none; border-top:1px solid #182840; margin: 18px 0; }
+
+/* ── LEFT PANEL ─────────────────────────────────────── */
+.note-big {
+  font-size: 108px;
+  font-weight: 200;
+  text-align: center;
+  line-height: 1;
+  color: #60a5fa;
+  letter-spacing: -4px;
+  margin-bottom: 6px;
+  transition: color 0.3s;
+}
+.hz-big {
+  font-size: 30px;
+  text-align: center;
+  color: #6090b0;
+  margin-bottom: 22px;
+  font-style: italic;
+}
+.body-zone {
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 8px;
+  font-style: italic;
+  transition: color 0.3s;
+}
+.chakra-name {
+  font-size: 22px;
+  text-align: center;
+  color: #9070c0;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+.sap-line {
+  font-size: 16px;
+  text-align: center;
+  color: #3a5868;
+  letter-spacing: 2px;
+  margin-bottom: 18px;
+}
+.proto-big {
+  font-size: 38px;
+  text-align: center;
+  letter-spacing: 8px;
+  color: #e8c840;
+  margin-bottom: 6px;
+}
+.geom-line {
+  font-size: 16px;
+  text-align: center;
+  color: #3a5060;
+  margin-bottom: 16px;
+}
+
+/* ── CENTER PANEL ───────────────────────────────────── */
+.dosha-row { margin-bottom: 18px; }
+.dosha-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; }
+.dosha-name { font-size: 24px; font-weight: bold; letter-spacing: 3px; }
+.dosha-pct  { font-size: 22px; font-weight: bold; }
+.bar-bg { background: rgba(255,255,255,0.05); border-radius:3px; height:10px; overflow:hidden; }
+.bar    { height:100%; border-radius:3px; transition: width 0.45s ease; }
+
+.dominant-name {
+  font-size: 36px;
+  text-align: center;
+  letter-spacing: 4px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  transition: color 0.3s;
+}
+.dominant-qual {
+  font-size: 19px;
+  text-align: center;
+  color: #5a7888;
+  font-style: italic;
+  margin-bottom: 18px;
+}
+
+.bija-huge {
+  font-size: 88px;
+  text-align: center;
+  letter-spacing: 10px;
+  font-weight: 200;
+  margin: 12px 0 6px;
+  line-height: 1;
+  transition: color 0.3s;
+}
+.bija-meaning {
+  font-size: 17px;
+  text-align: center;
+  color: #3a5868;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.healing-proto {
+  font-size: 44px;
+  text-align: center;
+  letter-spacing: 8px;
+  margin-bottom: 8px;
+  transition: color 0.3s;
+}
+.healing-text {
+  font-size: 18px;
+  text-align: center;
+  color: #4a6878;
+  line-height: 1.6;
+}
+
+/* ── RIGHT PANEL ────────────────────────────────────── */
+#cymaCanvas {
+  width: 100%;
+  height: 290px;
+  display: block;
+  border-radius: 50%;
+  margin-bottom: 18px;
+  background: rgba(4,8,20,0.85);
+}
+.raga-name {
+  font-size: 26px;
+  text-align: center;
+  color: #c8a050;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+.raga-sub {
+  font-size: 17px;
+  text-align: center;
+  color: #4a6060;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+}
+.prescription {
+  font-size: 19px;
+  line-height: 1.9;
+  color: #7090a8;
+  text-align: center;
+}
+.prescription strong {
+  font-size: 22px;
+  color: #b0cce0;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* ── SPECTRUM ───────────────────────────────────────── */
+#specCanvas {
+  width: 100%;
+  height: 56px;
+  display: block;
+  border-radius: 4px;
+  margin-top: 16px;
+  background: rgba(4,8,20,0.8);
+}
+</style>
+</head>
+<body>
+
+<h1>Ayurveda Bass Reading</h1>
+<p class="subtitle">play your bass · receive your prescription</p>
+<button id="startBtn" onclick="startAudio()">▶ activate microphone</button>
+
+<div class="grid">
+
+  <!-- ──────────────────────── LEFT : Body / Frequency ───────────────────── -->
+  <div class="panel">
+    <div class="lbl">§IV · frequency · body</div>
+    <div class="note-big" id="noteName">—</div>
+    <div class="hz-big"   id="hzDisplay">— Hz</div>
+    <hr class="divider">
+    <div class="lbl">body zone</div>
+    <div class="body-zone"  id="bodyZone">listening…</div>
+    <div class="chakra-name" id="chakraName">—</div>
+    <div class="sap-line"    id="sapLine">—</div>
+    <hr class="divider">
+    <div class="lbl">§F · proto-word</div>
+    <div class="proto-big" id="protoWord">—</div>
+    <div class="geom-line" id="geomLine">—</div>
+    <canvas id="specCanvas"></canvas>
+  </div>
+
+  <!-- ──────────────────────── CENTER : Dosha + Bija ─────────────────────── -->
+  <div class="panel">
+    <div class="lbl">dosha reading</div>
+
+    <div class="dosha-row">
+      <div class="dosha-head">
+        <span class="dosha-name" style="color:#818cf8">VATA</span>
+        <span class="dosha-pct"  style="color:#818cf8" id="vataPct">—</span>
+      </div>
+      <div class="bar-bg"><div class="bar" id="vataBar" style="width:0%;background:#818cf8"></div></div>
+    </div>
+
+    <div class="dosha-row">
+      <div class="dosha-head">
+        <span class="dosha-name" style="color:#f87171">PITTA</span>
+        <span class="dosha-pct"  style="color:#f87171" id="pittaPct">—</span>
+      </div>
+      <div class="bar-bg"><div class="bar" id="pittaBar" style="width:0%;background:#f87171"></div></div>
+    </div>
+
+    <div class="dosha-row">
+      <div class="dosha-head">
+        <span class="dosha-name" style="color:#4ade80">KAPHA</span>
+        <span class="dosha-pct"  style="color:#4ade80" id="kaphaPct">—</span>
+      </div>
+      <div class="bar-bg"><div class="bar" id="kaphaBar" style="width:0%;background:#4ade80"></div></div>
+    </div>
+
+    <hr class="divider">
+    <div class="dominant-name" id="dominantName">—</div>
+    <div class="dominant-qual" id="dominantQual">play a note to begin</div>
+
+    <hr class="divider">
+    <div class="lbl">bija mantra</div>
+    <div class="bija-huge"    id="bijaMantra">—</div>
+    <div class="bija-meaning" id="bijaMeaning">—</div>
+
+    <hr class="divider">
+    <div class="lbl">healing proto-word</div>
+    <div class="healing-proto" id="healingProto">—</div>
+    <div class="healing-text"  id="healingText">—</div>
+  </div>
+
+  <!-- ──────────────────────── RIGHT : Canvas + Raga ─────────────────────── -->
+  <div class="panel">
+    <div class="lbl">§F · cymatic geometry</div>
+    <canvas id="cymaCanvas"></canvas>
+    <div class="lbl">raga prescription</div>
+    <div class="raga-name" id="ragaName">—</div>
+    <div class="raga-sub"  id="ragaSub">—</div>
+    <hr class="divider">
+    <div class="lbl">prescription</div>
+    <div class="prescription" id="prescText">Activate microphone and play a note to receive your Ayurvedic reading.</div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// CONSTANTS — ALL VALUES FROM REFERENCE.md
+// ════════════════════════════════════════════════════════════════════════════
+const ROOT_432    = 256.0000;   // §II: C = 2^8 exactly
+const FFT_SIZE    = 8192;
+const SAMPLE_RATE = 48000;
+const BIN_HZ      = SAMPLE_RATE / FFT_SIZE; // ≈5.86 Hz/bin
+
+// §IV — Lunar Nikkal full scale (Moon root 210.42, pitch-classes 0–12)
+const LUNAR = [
+  { pc:0,  note:'C',   hz:210.42, fib:1,   tree:'Birch',   ogham:'Beith', sap:'Rising',     proto:'AH',  body:'Root',               color:'#60a5fa' },
+  { pc:1,  note:'C#',  hz:222.93, fib:2,   tree:'Rowan',   ogham:'Luis',  sap:'Rising',     proto:'SA',  body:'Throat',             color:'#818cf8' },
+  { pc:2,  note:'D',   hz:236.19, fib:3,   tree:'Ash',     ogham:'Nion',  sap:'Rising',     proto:'LA',  body:'Hands & Lungs',      color:'#a78bfa' },
+  { pc:3,  note:'D#',  hz:250.23, fib:5,   tree:'Alder',   ogham:'Fearn', sap:'Peak',       proto:'RA',  body:'Stomach',            color:'#fb923c' },
+  { pc:4,  note:'E',   hz:265.11, fib:8,   tree:'Willow',  ogham:'Sail',  sap:'Peak',       proto:'DA',  body:'Solar Plexus',       color:'#facc15' },
+  { pc:5,  note:'F',   hz:280.88, fib:13,  tree:'Hawthorn',ogham:'Huath', sap:'Peak',       proto:'HA',  body:'Diaphragm',          color:'#f97316' },
+  { pc:6,  note:'F#',  hz:297.58, fib:21,  tree:'Oak',     ogham:'Duir',  sap:'Zero Point', proto:'NA',  body:'Heart',              color:'#4ade80' },
+  { pc:7,  note:'G',   hz:315.27, fib:34,  tree:'Holly',   ogham:'Tinne', sap:'Descending', proto:'KA',  body:'Spine',              color:'#22d3ee' },
+  { pc:8,  note:'G#',  hz:334.02, fib:55,  tree:'Hazel',   ogham:'Coll',  sap:'Descending', proto:'OM',  body:'The wound as portal',color:'#36d9b8' },
+  { pc:9,  note:'A',   hz:353.88, fib:89,  tree:'Vine',    ogham:'Muin',  sap:'Descending', proto:'AH',  body:'The blood',          color:'#f472b6' },
+  { pc:10, note:'A#',  hz:374.92, fib:144, tree:'Ivy',     ogham:'Gort',  sap:'Dormant',    proto:'EE',  body:'Deep interior',      color:'#c084fc' },
+  { pc:11, note:'B',   hz:397.22, fib:233, tree:'Elder',   ogham:'Ruis',  sap:'Dormant',    proto:'UH',  body:'The compost',        color:'#94a3b8' },
+  { pc:12, note:'C\'', hz:420.84, fib:377, tree:'Yew',     ogham:'Ioho',  sap:'Awakening',  proto:'TAO', body:'The full system',    color:'#e2e8f0' },
+];
+
+// §F — Cymatic geometry forms
+const PROTO_GEOM = {
+  'AH':  { nodes:0,  form:'Expanding circles',    planet:'Moon' },
+  'SA':  { nodes:2,  form:'Figure-8',             planet:'Mercury' },
+  'LA':  { nodes:3,  form:'3-petal triangle',     planet:'Venus' },
+  'RA':  { nodes:4,  form:'4-point radial',       planet:'Sun' },
+  'DA':  { nodes:5,  form:'5-point star',         planet:'Mars' },
+  'HA':  { nodes:6,  form:'6-petal hexagon',      planet:'Jupiter' },
+  'NA':  { nodes:0,  form:'Standing wave null',   planet:'Zero Point' },
+  'KA':  { nodes:8,  form:'8-point star',         planet:'Holly · Tinne' },
+  'OM':  { nodes:0,  form:'Phi spiral bloom',     planet:'Ophiuchus' },
+  'EE':  { nodes:11, form:'11-point star',        planet:'Ivy · Gort' },
+  'UH':  { nodes:12, form:'12-point star',        planet:'Elder · Ruis' },
+  'TAO': { nodes:13, form:'13-point burst',       planet:'Yew' },
+};
+
+// Chakra + Bija + Dosha + Raga — Nada Chikitsa mapping per pitch class
+const CHAKRA = [
+  { pc:0,  chakra:'Muladhara',   bija:'LAM', bijaM:'earth · stability · manifest',
+    dosha:'kapha', qual:'Grounded · heavy · stable',
+    raga:['Bhupali','Kedar'],
+    presc:'Your root is active. Ground through slow, sustained notes. Eat warm, cooked foods. Sesame oil to the soles of the feet.' },
+
+  { pc:1,  chakra:'Vishuddha',   bija:'HAM', bijaM:'ether · expression · bridge',
+    dosha:'vata',  qual:'Mobile · light · expressive',
+    raga:['Bhairavi','Yaman'],
+    presc:'The throat speaks. Breathe deeply between phrases. Warm oil to the neck and shoulders. Honey with ginger tea.' },
+
+  { pc:2,  chakra:'Anahata',     bija:'YAM', bijaM:'air · breath · hands as wings',
+    dosha:'vata',  qual:'Light · expansive · reaching',
+    raga:['Bhairavi','Yaman'],
+    presc:'Hands and lungs open. Let the phrase breathe. Green foods. Open the window. Slow down the bow.' },
+
+  { pc:3,  chakra:'Manipura',    bija:'RAM', bijaM:'fire · digestion · will',
+    dosha:'pitta', qual:'Sharp · digestive · willing',
+    raga:['Bhairav','Todi'],
+    presc:'Digestive fire is high. Play slowly. Cooling foods — cucumber, mint, coconut water. Rest between phrases.' },
+
+  { pc:4,  chakra:'Manipura',    bija:'RAM', bijaM:'fire · solar power · transformation',
+    dosha:'pitta', qual:'Fierce · focused · transformative',
+    raga:['Bhairav','Darbari'],
+    presc:'Solar plexus peak. Release control through sustained tones. Cool the fire with long slow exhalations.' },
+
+  { pc:5,  chakra:'Anahata',     bija:'YAM', bijaM:'fire-air · diaphragm · the bridge',
+    dosha:'pitta', qual:'Intense · bridging · willful',
+    raga:['Bhairav','Todi'],
+    presc:'The diaphragm holds tension. Breathe from the belly. Slow the attack. Peppermint to the chest.' },
+
+  { pc:6,  chakra:'Anahata',     bija:'YAM', bijaM:'air · heart · zero point · silence',
+    dosha:'vata',  qual:'Still · open · at the centre',
+    raga:['Yaman','Bhimpalasi'],
+    presc:'You touched Zero Point. The heart is open. No prescription needed — rest here. Let this note sustain as long as it wishes.' },
+
+  { pc:7,  chakra:'Sushumna',    bija:'KAM', bijaM:'all channels · spine · the axis',
+    dosha:'pitta', qual:'Aligned · direct · structural',
+    raga:['Darbari','Bhairav'],
+    presc:'The axis is clear. Sit straight while playing. The spine is your instrument. Sesame oil to the back of the neck.' },
+
+  { pc:8,  chakra:'Vishuddha',   bija:'OM',  bijaM:'Ophiuchus · liminal · the threshold',
+    dosha:'vata',  qual:'Liminal · transforming · portal',
+    raga:['Darbari','Todi'],
+    presc:'You are at the threshold. Do not force. This note transforms by itself. Sit with the silence after it ends.' },
+
+  { pc:9,  chakra:'Svadhisthana',bija:'VAM', bijaM:'water · blood · life force · rhythm',
+    dosha:'kapha', qual:'Fluid · vital · rhythmic',
+    raga:['Bhimpalasi','Kedar'],
+    presc:'The blood moves. Hydrate. Play in rhythm with your heartbeat. Warm water with lemon in the morning.' },
+
+  { pc:10, chakra:'Ajna',        bija:'AIM', bijaM:'ether · inner vision · deep interior',
+    dosha:'vata',  qual:'Visionary · interior · still',
+    raga:['Bhairavi','Puriya'],
+    presc:'The deep interior speaks. Close your eyes while playing. Silence after each note. Brahmi oil to the crown.' },
+
+  { pc:11, chakra:'Muladhara',   bija:'LAM', bijaM:'earth · release · composting',
+    dosha:'kapha', qual:'Dense · releasing · returning to earth',
+    raga:['Kedar','Bhupali'],
+    presc:'Release what is no longer needed. Play slowly. Let notes die completely before beginning another. Root foods.' },
+
+  { pc:12, chakra:'Sahasrara',   bija:'AUM', bijaM:'all · crown · the full cycle complete',
+    dosha:'all',   qual:'Complete · unified · transcendent',
+    raga:['Yaman','Bhairavi'],
+    presc:'The full system resonates. All three doshas are present and balanced. You are the instrument playing itself.' },
+];
+
+const DOSHA = {
+  vata:  { col:'#818cf8', name:'VATA',     element:'Air · Ether',  time:'dawn · dusk' },
+  pitta: { col:'#f87171', name:'PITTA',    element:'Fire · Water', time:'midday · midnight' },
+  kapha: { col:'#4ade80', name:'KAPHA',    element:'Earth · Water',time:'morning · evening' },
+  all:   { col:'#e2e8f0', name:'TRIDOSHA', element:'All elements', time:'all times' },
+};
+
+// Balancing proto-word per dominant dosha
+// Vata excess → ground with Kapha proto (C/AH = Root/earth)
+// Pitta excess → cool with Vata proto (F#/NA = Heart/Zero Point)
+// Kapha excess → activate with Pitta proto (E/DA = Solar Plexus/fire)
+const BALANCE_PC = { vata:0, pitta:6, kapha:4, all:6 };
+
+// ════════════════════════════════════════════════════════════════════════════
+// 432 Hz NOTE DETECTION
+// ════════════════════════════════════════════════════════════════════════════
+function parabolicPeak(data, i) {
+  const a = data[i-1], b = data[i], c = data[i+1];
+  const d = 2*b - a - c;
+  return d < 0.001 ? i : i + (c - a) / (2 * d);
+}
+
+function freqToNote(f) {
+  if(f < 20 || f > 2000) return null;
+  const semis = 12 * Math.log2(f / ROOT_432);
+  const pc    = ((Math.round(semis) % 12) + 12) % 12;
+  const cents = (semis - Math.round(semis)) * 100;
+  return { pc, cents };
+}
+
+function detectBass(data) {
+  const minB = Math.ceil(20  / BIN_HZ);
+  const maxB = Math.floor(500/ BIN_HZ);
+  let peakBin = minB, peakVal = -Infinity;
+  for(let i = minB; i <= maxB; i++) {
+    if(data[i] > peakVal) { peakVal = data[i]; peakBin = i; }
+  }
+  if(peakVal < -55) return { hz:0, db:peakVal };
+  const exactBin = parabolicPeak(data, peakBin);
+  return { hz: exactBin * BIN_HZ, db: peakVal };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// VIBRATO DFT (1.5–14 Hz on 180-frame buffer ≈ 3 s at 60 fps)
+// ════════════════════════════════════════════════════════════════════════════
+const VBUF = 180;
+const freqBuf = new Float32Array(VBUF);
+let vBufIdx = 0, vBufFilled = 0;
+
+function detectVibrato() {
+  const N = Math.min(180, vBufFilled);
+  if(N < 30) return { rate:0, depth:0 };
+  const arr = [];
+  for(let i = N-1; i >= 0; i--) arr.push(freqBuf[((vBufIdx-1-i)+VBUF)%VBUF]);
+  const valid = arr.filter(f => f > 20);
+  if(valid.length < 20) return { rate:0, depth:0 };
+  const mean  = valid.reduce((a,b) => a+b, 0) / valid.length;
+  const dev   = arr.map(f => f > 20 ? 1200 * Math.log2(f / mean) : 0);
+  const depth = Math.sqrt(dev.reduce((a,b) => a + b*b, 0) / dev.length);
+  let bestRate=0, bestPow=0;
+  for(let hz = 1.5; hz <= 14; hz += 0.25) {
+    let re=0, im=0;
+    for(let i=0; i<N; i++) {
+      const a = 2*Math.PI*hz*i/60;
+      re += dev[i]*Math.cos(a);
+      im += dev[i]*Math.sin(a);
+    }
+    const p = re*re + im*im;
+    if(p > bestPow) { bestPow=p; bestRate=hz; }
+  }
+  return { rate: (depth > 8 && bestPow > 200) ? bestRate : 0, depth };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// DOSHA SCORING
+// Three inputs: note body zone, vibrato rate, attack, harmonic clarity
+// ════════════════════════════════════════════════════════════════════════════
+// Note → primary dosha tendency (from §IV body zones)
+const NOTE_DOSHA = ['kapha','vata','vata','pitta','pitta','pitta','vata','pitta','vata','kapha','vata','kapha'];
+
+function scoreDosha(pc, riseMs, vibRate, clarity) {
+  let v=0, p=0, k=0;
+
+  // Note zone (40 pts)
+  const nd = NOTE_DOSHA[pc % 12];
+  if(nd==='vata') v += 40; else if(nd==='pitta') p += 40; else k += 40;
+
+  // Vibrato → Vata (movement = air quality)
+  if     (vibRate > 6) v += 30;
+  else if(vibRate > 3) v += 15;
+  else if(vibRate > 0) v += 5;
+  else                 k += 10;
+
+  // Attack → Pitta (fast/sharp) or Kapha (slow/heavy)
+  if     (riseMs < 80)  p += 20;
+  else if(riseMs < 200) { p += 8; k += 5; }
+  else                  k += 20;
+
+  // Harmonic clarity → Pitta (focused) or Vata (scattered)
+  if     (clarity > 0.65) p += 20;
+  else if(clarity > 0.35) { p += 8; v += 5; }
+  else                    v += 20;
+
+  const tot = v + p + k;
+  const vp = Math.round(v/tot*100);
+  const pp = Math.round(p/tot*100);
+  const kp = 100 - vp - pp;
+  return { vata:vp, pitta:pp, kapha:kp };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// CYMATIC CANVAS (§F geometry per proto-word)
+// ════════════════════════════════════════════════════════════════════════════
+const cymaEl = document.getElementById('cymaCanvas');
+const c2 = cymaEl.getContext('2d');
+let currentProto = 'AH', cymaPhase = 0;
+
+function drawCyma(proto, amp) {
+  const W = cymaEl.offsetWidth || 290;
+  const H = cymaEl.offsetHeight || 290;
+  cymaEl.width = W; cymaEl.height = H;
+  const cx = W/2, cy = H/2, R = Math.min(W,H)*0.42;
+  const lum = Math.min(1, Math.max(0.25, amp));
+  const t   = cymaPhase;
+
+  c2.clearRect(0,0,W,H);
+  const entry = LUNAR.find(l => l.proto === proto) || LUNAR[0];
+  c2.strokeStyle = entry.color;
+  c2.fillStyle   = entry.color;
+  c2.lineWidth   = 1.6;
+  c2.globalAlpha = 0.12 + lum * 0.65;
+
+  const g = PROTO_GEOM[proto] || PROTO_GEOM['AH'];
+
+  if(proto === 'AH') {
+    // Expanding circles — torus root
+    for(let i=1; i<=6; i++) {
+      const r = R * (i/6) * (0.88 + 0.12*Math.sin(t*0.7+i));
+      c2.beginPath(); c2.arc(cx,cy,r,0,Math.PI*2); c2.stroke();
+    }
+  } else if(proto === 'SA') {
+    // Figure-8 lemniscate
+    c2.beginPath();
+    for(let a=0; a<Math.PI*2; a+=0.015) {
+      const s = Math.sin(a + t*0.4);
+      const x = cx + R*0.8*Math.cos(a) / (1 + s*s);
+      const y = cy + R*0.8*Math.sin(a)*Math.cos(a) / (1 + s*s);
+      a < 0.015 ? c2.moveTo(x,y) : c2.lineTo(x,y);
+    }
+    c2.stroke();
+  } else if(proto === 'NA') {
+    // Standing wave null — near-horizontal shimmer
+    c2.beginPath();
+    for(let x=0; x<W; x++) {
+      const y = cy + Math.sin(x/W*Math.PI*8 + t)*R*0.04*lum;
+      x===0 ? c2.moveTo(x,y) : c2.lineTo(x,y);
+    }
+    c2.stroke();
+  } else if(proto === 'OM') {
+    // Phi spiral bloom
+    const phi = 1.6180339887;
+    c2.beginPath();
+    for(let a=0.1; a<Math.PI*6; a+=0.02) {
+      const r = 4*Math.pow(phi, a/(Math.PI*1.2));
+      const x = cx + r*Math.cos(a + t*0.25);
+      const y = cy + r*Math.sin(a + t*0.25);
+      if(r > R*1.05) break;
+      a < 0.12 ? c2.moveTo(x,y) : c2.lineTo(x,y);
+    }
+    c2.stroke();
+  } else {
+    // N-point rose / star
+    const pts = g.nodes || 4;
+    c2.beginPath();
+    for(let a=0; a<Math.PI*2; a+=0.008) {
+      const r = R*0.72*(0.5 + 0.5*Math.abs(Math.cos(pts*a*0.5 + t*0.35)));
+      const x = cx + r*Math.cos(a);
+      const y = cy + r*Math.sin(a);
+      a < 0.008 ? c2.moveTo(x,y) : c2.lineTo(x,y);
+    }
+    c2.closePath(); c2.stroke();
+  }
+  c2.globalAlpha = 1;
+  cymaPhase += 0.038;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// SPECTRUM
+// ════════════════════════════════════════════════════════════════════════════
+const specEl  = document.getElementById('specCanvas');
+const sctx    = specEl.getContext('2d');
+
+function drawSpec(data, detHz) {
+  const W = specEl.offsetWidth || 290, H = 56;
+  specEl.width = W; specEl.height = H;
+  sctx.clearRect(0,0,W,H);
+  const maxBin = Math.floor(800/BIN_HZ);
+  for(let i=1; i<maxBin; i++) {
+    const x = (i/maxBin)*W;
+    const db = Math.max(-80, data[i]);
+    const h  = ((db+80)/80)*H;
+    const isNote = detHz > 0 && Math.abs(i*BIN_HZ - detHz) < BIN_HZ*2;
+    sctx.fillStyle = isNote ? '#60a5fa' : 'rgba(60,120,160,0.35)';
+    sctx.fillRect(x, H-h, Math.max(1,W/maxBin*0.75), h);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// AUDIO ENGINE
+// ════════════════════════════════════════════════════════════════════════════
+let audioCtx, analyser, dataArray, animId;
+let envFast=0, envSlow=0, riseStart=0, riseMs=100, inRise=false;
+let claritySmooth=0;
+
+async function startAudio() {
+  document.getElementById('startBtn').style.display = 'none';
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:false }
+  });
+  audioCtx = new AudioContext({ sampleRate: SAMPLE_RATE });
+  const src = audioCtx.createMediaStreamSource(stream);
+  analyser  = audioCtx.createAnalyser();
+  analyser.fftSize = FFT_SIZE;
+  analyser.smoothingTimeConstant = 0.78;
+  src.connect(analyser);
+  dataArray = new Float32Array(analyser.frequencyBinCount);
+  loop();
+}
+
+function loop() {
+  animId = requestAnimationFrame(loop);
+  analyser.getFloatFrequencyData(dataArray);
+
+  const { hz:detHz, db:peakVal } = detectBass(dataArray);
+  const hasSignal = peakVal > -55 && detHz > 20;
+  const noteObj   = hasSignal ? freqToNote(detHz) : null;
+  const pc        = noteObj ? noteObj.pc : -1;
+  const amp       = Math.max(0, (peakVal+55)/40);
+
+  // Rise time tracking
+  envFast = envFast*0.7  + amp*0.3;
+  envSlow = envSlow*0.95 + amp*0.05;
+  if( envFast > envSlow*1.5 && !inRise) { inRise=true;  riseStart=Date.now(); }
+  if( envFast < envSlow*0.8 &&  inRise) { inRise=false; riseMs=Date.now()-riseStart; }
+
+  // Vibrato
+  freqBuf[vBufIdx] = hasSignal ? detHz : 0;
+  vBufIdx = (vBufIdx+1) % VBUF;
+  if(vBufFilled < VBUF) vBufFilled++;
+  const vib = detectVibrato();
+
+  // Harmonic clarity
+  let hE=0, tE=0;
+  const maxBin2 = Math.floor(2000/BIN_HZ);
+  for(let i=Math.ceil(20/BIN_HZ); i<maxBin2; i++) {
+    const lin = Math.pow(10, Math.max(-80,dataArray[i])/20);
+    tE += lin*lin;
+    if(detHz > 20) {
+      for(let h=1; h<=6; h++) {
+        if(Math.round(detHz*h/BIN_HZ) === i) hE += lin*lin;
+      }
+    }
+  }
+  const rawC = tE > 0 ? Math.min(1, hE/tE*20) : 0;
+  claritySmooth = claritySmooth*0.9 + rawC*0.1;
+
+  // ── UPDATE HUD ───────────────────────────────────────────────────────────
+  if(hasSignal && pc >= 0) {
+    const lunar  = LUNAR[pc];
+    const chakra = CHAKRA[pc];
+    const scores = scoreDosha(pc, riseMs, vib.rate, claritySmooth);
+    const dom    = scores.vata>scores.pitta && scores.vata>scores.kapha ? 'vata'
+                 : scores.pitta>scores.kapha ? 'pitta' : 'kapha';
+    const domD   = DOSHA[dom];
+
+    // LEFT
+    document.getElementById('noteName').textContent = lunar.note;
+    document.getElementById('noteName').style.color = lunar.color;
+    document.getElementById('hzDisplay').textContent = detHz.toFixed(1)+' Hz';
+    document.getElementById('bodyZone').textContent  = lunar.body;
+    document.getElementById('bodyZone').style.color  = lunar.color;
+    document.getElementById('chakraName').textContent = chakra.chakra;
+    document.getElementById('sapLine').textContent = lunar.sap.toUpperCase()+' · '+lunar.tree+' · '+lunar.ogham;
+    document.getElementById('protoWord').textContent = lunar.proto;
+    const gm = PROTO_GEOM[lunar.proto];
+    document.getElementById('geomLine').textContent  = gm ? gm.form+' · '+gm.planet : '';
+    currentProto = lunar.proto;
+
+    // CENTER dosha bars
+    document.getElementById('vataBar').style.width   = scores.vata+'%';
+    document.getElementById('pittaBar').style.width  = scores.pitta+'%';
+    document.getElementById('kaphaBar').style.width  = scores.kapha+'%';
+    document.getElementById('vataPct').textContent   = scores.vata+'%';
+    document.getElementById('pittaPct').textContent  = scores.pitta+'%';
+    document.getElementById('kaphaPct').textContent  = scores.kapha+'%';
+
+    document.getElementById('dominantName').textContent = domD.name;
+    document.getElementById('dominantName').style.color = domD.col;
+    document.getElementById('dominantQual').textContent = chakra.qual;
+
+    // Bija
+    document.getElementById('bijaMantra').textContent = chakra.bija;
+    document.getElementById('bijaMantra').style.color = domD.col;
+    document.getElementById('bijaMeaning').textContent = chakra.bijaM;
+
+    // Healing proto-word (balancing opposite)
+    const bpc   = BALANCE_PC[dom];
+    const bL    = LUNAR[bpc];
+    document.getElementById('healingProto').textContent = bL.proto;
+    document.getElementById('healingProto').style.color = bL.color;
+    const bg    = PROTO_GEOM[bL.proto];
+    document.getElementById('healingText').textContent =
+      'Chant '+bL.proto+' · '+bL.body+'\n'+(bg?bg.form:'')+ ' · balances '+domD.name.toLowerCase()+' excess';
+
+    // RIGHT: Raga
+    const hr = new Date().getHours();
+    const ri = (hr>=5 && hr<13) ? 0 : 1;
+    document.getElementById('ragaName').textContent = 'Rāga '+chakra.raga[ri];
+    document.getElementById('ragaSub').textContent  = domD.element+' · '+domD.time;
+    document.getElementById('prescText').innerHTML  = '<strong>'+chakra.chakra+'</strong>'+chakra.presc;
+  }
+
+  drawCyma(currentProto, amp);
+  drawSpec(dataArray, detHz);
+}
+</script>
+</body>
+</html>

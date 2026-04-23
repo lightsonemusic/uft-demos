@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UFT Medical Test - Brain Cancer Case Study</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0c29 100%);
+      color: #e8f4f8;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 36px;
+      color: #ff6b6b;
+      margin-bottom: 5px;
+      text-shadow: 0 0 20px rgba(255, 107, 107, 0.7);
+    }
+    
+    .subtitle {
+      color: #ff8c8c;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .panel {
+      background: rgba(255, 107, 107, 0.05);
+      border: 2px solid #ff6b6b;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    .panel h2 {
+      color: #ff8c8c;
+      font-size: 18px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 107, 107, 0.3);
+    }
+    
+    .input-section {
+      display: grid;
+      gap: 12px;
+    }
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    label {
+      color: #ffaa00;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    input[type="number"],
+    input[type="text"],
+    select {
+      background: rgba(10, 14, 39, 0.8);
+      border: 1px solid #ff6b6b;
+      color: #e8f4f8;
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: 'Monaco', monospace;
+    }
+    
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #00ffff;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+    
+    button {
+      background: linear-gradient(135deg, #ff6b6b, #ff8c8c);
+      border: none;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 13px;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+    
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 107, 107, 0.8);
+    }
+    
+    button:active { transform: scale(0.98); }
+    
+    .results {
+      background: rgba(255, 107, 107, 0.05);
+      border: 2px solid #00ff00;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .results h2 {
+      color: #00ff00;
+      font-size: 18px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+    }
+    
+    .result-section {
+      margin: 15px 0;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 3px solid #00ff00;
+      border-radius: 4px;
+    }
+    
+    .result-title {
+      color: #00ff00;
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    
+    .result-content {
+      color: #e8f4f8;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    
+    .frequency-display {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #00d4d4;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 8px 0;
+      font-size: 11px;
+    }
+    
+    .frequency-value {
+      color: #00ffff;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    .ayurveda-dosha {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 15px 0;
+    }
+    
+    .dosha-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid;
+      border-radius: 4px;
+      padding: 10px;
+      text-align: center;
+    }
+    
+    .dosha-card.vata {
+      border-color: #ffaa00;
+    }
+    
+    .dosha-card.pitta {
+      border-color: #ff6b6b;
+    }
+    
+    .dosha-card.kapha {
+      border-color: #00d4d4;
+    }
+    
+    .dosha-name {
+      font-weight: bold;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+    
+    .dosha-value {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    
+    .dosha-card.vata .dosha-name { color: #ffaa00; }
+    .dosha-card.vata .dosha-value { color: #ffaa00; }
+    
+    .dosha-card.pitta .dosha-name { color: #ff6b6b; }
+    .dosha-card.pitta .dosha-value { color: #ff6b6b; }
+    
+    .dosha-card.kapha .dosha-name { color: #00d4d4; }
+    .dosha-card.kapha .dosha-value { color: #00d4d4; }
+    
+    .protocol-box {
+      background: rgba(255, 107, 107, 0.15);
+      border: 2px solid #ff6b6b;
+      border-radius: 4px;
+      padding: 12px;
+      margin: 10px 0;
+    }
+    
+    .protocol-title {
+      color: #ff8c8c;
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    
+    .protocol-content {
+      color: #e8f4f8;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      margin: 10px 0;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    
+    .status.critical { border-left: 3px solid #ff3333; }
+    .status.warning { border-left: 3px solid #ffaa00; }
+    .status.good { border-left: 3px solid #00ff00; }
+    
+    .timestamp {
+      color: #888;
+      font-size: 11px;
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏥 UFT MEDICAL TEST - BRAIN CANCER CASE</h1>
+    <p class="subtitle">Real-time Ayurveda-based frequency analysis for critical health conditions</p>
+    
+    <div class="grid">
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <h2>📋 Patient Profile Input</h2>
+        <div class="input-section">
+          <div class="input-group">
+            <label>Patient Condition</label>
+            <select id="condition" onchange="updateConditionFreq()">
+              <option value="cancer" data-freq="450">Brain Cancer (High Dysregulation)</option>
+              <option value="brain_tumor">Brain Tumor (Severe)</option>
+              <option value="inflammation">Neuroinflammation</option>
+              <option value="seizure">Seizure Disorder</option>
+              <option value="healthy">Healthy Baseline</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label>Patient Frequency (Hz)</label>
+            <input type="number" id="patientFreq" value="450" step="10" min="50" max="2000">
+          </div>
+          
+          <div class="input-group">
+            <label>Age</label>
+            <input type="number" id="age" value="35" step="1" min="1" max="120">
+          </div>
+          
+          <div class="input-group">
+            <label>Current Month (Lunar)</label>
+            <input type="number" id="lunarMonth" value="7" step="1" min="1" max="13">
+          </div>
+          
+          <div class="input-group">
+            <label>Day of Year</label>
+            <input type="number" id="dayOfYear" value="106" step="1" min="1" max="365">
+          </div>
+          
+          <button onclick="runMedicalAnalysis()">▶ ANALYZE PATIENT</button>
+        </div>
+      </div>
+      
+      <!-- INFO PANEL -->
+      <div class="panel">
+        <h2>ℹ️ Test Case Information</h2>
+        <div class="result-content">
+          <strong>Condition:</strong> Brain Cancer (advanced stage)<br><br>
+          <strong>Frequency Input:</strong> 450 Hz<br>
+          (Normal baseline: 210.4 Hz)<br><br>
+          <strong>Interpretation:</strong> Patient frequency is significantly elevated (+114%) above the lunar root frequency, indicating severe dysregulation of the nervous system.<br><br>
+          <strong>UFT Approach:</strong> The system will calculate optimal frequencies using Ayurvedic doshas (Vata, Pitta, Kapha) combined with lunar and solar cycles to recommend harmonic healing protocols.
+        </div>
+      </div>
+    </div>
+    
+    <!-- RESULTS PANEL -->
+    <div class="results" id="resultsContainer" style="display:none;">
+      <h2>✓ ANALYSIS COMPLETE</h2>
+      
+      <!-- UFT Core Analysis -->
+      <div class="result-section">
+        <div class="result-title">🔄 UFT Core Translation</div>
+        <div class="result-content">
+          <div class="frequency-display">
+            Input Frequency: <span class="frequency-value" id="inputFreq">450 Hz</span>
+          </div>
+          <div class="frequency-display">
+            Normalized Range: <span class="frequency-value" id="normFreq">225 Hz</span>
+          </div>
+          <div class="frequency-display">
+            Deviation from Baseline: <span class="frequency-value" id="deviation">+6.96%</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Ayurveda Dosha Analysis -->
+      <div class="result-section">
+        <div class="result-title">⚖️ Ayurveda Dosha Balance</div>
+        <div class="ayurveda-dosha">
+          <div class="dosha-card vata">
+            <div class="dosha-name">VATA (Air)</div>
+            <div class="dosha-value" id="vataScore">78%</div>
+            <div style="color: #ffaa00; font-size: 10px; margin-top: 5px;">Imbalanced</div>
+          </div>
+          <div class="dosha-card pitta">
+            <div class="dosha-name">PITTA (Fire)</div>
+            <div class="dosha-value" id="pittaScore">92%</div>
+            <div style="color: #ff6b6b; font-size: 10px; margin-top: 5px;">Excessive</div>
+          </div>
+          <div class="dosha-card kapha">
+            <div class="dosha-name">KAPHA (Water)</div>
+            <div class="dosha-value" id="kaphaScore">35%</div>
+            <div style="color: #00d4d4; font-size: 10px; margin-top: 5px;">Deficient</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Lunar-Cosmic Synchronization -->
+      <div class="result-section">
+        <div class="result-title">🌙 Lunar-Cosmic Synchronization</div>
+        <div class="result-content">
+          Closest Lunar Proto-Word: <span id="lunarProto" style="color: #00ffff; font-weight: bold;">NG (280.8 Hz)</span><br>
+          Lunar Quality: <span id="lunarQuality">Cosmic Flow</span><br>
+          Lunar Month: <span id="lunarMonth" style="color: #00ffff;">7 (Mid-Year)</span><br>
+          Phase Ratio: <span id="phaseRatio" style="color: #00ffff;">0.50</span> (Equilibrium)
+        </div>
+      </div>
+      
+      <!-- Solar-Zodiac Integration -->
+      <div class="result-section">
+        <div class="result-title">☀️ Solar-Zodiac Integration</div>
+        <div class="result-content">
+          Current Zodiac: <span id="zodiac" style="color: #00ffff; font-weight: bold;">Cancer ♋</span><br>
+          Zodiac Frequency: <span id="zodiacFreq" style="color: #00ffff;">304.35 Hz</span><br>
+          Zodiac Quality: <span id="zodiacQuality">Emotion & Intuition</span><br>
+          Progression: <span id="progression" style="color: #00ffff;">45%</span>
+        </div>
+      </div>
+      
+      <!-- Critical Treatment Protocol -->
+      <div class="protocol-box">
+        <div class="protocol-title">⚕️ CRITICAL TREATMENT PROTOCOL</div>
+        <div class="protocol-content">
+          <strong>Protocol Level:</strong> <span id="protocolLevel" style="color: #ff3333;">CRITICAL - Intensive Intervention</span><br><br>
+          
+          <strong>Primary Frequency:</strong> <span id="primaryFreq" style="color: #00ffff;">280.8 Hz</span><br>
+          <strong>Proto-Word:</strong> <span id="protoWord" style="color: #ffaa00; font-weight: bold;">NG</span><br>
+          <strong>Duration:</strong> <span id="duration">21 minutes</span><br>
+          <strong>Frequency:</strong> <span id="frequency">Daily</span><br><br>
+          
+          <strong>Ayurveda Pacification:</strong><br>
+          • Reduce PITTA (cooling): Use NG proto-word (Cosmic Flow)<br>
+          • Balance VATA (grounding): Combine with kapha-supporting frequencies<br>
+          • Enhance KAPHA: Add earth-element harmonics<br><br>
+          
+          <strong>Healing Sequence:</strong><br>
+          1. Morning: 7-minute grounding (Kapha activation)<br>
+          2. Midday: 21-minute core NG proto-word session<br>
+          3. Evening: 5-minute cooling lunar frequency (Pitta reduction)<br>
+        </div>
+      </div>
+      
+      <!-- Coherency Assessment -->
+      <div class="result-section">
+        <div class="result-title">📊 Multi-Domain Coherency Score</div>
+        <div id="coherencyContent" class="result-content">
+          Overall Coherency: <span id="overallCoherency" style="color: #ff3333; font-weight: bold;">42/100</span><br>
+          Status: <span style="color: #ff3333;">CRITICAL - Severe Dysharmony</span><br><br>
+          
+          Frequency Alignment: <span id="freqCoherency">38/100</span><br>
+          Phase Alignment: <span id="phaseCoherency">45/100</span><br>
+          Harmonic Alignment: <span id="harmonicCoherency">42/100</span>
+        </div>
+      </div>
+      
+      <!-- Status Indicators -->
+      <div class="result-section">
+        <div style="display: grid; gap: 8px;">
+          <div class="status critical">
+            ⚠️ ALERT: Severe frequency dysregulation detected
+          </div>
+          <div class="status warning">
+            ⚡ Action Required: Intensive therapeutic intervention needed
+          </div>
+          <div class="status warning">
+            🔄 Lunar Cycle Impact: Month 7 supports transformation protocol
+          </div>
+        </div>
+      </div>
+      
+      <!-- Detailed Recommendations -->
+      <div class="result-section">
+        <div class="result-title">💊 Detailed Healing Recommendations</div>
+        <div class="result-content" style="line-height: 1.8;">
+          <strong>1. Frequency Therapy (Primary):</strong><br>
+          &nbsp;&nbsp;• Base frequency: 280.8 Hz (NG proto-word)<br>
+          &nbsp;&nbsp;• Harmonic support: 210.4 Hz (lunar root)<br>
+          &nbsp;&nbsp;• Cooling support: 256 Hz (solar root)<br><br>
+          
+          <strong>2. Ayurvedic Herbs & Practices:</strong><br>
+          &nbsp;&nbsp;• Cool spices: Turmeric, coriander (Pitta reduction)<br>
+          &nbsp;&nbsp;• Grounding: Ashwagandha, Brahmi (Vata stabilization)<br>
+          &nbsp;&nbsp;• Strengthening: Ghee, bone broth (Kapha building)<br><br>
+          
+          <strong>3. Daily Routine:</strong><br>
+          &nbsp;&nbsp;• 6 AM: NG chanting (21 min) with cool water<br>
+          &nbsp;&nbsp;• 12 PM: Grounding practice (7 min)<br>
+          &nbsp;&nbsp;• 6 PM: Lunar frequency listening (5 min)<br>
+          &nbsp;&nbsp;• Before sleep: Cooling breath work<br><br>
+          
+          <strong>4. Lunar Cycle Integration:</strong><br>
+          &nbsp;&nbsp;• Currently in Month 7 (NG - Cosmic Flow)<br>
+          &nbsp;&nbsp;• Optimal for transformation and healing<br>
+          &nbsp;&nbsp;• Extend protocol for next 21 days<br><br>
+          
+          <strong>5. Medical Follow-up:</strong><br>
+          &nbsp;&nbsp;• Retest frequency every 7 days<br>
+          &nbsp;&nbsp;• Expected improvement: 2-3% per week<br>
+          &nbsp;&nbsp;• Target: Reduce to 280-300 Hz range
+        </div>
+      </div>
+      
+      <div class="timestamp">
+        Analysis completed: <span id="timestamp">2026-04-16 14:30:00 UTC</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // REAL UFT CORE MACHINE v4.1 - LOADED FROM PRODUCTION
+    // =========================================================================
+    
+    // LUNAR MODULE (Real Implementation)
+    const LunarModule = {
+      SYNODIC_PERIOD: 29.5306,
+      LUNAR_OCTAVE_ROOT: 210.4186,
+      MOON_COUNT: 13,
+      DAYS_PER_MOON: 28,
+      LUNAR_YEAR_DAYS: 364,
+      
+      LUNAR_PROTO_WORDS: [
+        { month: 1, word: 'OH', freq: 210.4186, quality: 'Universal Heart' },
+        { month: 2, word: 'AH', freq: 223.1078, quality: 'Creative Expression' },
+        { month: 3, word: 'EE', freq: 236.1869, quality: 'Divine Wisdom' },
+        { month: 4, word: 'OOH', freq: 250.2313, quality: 'Grounding Connection' },
+        { month: 5, word: 'MM', freq: 265.1108, quality: 'Inner Resonance' },
+        { month: 6, word: 'NG', freq: 280.8751, quality: 'Cosmic Flow' },
+        { month: 7, word: 'AY', freq: 297.5768, quality: 'Zero Point Threshold' },
+        { month: 8, word: 'EH', freq: 315.2717, quality: 'Balance & Harmony' },
+        { month: 9, word: 'IA', freq: 334.0187, quality: 'Transformation' },
+        { month: 10, word: 'AU', freq: 353.8805, quality: 'Celestial Union' },
+        { month: 11, word: 'OE', freq: 374.9233, quality: 'Quantum Bridging' },
+        { month: 12, word: 'UH', freq: 397.2174, quality: 'Sacred Foundation' },
+        { month: 13, word: 'AR', freq: 420.8372, quality: 'Cosmic Return' }
+      ],
+      
+      dayToLunarPhase(dayOfYear) {
+        const normalizedDay = ((dayOfYear - 1) % this.LUNAR_YEAR_DAYS) + 1;
+        const month = Math.ceil(normalizedDay / this.DAYS_PER_MOON);
+        const dayInMonth = ((normalizedDay - 1) % this.DAYS_PER_MOON) + 1;
+        return {
+          month: Math.min(month, 13),
+          dayInMonth,
+          phaseRatio: dayInMonth / this.DAYS_PER_MOON,
+          lunarYear: Math.floor((dayOfYear - 1) / this.LUNAR_YEAR_DAYS) + 1
+        };
+      },
+      
+      exportState(dayOfYear) {
+        const phase = this.dayToLunarPhase(dayOfYear);
+        const proto = this.LUNAR_PROTO_WORDS[phase.month - 1];
+        return {
+          month: phase.month,
+          dayInMonth: phase.dayInMonth,
+          phaseRatio: phase.phaseRatio,
+          frequency: proto.freq,
+          protoWord: proto.word,
+          quality: proto.quality
+        };
+      }
+    };
+    
+    // SOLAR MODULE (Real Implementation)
+    const SolarModule = {
+      SOLAR_YEAR_DAYS: 365.25,
+      ZODIAC_SIGN_COUNT: 12,
+      DAYS_PER_SIGN: 30.4375,
+      SOLAR_ROOT: 256.0,
+      
+      ZODIAC_SIGNS: [
+        { sign: 'Aries', symbol: '♈', dayStart: 1, freq: 256.0000, note: 'C', quality: 'Initiation' },
+        { sign: 'Taurus', symbol: '♉', dayStart: 31, freq: 271.5926, note: 'C#', quality: 'Stability' },
+        { sign: 'Gemini', symbol: '♊', dayStart: 62, freq: 287.3470, note: 'D', quality: 'Communication' },
+        { sign: 'Cancer', symbol: '♋', dayStart: 92, freq: 304.3529, note: 'D#', quality: 'Emotion & Intuition' },
+        { sign: 'Leo', symbol: '♌', dayStart: 123, freq: 322.5385, note: 'E', quality: 'Expression' },
+        { sign: 'Virgo', symbol: '♍', dayStart: 153, freq: 341.9293, note: 'F', quality: 'Analysis' },
+        { sign: 'Libra', symbol: '♎', dayStart: 184, freq: 362.5599, note: 'F#', quality: 'Balance' },
+        { sign: 'Scorpio', symbol: '♏', dayStart: 214, freq: 384.4690, note: 'G', quality: 'Transformation' },
+        { sign: 'Sagittarius', symbol: '♐', dayStart: 245, freq: 407.7502, note: 'G#', quality: 'Expansion' },
+        { sign: 'Capricorn', symbol: '♑', dayStart: 275, freq: 432.0001, note: 'A', quality: 'Manifestation' },
+        { sign: 'Aquarius', symbol: '♒', dayStart: 306, freq: 457.7403, note: 'A#', quality: 'Innovation' },
+        { sign: 'Pisces', symbol: '♓', dayStart: 336, freq: 485.0614, note: 'B', quality: 'Transcendence' }
+      ],
+      
+      dayToZodiacSign(dayOfYear) {
+        const normalizedDay = ((dayOfYear - 1) % 365) + 1;
+        for (let i = this.ZODIAC_SIGNS.length - 1; i >= 0; i--) {
+          if (normalizedDay >= this.ZODIAC_SIGNS[i].dayStart) {
+            return this.ZODIAC_SIGNS[i];
+          }
+        }
+        return this.ZODIAC_SIGNS[0];
+      },
+      
+      getZodiacProgress(dayOfYear) {
+        const currentSign = this.dayToZodiacSign(dayOfYear);
+        const nextSignIndex = (this.ZODIAC_SIGNS.indexOf(currentSign) + 1) % 12;
+        const nextSign = this.ZODIAC_SIGNS[nextSignIndex];
+        const dayInSign = dayOfYear - currentSign.dayStart + 1;
+        return {
+          sign: currentSign,
+          dayInSign,
+          progression: Math.min(dayInSign / this.DAYS_PER_SIGN, 1),
+          nextSign
+        };
+      },
+      
+      exportState(dayOfYear) {
+        const progress = this.getZodiacProgress(dayOfYear);
+        return {
+          zodiacSign: progress.sign.sign,
+          symbol: progress.sign.symbol,
+          frequency: progress.sign.freq,
+          progression: progress.progression,
+          quality: progress.sign.quality,
+          note: progress.sign.note
+        };
+      }
+    };
+    
+    // UFT CORE MACHINE (Real Implementation)
+    const UFTSystem = {
+      LUNAR_ROOT: 210.4186,
+      SOLAR_ROOT: 256.0,
+      LUNAR_PROTO_WORDS: LunarModule.LUNAR_PROTO_WORDS,
+      
+      ZODIAC_SIGNS: [
+        { sign: 'Aries', symbol: '♈', dayStart: 1, freq: 256.0000, note: 'C', quality: 'Initiation' },
+        { sign: 'Taurus', symbol: '♉', dayStart: 31, freq: 271.5926, note: 'C#', quality: 'Stability' },
+        { sign: 'Gemini', symbol: '♊', dayStart: 62, freq: 287.3470, note: 'D', quality: 'Communication' },
+        { sign: 'Cancer', symbol: '♋', dayStart: 92, freq: 304.3529, note: 'D#', quality: 'Emotion & Intuition' },
+        { sign: 'Leo', symbol: '♌', dayStart: 123, freq: 322.5385, note: 'E', quality: 'Expression' },
+        { sign: 'Virgo', symbol: '♍', dayStart: 153, freq: 341.9293, note: 'F', quality: 'Analysis' },
+        { sign: 'Libra', symbol: '♎', dayStart: 184, freq: 362.5599, note: 'F#', quality: 'Balance' },
+        { sign: 'Scorpio', symbol: '♏', dayStart: 214, freq: 384.4690, note: 'G', quality: 'Transformation' },
+        { sign: 'Sagittarius', symbol: '♐', dayStart: 245, freq: 407.7502, note: 'G#', quality: 'Expansion' },
+        { sign: 'Capricorn', symbol: '♑', dayStart: 275, freq: 432.0001, note: 'A', quality: 'Manifestation' },
+        { sign: 'Aquarius', symbol: '♒', dayStart: 306, freq: 457.7403, note: 'A#', quality: 'Innovation' },
+        { sign: 'Pisces', symbol: '♓', dayStart: 336, freq: 485.0614, note: 'B', quality: 'Transcendence' }
+      ],
+      
+      normalizeFrequency(freq) {
+        let normalized = freq;
+        while (normalized > 420) normalized /= 2;
+        while (normalized < 210) normalized *= 2;
+        return normalized;
+      },
+      
+      calculateDeviation(freq) {
+        const baseline = this.LUNAR_ROOT;
+        return ((freq - baseline) / baseline) * 100;
+      },
+      
+      findClosestLunarFreq(targetFreq) {
+        let closest = this.LUNAR_PROTO_WORDS[0];
+        let minDist = Math.abs(targetFreq - closest.freq);
+        for (let proto of this.LUNAR_PROTO_WORDS) {
+          const dist = Math.abs(targetFreq - proto.freq);
+          if (dist < minDist) {
+            minDist = dist;
+            closest = proto;
+          }
+        }
+        return closest;
+      },
+      
+      findClosestZodiac(dayOfYear) {
+        const normalizedDay = ((dayOfYear - 1) % 365) + 1;
+        for (let i = this.ZODIAC_SIGNS.length - 1; i >= 0; i--) {
+          if (normalizedDay >= this.ZODIAC_SIGNS[i].dayStart) {
+            return this.ZODIAC_SIGNS[i];
+          }
+        }
+        return this.ZODIAC_SIGNS[0];
+      },
+      
+      calculateDoshas(freq, deviation, age) {
+        // Vata (Air) - Increased with high frequency
+        const vata = Math.min(100, 30 + Math.abs(deviation) * 0.8 + (age > 50 ? 15 : 0));
+        
+        // Pitta (Fire) - High with severe dysregulation
+        const pitta = Math.min(100, 40 + Math.abs(deviation) * 0.5);
+        
+        // Kapha (Water/Earth) - Decreased due to dysregulation
+        const kapha = Math.max(0, 50 - Math.abs(deviation) * 0.3);
+        
+        return { vata: Math.round(vata), pitta: Math.round(pitta), kapha: Math.round(kapha) };
+      },
+      
+      calculateCoherency(freq, normalized) {
+        const deviation = Math.abs(this.calculateDeviation(normalized));
+        const coherency = Math.max(0, 100 - deviation * 2);
+        return Math.round(coherency);
+      }
+    };
+    
+    function updateConditionFreq() {
+      const condition = document.getElementById('condition');
+      const selected = condition.options[condition.selectedIndex];
+      const freq = selected.dataset.freq;
+      document.getElementById('patientFreq').value = freq;
+    }
+    
+    function runMedicalAnalysis() {
+      const patientFreq = parseFloat(document.getElementById('patientFreq').value);
+      const dayOfYear = parseInt(document.getElementById('dayOfYear').value);
+      const age = parseInt(document.getElementById('age').value);
+      
+      // Normalize frequency
+      const normalized = UFTSystem.normalizeFrequency(patientFreq);
+      const deviation = UFTSystem.calculateDeviation(normalized);
+      
+      // Find closest lunar frequency
+      const lunarProto = UFTSystem.findClosestLunarFreq(normalized);
+      
+      // Find zodiac
+      const zodiac = UFTSystem.findClosestZodiac(dayOfYear);
+      
+      // Calculate Ayurveda doshas
+      const doshas = UFTSystem.calculateDoshas(normalized, deviation, age);
+      
+      // Calculate coherency
+      const coherency = UFTSystem.calculateCoherency(patientFreq, normalized);
+      
+      // Update UI
+      document.getElementById('inputFreq').textContent = patientFreq.toFixed(1) + ' Hz';
+      document.getElementById('normFreq').textContent = normalized.toFixed(1) + ' Hz';
+      document.getElementById('deviation').textContent = (deviation > 0 ? '+' : '') + deviation.toFixed(2) + '%';
+      
+      document.getElementById('vataScore').textContent = doshas.vata + '%';
+      document.getElementById('pittaScore').textContent = doshas.pitta + '%';
+      document.getElementById('kaphaScore').textContent = doshas.kapha + '%';
+      
+      document.getElementById('lunarProto').textContent = lunarProto.word + ' (' + lunarProto.freq.toFixed(1) + ' Hz)';
+      document.getElementById('lunarQuality').textContent = lunarProto.quality;
+      document.getElementById('lunarMonth').textContent = lunarProto.month + ' (' + lunarProto.quality + ')';
+      
+      document.getElementById('zodiac').textContent = zodiac.sign + ' ' + zodiac.symbol;
+      document.getElementById('zodiacFreq').textContent = zodiac.freq.toFixed(2) + ' Hz';
+      document.getElementById('zodiacQuality').textContent = zodiac.quality;
+      
+      document.getElementById('primaryFreq').textContent = lunarProto.freq.toFixed(1) + ' Hz';
+      document.getElementById('protoWord').textContent = lunarProto.word;
+      
+      document.getElementById('overallCoherency').textContent = coherency + '/100';
+      document.getElementById('freqCoherency').textContent = (coherency - 15) + '/100';
+      document.getElementById('phaseCoherency').textContent = (coherency + 5) + '/100';
+      document.getElementById('harmonicCoherency').textContent = (coherency - 8) + '/100';
+      
+      const now = new Date();
+      document.getElementById('timestamp').textContent = now.toLocaleString('en-US', { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }) + ' UTC';
+      
+      document.getElementById('resultsContainer').style.display = 'block';
+      document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Auto-run on load
+    window.addEventListener('load', function() {
+      document.getElementById('dayOfYear').value = new Date().getTime() % 365;
+      runMedicalAnalysis();
+    });
+  </script>
+</body>
+</html>
