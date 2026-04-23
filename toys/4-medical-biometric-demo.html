@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UFT v4.1 Medical Demo - Human Biometric Input</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at 50% 0%, #0a0e27 0%, #1a1a2e 50%, #0d0f1f 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 204, 255, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .container { position: relative; z-index: 2; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 60, 0.85);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 136, 0.3),
+                0 0 40px rgba(0, 204, 255, 0.15),
+                inset 0 0 20px rgba(0, 255, 136, 0.05);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 2;
+        }
+        .disclaimer {
+            background: rgba(255, 100, 0, 0.1);
+            border: 2px solid #ff6400;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .disclaimer-icon {
+            font-size: 2em;
+            flex-shrink: 0;
+            color: #ff8800;
+        }
+        .disclaimer-text {
+            color: #ffc080;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        .disclaimer-title {
+            color: #ff8800;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+        h1 { 
+            text-align: center; 
+            color: #00ff88; 
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        .subtitle { 
+            text-align: center; 
+            color: #00ccff; 
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .panel {
+            background: rgba(20, 20, 50, 0.8);
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .panel h2 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border-bottom: 1px solid #00ff88;
+            padding-bottom: 10px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .input-label label {
+            font-weight: 600;
+            color: #00ccff;
+        }
+        .input-unit {
+            font-size: 0.85em;
+            color: #888;
+        }
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(10, 10, 30, 0.9);
+            border: 1px solid #00ff88;
+            border-radius: 4px;
+            color: #00ff88;
+            font-size: 1em;
+        }
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #00ccff;
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
+        }
+        input[type="number"]::placeholder {
+            color: #666;
+        }
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        button {
+            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .pipeline {
+            grid-column: 1 / -1;
+            background: rgba(20, 20, 50, 0.8);
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .pipeline h2 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #00ff88;
+            padding-bottom: 10px;
+        }
+        .pipeline-stages {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stage {
+            background: rgba(10, 10, 30, 0.9);
+            border: 1px solid #00ccff;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .stage-title {
+            color: #00ff88;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stage-value {
+            color: #00ccff;
+            font-family: monospace;
+            font-size: 0.85em;
+            word-break: break-all;
+        }
+        .arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ff88;
+            font-size: 1.2em;
+        }
+        .output-panel {
+            grid-column: 1 / -1;
+            background: rgba(20, 30, 50, 0.8);
+            border: 2px solid #00ccff;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .output-panel h2 {
+            color: #00ccff;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #00ccff;
+            padding-bottom: 10px;
+        }
+        .output-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .output-item {
+            background: rgba(10, 10, 30, 0.9);
+            border: 1px solid #00ff88;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .output-item-label {
+            color: #00ff88;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        .output-item-value {
+            color: #00ccff;
+            font-family: monospace;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        .output-item-detail {
+            color: #888;
+            font-size: 0.85em;
+        }
+        .medical-recommendation {
+            grid-column: 1 / -1;
+            background: rgba(30, 20, 10, 0.8);
+            border: 1px solid #ff8800;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .medical-recommendation-title {
+            color: #ff8800;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .medical-recommendation-text {
+            color: #ffc080;
+            line-height: 1.5;
+        }
+        .hardware-outputs {
+            grid-column: 1 / -1;
+            background: rgba(20, 30, 50, 0.8);
+            border: 1px solid #00ccff;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .hardware-outputs-title {
+            color: #00ccff;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .hardware-item {
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 10px;
+        }
+        .hardware-label {
+            color: #888;
+            font-size: 0.85em;
+        }
+        .hardware-value {
+            color: #00ff88;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            color: #ff8888;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        @media (max-width: 1024px) {
+            .layout { grid-template-columns: 1fr; }
+            .output-grid { grid-template-columns: repeat(2, 1fr); }
+            .pipeline-stages { grid-template-columns: repeat(3, 1fr); }
+        }
+        .visualization-panel {
+            grid-column: 1 / -1;
+            background: rgba(20, 30, 50, 0.8);
+            border: 1px solid #00ccff;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .visualization-panel h2 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #00ff88;
+            padding-bottom: 10px;
+            width: 100%;
+        }
+        #geometricCanvas {
+            border: 1px solid #00ccff;
+            border-radius: 6px;
+            background: radial-gradient(circle at center, rgba(10, 20, 50, 0.9), rgba(5, 10, 30, 0.95));
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+            margin-bottom: 15px;
+            display: none;
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.2);
+        }
+        #geometricCanvas.active {
+            display: block;
+            animation: glow 2s ease-in-out infinite;
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 204, 255, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.3); }
+        }
+        .geometry-info {
+            color: #00ccff;
+            font-size: 0.9em;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Universal Frequency Translator (UFT) v4.1 Medical Demo</h1>
+        <p class="subtitle">Human Biometric Input → UFT v4.1 Pipeline → Therapeutic Output</p>
+
+        <div class="disclaimer">
+            <div class="disclaimer-icon">⚠️</div>
+            <div class="disclaimer-text">
+                <div class="disclaimer-title">TESTING & DEMONSTRATION ONLY</div>
+                This is an experimental research demonstration of the UFT v4.1 system. This is NOT a medical device, NOT FDA approved, and should NOT be used for medical diagnosis or treatment. Results are simulated for educational purposes only. Always consult qualified healthcare professionals for medical advice.
+            </div>
+        </div>
+
+        <!-- ABOUT UFT SECTION -->
+        <div class="panel" style="grid-column: 1 / -1; margin-bottom: 20px; border-color: #00ccff;">
+            <h2>📚 About UFT v4.1 Medical Demo</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.95em;">
+                <div>
+                    <p style="color: #00ff88; margin-bottom: 10px;"><strong>What is UFT?</strong></p>
+                    <p style="color: #ccc; line-height: 1.6;">The Universal Frequency Translator (UFT) v4.1 is a cosmic resonance system that maps human biometric data into the 21-state lunar cycle. It calculates therapeutic frequencies based on optimal health parameters.</p>
+                </div>
+                <div>
+                    <p style="color: #00ff88; margin-bottom: 10px;"><strong>How It Works</strong></p>
+                    <p style="color: #ccc; line-height: 1.6;">Your vital signs (heart rate, temperature, etc.) convert to frequencies → normalize to cosmic range (210-421 Hz) → map to 21 states → extract therapeutic proto-words with Ogham/Chakra significance.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUICK START GUIDE -->
+        <div class="panel" style="grid-column: 1 / -1; margin-bottom: 20px; background: rgba(20, 40, 30, 0.8); border-color: #00ff88;">
+            <h2>🚀 Quick Start Guide</h2>
+            <ol style="color: #00ff88; line-height: 2; margin-left: 20px;">
+                <li><strong>Enter Your Measurements:</strong> Fill in your vital signs (default values are already provided for testing)</li>
+                <li><strong>Select Your Condition:</strong> Choose a health focus from the dropdown (Stress, Pain, Sleep, Energy, etc.)</li>
+                <li><strong>Click "Process Through UFT v4.1":</strong> Watch the pipeline visualization process your data</li>
+                <li><strong>View Results:</strong> See your cosmic state, proto-word resonance, and therapeutic recommendation</li>
+                <li><strong>Observe Geometry:</strong> The animated visualization shows your coherency state in real-time</li>
+            </ol>
+        </div>
+
+        <div class="layout">
+            <!-- HUMAN INPUT PANEL -->
+            <div class="panel">
+                <h2>📊 Human Measurements</h2>
+                
+                <div class="input-group">
+                    <div class="input-label">
+                        <label for="heartRate">Heart Rate</label>
+                        <span class="input-unit">bpm</span>
+                    </div>
+                    <input type="number" id="heartRate" placeholder="60-100 typical" min="40" max="200" value="72">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label">
+                        <label for="temperature">Body Temperature</label>
+                        <span class="input-unit">°C</span>
+                    </div>
+                    <input type="number" id="temperature" placeholder="36-37.5 normal" min="35" max="40" step="0.1" value="37.0">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label">
+                        <label for="respirationRate">Respiratory Rate</label>
+                        <span class="input-unit">breaths/min</span>
+                    </div>
+                    <input type="number" id="respirationRate" placeholder="12-20 typical" min="8" max="40" value="16">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label">
+                        <label>Blood Pressure</label>
+                        <span class="input-unit">mmHg</span>
+                    </div>
+                    <div class="input-row">
+                        <input type="number" id="bpSystolic" placeholder="Systolic" min="70" max="200" value="120">
+                        <input type="number" id="bpDiastolic" placeholder="Diastolic" min="40" max="130" value="80">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label">
+                        <label for="bloodGlucose">Blood Glucose (Optional)</label>
+                        <span class="input-unit">mg/dL</span>
+                    </div>
+                    <input type="number" id="bloodGlucose" placeholder="70-100 fasting" min="50" max="400" value="95">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label">
+                        <label for="condition">Health Condition / Symptom</label>
+                    </div>
+                    <select id="condition">
+                        <option value="general">General Wellness</option>
+                        <option value="stress">Stress/Anxiety</option>
+                        <option value="inflammation">Inflammation</option>
+                        <option value="pain">Chronic Pain</option>
+                        <option value="sleep">Sleep Disorder</option>
+                        <option value="immune">Immune Support</option>
+                        <option value="energy">Low Energy</option>
+                        <option value="focus">Poor Focus/Clarity</option>
+                        <option value="cardiovascular">Cardiovascular Health</option>
+                    </select>
+                </div>
+
+                <button onclick="processBiometrics()">🔄 Process Through UFT v4.1</button>
+                <div id="inputError"></div>
+            </div>
+
+            <!-- REFERENCE DATA PANEL -->
+            <div class="panel">
+                <h2>📖 Reference Values</h2>
+                <p style="font-size: 0.9em; color: #888; margin-bottom: 15px;">Typical healthy ranges:</p>
+                <div style="font-family: monospace; font-size: 0.9em; color: #00ccff;">
+                    <p><strong>Heart Rate:</strong> 60-100 bpm (resting)</p>
+                    <p><strong>Temperature:</strong> 36.1-37.2°C (core)</p>
+                    <p><strong>Respiration:</strong> 12-20 breaths/min</p>
+                    <p><strong>BP (Systolic):</strong> &lt;120 mmHg</p>
+                    <p><strong>BP (Diastolic):</strong> &lt;80 mmHg</p>
+                    <p><strong>Blood Glucose:</strong> 70-100 mg/dL (fasting)</p>
+                </div>
+                <hr style="border: 1px solid #00ff88; margin: 15px 0;">
+                <p style="font-size: 0.9em; color: #888; margin-bottom: 10px;"><strong>UFT Calibration:</strong></p>
+                <div style="font-family: monospace; font-size: 0.9em; color: #00ff88;">
+                    <p>COSMIC_ROOT: 210.42 Hz (Lunar)</p>
+                    <p>SOLAR_ROOT: 256.00 Hz (432-Hz system)</p>
+                    <p>PHI (Golden Ratio): 1.618</p>
+                    <p>States: 21 (29.53-day cycle)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- UFT PROCESSING PIPELINE -->
+        <div class="pipeline">
+            <h2>⚙️ UFT v4.1 Processing Pipeline</h2>
+            <div class="pipeline-stages">
+                <div class="stage">
+                    <div class="stage-title">1. Input</div>
+                    <div class="stage-value" id="pipelineInput">Waiting...</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="stage">
+                    <div class="stage-title">2. Normalize</div>
+                    <div class="stage-value" id="pipelineNormalize">Waiting...</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="stage">
+                    <div class="stage-title">3. Cosmic Phase</div>
+                    <div class="stage-value" id="pipelinePhase">Waiting...</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="stage">
+                    <div class="stage-title">4. State (0-20)</div>
+                    <div class="stage-value" id="pipelineState">Waiting...</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="stage">
+                    <div class="stage-title">5. Therapeutic</div>
+                    <div class="stage-value" id="pipelineTherapeutic">Waiting...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GEOMETRIC VISUALIZATION -->
+        <div class="visualization-panel">
+            <h2>✨ Cosmic Geometry Visualization</h2>
+            <canvas id="geometricCanvas"></canvas>
+            <div class="geometry-info" id="geometryInfo">Process biometrics to visualize cosmic resonance geometry</div>
+        </div>
+
+        <!-- OUTPUT & RESULTS -->
+        <div class="output-panel">
+            <h2>📡 UFT Diagnostic Output</h2>
+            <div class="output-grid">
+                <div class="output-item">
+                    <div class="output-item-label">Primary Frequency</div>
+                    <div class="output-item-value" id="primaryFreq">—</div>
+                    <div class="output-item-detail" id="primaryFreqDetail">Hz (normalized range: 210-421)</div>
+                </div>
+                <div class="output-item">
+                    <div class="output-item-label">Cosmic State</div>
+                    <div class="output-item-value" id="cosmicState">—</div>
+                    <div class="output-item-detail" id="cosmicStateDetail">0-20 (29.53-day cycle)</div>
+                </div>
+                <div class="output-item">
+                    <div class="output-item-label">Health Coherency</div>
+                    <div class="output-item-value" id="coherency">—</div>
+                    <div class="output-item-detail">Perfect: 100% | Needs Support: 0%</div>
+                </div>
+                <div class="output-item">
+                    <div class="output-item-label">Proto-Word</div>
+                    <div class="output-item-value" id="protoWord">—</div>
+                    <div class="output-item-detail" id="protoWordDetail">Primary cosmic frequency name</div>
+                </div>
+                <div class="output-item" style="background: rgba(0, 255, 136, 0.1); border-color: #00ff88;">
+                    <div class="output-item-label" style="color: #00ff88;">🎯 Recommended Therapeutic Frequency</div>
+                    <div class="output-item-value" id="therapeuticFreq">—</div>
+                    <div class="output-item-detail" id="therapeuticFreqDetail">Use for audio synthesis or hardware output</div>
+                </div>
+                <div class="output-item">
+                    <div class="output-item-label">Ogham Tree</div>
+                    <div class="output-item-value" id="oghamTree">—</div>
+                    <div class="output-item-detail" id="oghamTreeDetail">Celtic tree correspondence</div>
+                </div>
+                <div class="output-item">
+                    <div class="output-item-label">Chakra Affinity</div>
+                    <div class="output-item-value" id="chakra">—</div>
+                    <div class="output-item-detail" id="chakraDetail">Energy center resonance</div>
+                </div>
+            </div>
+
+            <div class="medical-recommendation">
+                <div class="medical-recommendation-title">💊 Therapeutic Recommendation</div>
+                <div class="medical-recommendation-text" id="medicalRec">
+                    Click the green button above to process your measurements and receive your personalized therapeutic recommendation.
+                </div>
+            </div>
+
+            <!-- INTERPRETATION GUIDE -->
+            <div style="background: rgba(20, 30, 50, 0.8); border: 1px solid #00ccff; border-radius: 6px; padding: 15px; margin-top: 15px;">
+                <div style="color: #00ccff; font-weight: bold; margin-bottom: 10px;">📖 How to Interpret Results</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9em;">
+                    <div>
+                        <div style="color: #00ff88; margin-bottom: 5px;"><strong>Coherency:</strong></div>
+                        <p style="color: #ccc; margin: 0;">Shows how well your vital signs align with optimal health. 100% = perfect balance. Lower values suggest areas needing support.</p>
+                    </div>
+                    <div>
+                        <div style="color: #00ff88; margin-bottom: 5px;"><strong>Cosmic State:</strong></div>
+                        <p style="color: #ccc; margin: 0;">Your position in the 21-state lunar cycle. Different states correspond to different therapeutic frequencies and natural rhythms.</p>
+                    </div>
+                    <div>
+                        <div style="color: #00ff88; margin-bottom: 5px;"><strong>Proto-Word:</strong></div>
+                        <p style="color: #ccc; margin: 0;">Sacred syllables (AH, SA, LA, RA, etc.) that resonate with your current frequency. Each has unique harmonic and symbolic properties.</p>
+                    </div>
+                    <div>
+                        <div style="color: #00ff88; margin-bottom: 5px;"><strong>Ogham/Chakra:</strong></div>
+                        <p style="color: #ccc; margin: 0;">Ancient Celtic and Hindu correspondences. Trees and energy centers that resonate with your therapeutic frequency profile.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // UFT system objects (stubs - using local calculations)
+        const UFT = {};
+        const engine = {};
+        const states = { states: [] };
+        for (let i = 0; i < 21; i++) {
+            states.states.push({ name: `State ${i}`, frequency: 210.42 + (i * 10) });
+        }
+
+        // Canvas animation state
+        let animationId = null;
+        let animationState = {
+            time: 0,
+            stateIndex: 0,
+            frequency: 0,
+            coherency: 0,
+            condition: 'general'
+        };
+
+        // Geometric visualization functions
+        function drawGeometry(canvas, stateIndex, frequency, coherency) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            const centerX = w / 2;
+            const centerY = h / 2;
+            const baseRadius = Math.min(w, h) * 0.25;
+
+            // Clear canvas with gradient
+            const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, baseRadius * 2);
+            grad.addColorStop(0, 'rgba(10, 20, 50, 1)');
+            grad.addColorStop(1, 'rgba(5, 10, 30, 1)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            // Calculate geometry type based on state
+            const geometryType = stateIndex % 9;
+            const time = animationState.time * 0.01;
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+
+            // Draw based on state
+            switch(geometryType) {
+                case 0: drawExpandingCircles(ctx, baseRadius, coherency, time); break;
+                case 1: drawGoldenSpiral(ctx, baseRadius, coherency, time); break;
+                case 2: drawFlowerPetals(ctx, baseRadius, stateIndex, coherency, time); break;
+                case 3: drawRadialWave(ctx, baseRadius, coherency, time); break;
+                case 4: drawStarPolygon(ctx, baseRadius, stateIndex, coherency, time); break;
+                case 5: drawHexagon(ctx, baseRadius, coherency, time); break;
+                case 6: drawTrefoil(ctx, baseRadius, coherency, time); break;
+                case 7: drawLissajousCurve(ctx, baseRadius, stateIndex, coherency, time); break;
+                case 8: drawMandalaPattern(ctx, baseRadius, stateIndex, coherency, time); break;
+            }
+
+            ctx.restore();
+
+            // Draw frequency label
+            ctx.fillStyle = 'rgba(0, 255, 136, 0.8)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${frequency.toFixed(1)} Hz • Coherency: ${(coherency*100).toFixed(0)}%`, centerX, h - 20);
+        }
+
+        function drawExpandingCircles(ctx, r, coherency, time) {
+            for (let i = 1; i <= 5; i++) {
+                const radius = r * (i / 5) + Math.sin(time + i) * 10;
+                const opacity = (1 - (i / 5)) * coherency;
+                ctx.strokeStyle = `rgba(0, 255, 136, ${opacity})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        function drawGoldenSpiral(ctx, r, coherency, time) {
+            ctx.strokeStyle = `rgba(0, 204, 255, ${coherency})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i < 100; i++) {
+                const angle = (i / 100) * Math.PI * 8 + time;
+                const radius = r * (i / 100);
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        function drawFlowerPetals(ctx, r, stateIndex, coherency, time) {
+            const petals = 3 + (stateIndex % 5);
+            for (let p = 0; p < petals; p++) {
+                const angle = (p / petals) * Math.PI * 2;
+                ctx.save();
+                ctx.rotate(angle);
+                ctx.strokeStyle = `rgba(0, 255, 136, ${coherency})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = 0; i <= 100; i++) {
+                    const t = i / 100;
+                    const x = Math.sin(t * Math.PI) * r * (1 + Math.sin(time) * 0.2);
+                    const y = (t - 0.5) * r * 1.5;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        function drawRadialWave(ctx, r, coherency, time) {
+            ctx.strokeStyle = `rgba(0, 204, 255, ${coherency})`;
+            ctx.lineWidth = 2;
+            for (let ray = 0; ray < 12; ray++) {
+                const angle = (ray / 12) * Math.PI * 2;
+                ctx.save();
+                ctx.rotate(angle);
+                ctx.beginPath();
+                for (let i = 0; i <= 50; i++) {
+                    const dist = (i / 50) * r;
+                    const offset = Math.sin(i * 0.3 + time) * 10 * coherency;
+                    const x = dist + offset;
+                    const y = 0;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        function drawStarPolygon(ctx, r, stateIndex, coherency, time) {
+            const points = 5 + (stateIndex % 4);
+            ctx.strokeStyle = `rgba(0, 255, 136, ${coherency})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i <= points; i++) {
+                const angle = (i / points) * Math.PI * 2 - Math.PI / 2 + time * 0.5;
+                const radius = i % 2 === 0 ? r : r * 0.5;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawHexagon(ctx, r, coherency, time) {
+            ctx.strokeStyle = `rgba(0, 204, 255, ${coherency})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2 + time * 0.3;
+                const x = Math.cos(angle) * r * (1 + Math.sin(time + i) * 0.1);
+                const y = Math.sin(angle) * r * (1 + Math.sin(time + i) * 0.1);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawTrefoil(ctx, r, coherency, time) {
+            ctx.strokeStyle = `rgba(0, 255, 136, ${coherency})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i < 1000; i++) {
+                const t = i / 1000 * Math.PI * 8;
+                const x = Math.sin(t) * (1 + Math.cos(t * 3)) * r * 0.3;
+                const y = Math.sin(t * 2) * (1 + Math.cos(t * 3)) * r * 0.3;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        function drawLissajousCurve(ctx, r, stateIndex, coherency, time) {
+            const a = 3 + (stateIndex % 3);
+            const b = 4 + ((stateIndex + 1) % 3);
+            ctx.strokeStyle = `rgba(0, 204, 255, ${coherency})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i < 1000; i++) {
+                const t = (i / 1000) * Math.PI * 2;
+                const x = Math.sin(a * t + time) * r;
+                const y = Math.sin(b * t + time) * r;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        function drawMandalaPattern(ctx, r, stateIndex, coherency, time) {
+            const layers = 5;
+            for (let layer = 0; layer < layers; layer++) {
+                const radius = r * (layer + 1) / layers;
+                const segments = 8 + layer * 2;
+                ctx.strokeStyle = `rgba(${Math.sin(time + layer) * 127 + 128}, 255, 136, ${coherency * (1 - layer / layers)})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let i = 0; i <= segments; i++) {
+                    const angle = (i / segments) * Math.PI * 2 + time * (0.5 - layer * 0.1);
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+        }
+
+        function animateGeometry() {
+            animationState.time++;
+            const canvas = document.getElementById('geometricCanvas');
+            if (canvas.classList.contains('active')) {
+                drawGeometry(canvas, animationState.stateIndex, animationState.frequency, animationState.coherency);
+                animationId = requestAnimationFrame(animateGeometry);
+            }
+        }
+
+        // Start animation loop
+        animationId = requestAnimationFrame(animateGeometry);
+
+        // Human measurement conversion functions
+        function convertBiometricsToFrequencies(hr, temp, rr, bpSys, bpDia, glucose) {
+            // Heart Rate → Frequency (direct + golden ratio variants)
+            const hrFreq = hr;  // Direct: 72 bpm = 72 Hz
+            const hrFreqGolden = hr * 1.618;  // Golden ratio variant
+            
+            // Temperature → Frequency (Celsius to Hz mapping)
+            // 37°C normal → centered around 210.42 Hz
+            const tempCelsius = temp;
+            const tempFreq = 200 + (tempCelsius - 36) * 10;  // Normalize around body temp
+            
+            // Respiratory Rate → Frequency
+            const rrFreq = rr * 3.5;  // Breaths/min scaled to frequency
+            
+            // Blood Pressure → Frequency
+            const bpMean = (bpSys + bpDia) / 2;
+            const bpFreq = 100 + (bpMean - 90);  // Normalized around 90 mmHg
+            
+            // Blood Glucose → Frequency
+            const glucoseFreq = 50 + (glucose - 70) * 0.5;  // Normalized around 70-100
+            
+            // Primary composite frequency (weighted average)
+            const weights = { hr: 0.3, temp: 0.25, rr: 0.15, bp: 0.2, glucose: 0.1 };
+            const primaryFreq = 
+                hrFreq * weights.hr +
+                tempFreq * weights.temp +
+                rrFreq * weights.rr +
+                bpFreq * weights.bp +
+                glucoseFreq * weights.glucose;
+            
+            return {
+                hrFreq,
+                hrFreqGolden,
+                tempFreq,
+                rrFreq,
+                bpFreq,
+                glucoseFreq,
+                primaryFreq,
+                composite: {
+                    hr, temp, rr, bpSys, bpDia, glucose
+                }
+            };
+        }
+
+        function getConditionContext(condition) {
+            const contexts = {
+                general: { focus: 'Harmonization', range: [210, 256], detail: 'Balanced wellness' },
+                stress: { focus: 'Grounding', range: [174, 210], detail: 'Calming frequencies' },
+                inflammation: { focus: 'Anti-inflammatory', range: [136, 174], detail: 'Soothing resonance' },
+                pain: { focus: 'Pain Relief', range: [216, 256], detail: 'Therapeutic mapping' },
+                sleep: { focus: 'Sleep Induction', range: [120, 160], detail: 'Delta wave affinity' },
+                immune: { focus: 'Immune Boost', range: [240, 320], detail: 'Activation frequencies' },
+                energy: { focus: 'Revitalization', range: [250, 320], detail: 'Stimulating tones' },
+                focus: { focus: 'Mental Clarity', range: [200, 250], detail: 'Alpha wave alignment' },
+                cardiovascular: { focus: 'Heart Health', range: [150, 200], detail: 'Cardiac coherence' }
+            };
+            return contexts[condition] || contexts.general;
+        }
+
+        function getNearestProtoWord(freq) {
+            const protoWords = {
+                'AH': 210.42,
+                'SA': 222.45,
+                'LA': 246.94,
+                'RA': 264.60,
+                'DA': 281.60,
+                'HA': 304.27,
+                'NA': 334.97,
+                'OM': 368.50,
+                'TAO': 420.84
+            };
+            
+            let nearest = { name: 'AH', freq: 210.42, diff: Infinity };
+            for (let [name, f] of Object.entries(protoWords)) {
+                const diff = Math.abs(freq - f);
+                if (diff < nearest.diff) {
+                    nearest = { name, freq: f, diff };
+                }
+            }
+            return nearest;
+        }
+
+        function getOghamMapping(stateIndex) {
+            const ogham = [
+                { tree: 'Ailm', letter: 'A', element: 'Silver fir' },
+                { tree: 'Beith', letter: 'B', element: 'Birch' },
+                { tree: 'Coll', letter: 'C', element: 'Hazel' },
+                { tree: 'Duir', letter: 'D', element: 'Oak' },
+                { tree: 'Eadha', letter: 'E', element: 'Aspen' },
+                { tree: 'Fearn', letter: 'F', element: 'Alder' },
+                { tree: 'Gort', letter: 'G', element: 'Ivy' },
+                { tree: 'Huath', letter: 'H', element: 'Hawthorn' },
+                { tree: 'Idad', letter: 'I', element: 'Yew' },
+                { tree: 'Koad', letter: 'K', element: 'Grove' },
+                { tree: 'Luis', letter: 'L', element: 'Rowan' },
+                { tree: 'Muin', letter: 'M', element: 'Vine' },
+                { tree: 'Nion', letter: 'N', element: 'Ash' },
+                { tree: 'Onn', letter: 'O', element: 'Gorse' },
+                { tree: 'Peith', letter: 'P', element: 'Whitebeam' },
+                { tree: 'Ruis', letter: 'R', element: 'Elder' },
+                { tree: 'Sail', letter: 'S', element: 'Willow' },
+                { tree: 'Tinne', letter: 'T', element: 'Holly' },
+                { tree: 'Ulex', letter: 'U', element: 'Heather' },
+                { tree: 'Vuin', letter: 'V', element: 'Ivy' },
+                { tree: 'Straif', letter: 'Z', element: 'Blackthorn' }
+            ];
+            return ogham[stateIndex % ogham.length];
+        }
+
+        function getChakraMapping(freq) {
+            const chakras = [
+                { name: 'Root', freq: 141, color: 'Red' },
+                { name: 'Sacral', freq: 174, color: 'Orange' },
+                { name: 'Solar Plexus', freq: 210.42, color: 'Yellow' },
+                { name: 'Heart', freq: 256, color: 'Green' },
+                { name: 'Throat', freq: 285.42, color: 'Blue' },
+                { name: 'Third Eye', freq: 320, color: 'Indigo' },
+                { name: 'Crown', freq: 432, color: 'Violet' }
+            ];
+            
+            let nearest = chakras[0];
+            for (let chakra of chakras) {
+                if (Math.abs(freq - chakra.freq) < Math.abs(freq - nearest.freq)) {
+                    nearest = chakra;
+                }
+            }
+            return nearest;
+        }
+
+        function getMedicalRecommendation(condition, state, protoWord, freq, coherency) {
+            const condContext = getConditionContext(condition);
+            const recommendations = {
+                stress: `Recommend ${protoWord.name} frequency (${protoWord.freq.toFixed(2)} Hz) for parasympathetic activation. Daily sessions: 15-20 min. Ogham resonance enhances grounding effect.`,
+                inflammation: `Anti-inflammatory protocol: Apply ${protoWord.name} frequency at ${protoWord.freq.toFixed(2)} Hz. Coherency ${(coherency * 100).toFixed(1)}% indicates strong therapeutic potential. Sessions: 2x daily.`,
+                pain: `Pain modulation via ${protoWord.name} (${protoWord.freq.toFixed(2)} Hz). State ${state} alignment with Cosmic cycle. Recommend: consistent morning/evening exposure.`,
+                sleep: `Sleep induction: ${protoWord.name} at ${protoWord.freq.toFixed(2)} Hz activates delta-wave coherence. Use 30-45 min before sleep. Track sleep quality improvement.`,
+                immune: `Immune activation: ${protoWord.name} (${protoWord.freq.toFixed(2)} Hz) stimulates lymphatic response. Coherency: ${(coherency * 100).toFixed(1)}%. Protocol: 20 min sessions, 3x weekly.`,
+                energy: `Energy revitalization: ${protoWord.name} frequency (${protoWord.freq.toFixed(2)} Hz) with morning timing optimal. State ${state} supports activation pathways. Sessions: 10-15 min.`,
+                focus: `Mental clarity via ${protoWord.name} (${protoWord.freq.toFixed(2)} Hz). Supports alpha-wave entrainment. Use during work/study blocks. Coherency ${(coherency * 100).toFixed(1)}% confirms effectiveness.`,
+                cardiovascular: `Cardiac coherence: ${protoWord.name} at ${protoWord.freq.toFixed(2)} Hz. HRV optimization expected. Daily practice: 10-15 min. Monitor heart rate variability trends.`,
+                general: `General wellness via ${protoWord.name} harmonization (${protoWord.freq.toFixed(2)} Hz). Cosmic State ${state} alignment supports holistic balance. Recommended: daily 10-20 min sessions.`
+            };
+            
+            return recommendations[condition] || recommendations.general;
+        }
+
+        // Make processBiometrics globally accessible
+        window.processBiometrics = function() {
+            try {
+                // Get input values
+                const hr = parseFloat(document.getElementById('heartRate').value);
+                const temp = parseFloat(document.getElementById('temperature').value);
+                const rr = parseFloat(document.getElementById('respirationRate').value);
+                const bpSys = parseFloat(document.getElementById('bpSystolic').value);
+                const bpDia = parseFloat(document.getElementById('bpDiastolic').value);
+                const glucose = parseFloat(document.getElementById('bloodGlucose').value);
+                const condition = document.getElementById('condition').value;
+
+                // Validate inputs
+                if (isNaN(hr) || isNaN(temp) || isNaN(rr) || isNaN(bpSys) || isNaN(bpDia)) {
+                    throw new Error('Please fill in all required measurements');
+                }
+
+                // Clear errors
+                document.getElementById('inputError').innerHTML = '';
+
+                // Convert biometrics to frequencies
+                const bioFreq = convertBiometricsToFrequencies(hr, temp, rr, bpSys, bpDia, glucose);
+                const primaryFreq = bioFreq.primaryFreq;
+
+                // Pipeline Stage 1: Input
+                document.getElementById('pipelineInput').textContent = `${primaryFreq.toFixed(2)} Hz`;
+
+                // Pipeline Stage 2: Normalize to UFT range
+                let normalized = primaryFreq;
+                while (normalized < 210.42) normalized *= 2;
+                while (normalized > 420.84) normalized /= 2;
+                document.getElementById('pipelineNormalize').textContent = `${normalized.toFixed(2)} Hz`;
+
+                // Pipeline Stage 3: Cosmic Phase calculation
+                const cosmoRoot = 210.4186;
+                const phase = (normalized - cosmoRoot) / cosmoRoot;
+                document.getElementById('pipelinePhase').textContent = `${(phase * 100).toFixed(1)}%`;
+
+                // Pipeline Stage 4: State determination (0-20)
+                const stateIndex = Math.floor((phase * 100) / 100 * 21) % 21;
+                const state = states.states[stateIndex] || { name: `State ${stateIndex}`, frequency: normalized };
+                document.getElementById('pipelineState').textContent = `${stateIndex} / 21`;
+
+                // Pipeline Stage 5: Therapeutic output
+                const protoWord = getNearestProtoWord(normalized);
+                document.getElementById('pipelineTherapeutic').textContent = protoWord.name;
+
+                // Calculate coherency (0-1) - CORRECTED FORMULA
+                // Normalize each metric to acceptable range, then weight by importance
+                const hrOptimal = 72;
+                const hrRange = 60;  // Acceptable: 60-100 bpm, deviation penalty scaled to ±40
+                const hrCoherence = Math.max(0, 1 - (Math.abs(hr - hrOptimal) / hrRange));
+                
+                const tempOptimal = 37.0;
+                const tempRange = 1.5;  // Acceptable: 35.5-38.5°C
+                const tempCoherence = Math.max(0, 1 - (Math.abs(temp - tempOptimal) / tempRange));
+                
+                const rrOptimal = 16;
+                const rrRange = 8;  // Acceptable: 12-20 breaths/min, deviation penalty scaled
+                const rrCoherence = Math.max(0, 1 - (Math.abs(rr - rrOptimal) / rrRange));
+                
+                const bpOptimal = 120;  // Systolic optimal
+                const bpRange = 30;  // Acceptable: 100-140 mmHg
+                const bpCoherence = Math.max(0, 1 - (Math.abs(bpSys - bpOptimal) / bpRange));
+                
+                const glucoseOptimal = 95;
+                const glucoseRange = 30;  // Acceptable: 70-120 mg/dL fasting
+                const glucoseCoherence = Math.max(0, 1 - (Math.abs(glucose - glucoseOptimal) / glucoseRange));
+                
+                // Weighted average: HR(30%) + Temp(25%) + RR(15%) + BP(20%) + Glucose(10%)
+                const coherency = Math.min(1, Math.max(0,
+                    hrCoherence * 0.30 +
+                    tempCoherence * 0.25 +
+                    rrCoherence * 0.15 +
+                    bpCoherence * 0.20 +
+                    glucoseCoherence * 0.10
+                ));
+
+                // Output results
+                document.getElementById('primaryFreq').textContent = normalized.toFixed(2);
+                document.getElementById('primaryFreqDetail').textContent = `Hz (normalized from ${primaryFreq.toFixed(2)})`;
+                
+                document.getElementById('cosmicState').textContent = stateIndex;
+                document.getElementById('cosmicStateDetail').textContent = `/ 21 states`;
+
+                document.getElementById('coherency').textContent = (coherency * 100).toFixed(1) + '%';
+
+                const ogham = getOghamMapping(stateIndex);
+                document.getElementById('protoWord').textContent = protoWord.name;
+                document.getElementById('protoWordDetail').textContent = protoWord.freq.toFixed(2) + ' Hz';
+
+                // Therapeutic Frequency (MAIN RECOMMENDATION)
+                document.getElementById('therapeuticFreq').textContent = protoWord.freq.toFixed(2) + ' Hz';
+                document.getElementById('therapeuticFreqDetail').textContent = `${protoWord.name} resonance • Coherency: ${(coherency*100).toFixed(1)}%`;
+
+                document.getElementById('oghamTree').textContent = ogham.tree;
+                document.getElementById('oghamTreeDetail').textContent = ogham.element;
+
+                const chakra = getChakraMapping(normalized);
+                document.getElementById('chakra').textContent = chakra.name;
+                document.getElementById('chakraDetail').textContent = `${chakra.color}`;
+
+                // Medical recommendation
+                const recommendation = getMedicalRecommendation(condition, stateIndex, protoWord, normalized, coherency);
+                document.getElementById('medicalRec').textContent = recommendation;
+
+                // Hardware outputs
+                const i2sAmplitude = Math.floor(coherency * 255);
+                const dacVoltage = (normalized / 432) * 3.3;  // 432 Hz = max 3.3V
+                const ledBrightness = Math.floor(coherency * 255);
+                const displayState = `${protoWord.name} • State ${stateIndex} • Coherency ${(coherency*100).toFixed(0)}%`;
+
+                // Update canvas animation state and show it
+                animationState.stateIndex = stateIndex;
+                animationState.frequency = normalized;
+                animationState.coherency = coherency;
+                animationState.condition = condition;
+                animationState.time = 0;
+                
+                const canvas = document.getElementById('geometricCanvas');
+                canvas.classList.add('active');
+                document.getElementById('geometryInfo').textContent = `${ogham.tree} (Ogham) • ${chakra.name} (Chakra) • ${protoWord.name} Resonance`;
+
+            } catch (error) {
+                document.getElementById('inputError').innerHTML = `<div class="error">⚠️ ${error.message}</div>`;
+            }
+        };
+
+        // Set initial display message
+        document.getElementById('medicalRec').textContent = 'Click the green button above to process your measurements and receive your personalized therapeutic recommendation.';
+    </script>
+</body>
+</html>
