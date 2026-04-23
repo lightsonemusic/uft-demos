@@ -619,8 +619,8 @@
         // Geometric visualization functions
         function drawGeometry(canvas, stateIndex, frequency, coherency) {
             const ctx = canvas.getContext('2d');
-            const w = canvas.width;
-            const h = canvas.height;
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
             const centerX = w / 2;
             const centerY = h / 2;
             const baseRadius = Math.min(w, h) * 0.25;
@@ -812,19 +812,40 @@
             }
         }
 
+        function initializeCanvas() {
+            const canvas = document.getElementById('geometricCanvas');
+            const container = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            
+            // Get actual display size
+            const displayWidth = container.clientWidth * 0.95; // Leave some padding
+            const displayHeight = 400;
+            const maxWidth = 500;
+            
+            // Set canvas display size
+            const actualWidth = Math.min(displayWidth, maxWidth);
+            canvas.style.width = actualWidth + 'px';
+            canvas.style.height = displayHeight + 'px';
+            
+            // Set canvas resolution (for sharp rendering)
+            canvas.width = actualWidth * dpr;
+            canvas.height = displayHeight * dpr;
+            
+            // Scale context to account for DPR
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            
+            return canvas;
+        }
+
         function animateGeometry() {
             animationState.time++;
             const canvas = document.getElementById('geometricCanvas');
             if (canvas.classList.contains('active')) {
                 drawGeometry(canvas, animationState.stateIndex, animationState.frequency, animationState.coherency);
-                animationId = requestAnimationFrame(animateGeometry);
             }
+            animationId = requestAnimationFrame(animateGeometry);
         }
-
-        // Initialize canvas dimensions
-        const canvas = document.getElementById('geometricCanvas');
-        canvas.width = 500;
-        canvas.height = 400;
 
         // Start animation loop
         animationId = requestAnimationFrame(animateGeometry);
@@ -1096,6 +1117,7 @@
                 
                 const canvas = document.getElementById('geometricCanvas');
                 canvas.classList.add('active');
+                initializeCanvas();  // Properly initialize canvas when becoming visible
                 document.getElementById('geometryInfo').textContent = `${ogham.tree} (Ogham) • ${chakra.name} (Chakra) • ${protoWord.name} Resonance`;
 
             } catch (error) {
