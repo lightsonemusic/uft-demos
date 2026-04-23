@@ -1,0 +1,43 @@
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+Copyright (C) 2026 LightsOnemusic
+
+UFT-demos — Universal Frequency Translator demonstration files
+Original work by LightsOnemusic. All rights reserved under GPL v3.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+---
+
+ADDITIONAL TERMS (permitted under GPL v3 Section 7):
+
+1. Attribution required: Any distribution or derivative work must
+   prominently credit "LightsOnemusic — Universal Frequency Translator"
+   and link to the original repository.
+
+2. Commercial use: Any commercial product incorporating this code or
+   the UFT framework (including the MOON_ROOT derivation, 13-tone lunar
+   calendar engine, and proto-word mappings) requires a separate
+   commercial license agreement with LightsOnemusic.
+
+   Contact for commercial licensing: see repository contact information.
+
+3. The name "UFT", "Universal Frequency Translator", and "LightsOnemusic"
+   may not be used to endorse or promote derivative products without
+   prior written permission.
+
+---
+
+Full GPL v3 license text: https://www.gnu.org/licenses/gpl-3.0.txt

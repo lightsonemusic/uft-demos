@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cymatic Geometry Player</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Monaco', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%);
+      color: #e8f4f8;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #e74c3c, #f39c12);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle { text-align: center; color: #888; font-size: 12px; margin-bottom: 30px; }
+    
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    
+    button {
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      color: #e8f4f8;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    
+    button:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    button.active {
+      background: rgba(231, 76, 60, 0.2);
+      border-color: #e74c3c;
+      color: #e74c3c;
+    }
+    
+    canvas {
+      width: 100%;
+      height: 500px;
+      border-radius: 8px;
+      background: #050510;
+      border: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 20px;
+      display: block;
+    }
+    
+    .info-panel {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 15px;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    
+    .info-item {
+      background: rgba(255,255,255,0.02);
+      padding: 10px;
+      border-radius: 4px;
+      border-left: 2px solid #e74c3c;
+    }
+    
+    .info-label { font-size: 10px; color: #888; }
+    .info-value { font-size: 13px; font-weight: bold; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌊 Cymatic Geometry Player</h1>
+    <p class="subtitle">Visualize the cosmic geometry of proto-word frequencies</p>
+    
+    <div class="controls" id="controls"></div>
+    
+    <canvas id="cymaticCanvas"></canvas>
+    
+    <div class="info-panel">
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Current Proto-Word</div>
+          <div class="info-value" id="infoWord">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Frequency</div>
+          <div class="info-value" id="infoFreq">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Geometry Type</div>
+          <div class="info-value" id="infoGeom">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Significance</div>
+          <div class="info-value" id="infoSig">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PROTO_WORDS = [
+      { word: 'AH', freq: 210.42, planet: 'Moon', color: '#1abc9c', geometry: 'expanding_circles', significance: 'First breath' },
+      { word: 'SA', freq: 222.93, planet: 'Mercury', color: '#2ecc71', geometry: 'figure_8', significance: 'The bridge' },
+      { word: 'LA', freq: 236.19, planet: 'Venus', color: '#3498db', geometry: 'three_petal', significance: 'Proportion' },
+      { word: 'RA', freq: 250.23, planet: 'Sun', color: '#f39c12', geometry: 'four_radial', significance: 'Fire · Light' },
+      { word: 'DA', freq: 265.11, planet: 'Mars', color: '#e74c3c', geometry: 'five_star', significance: 'Will · Surge' },
+      { word: 'HA', freq: 280.88, planet: 'Jupiter', color: '#9b59b6', geometry: 'six_hexagon', significance: 'Harmony' },
+      { word: 'NA', freq: 297.58, planet: 'Zero Point', color: '#ffffff', geometry: 'standing_wave', significance: 'Silence' },
+      { word: 'OM', freq: 334.02, planet: 'Ophiuchus', color: '#36d9b8', geometry: 'phi_spiral', significance: 'Threshold' },
+      { word: 'TAO', freq: 420.84, planet: 'Yew', color: '#ecf0f1', geometry: 'thirteen_burst', significance: 'Full cycle' }
+    ];
+
+    let canvas = document.getElementById('cymaticCanvas');
+    let ctx = canvas.getContext('2d');
+    let currentWord = PROTO_WORDS[0];
+    let animId = null;
+
+    function buildControls() {
+      const controls = document.getElementById('controls');
+      PROTO_WORDS.forEach((pw, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = pw.word;
+        btn.dataset.index = i;
+        if (i === 0) btn.classList.add('active');
+        btn.onclick = () => selectWord(pw, btn);
+        controls.appendChild(btn);
+      });
+    }
+
+    function selectWord(pw, btn) {
+      document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentWord = pw;
+      updateInfo();
+    }
+
+    function updateInfo() {
+      document.getElementById('infoWord').textContent = currentWord.word;
+      document.getElementById('infoFreq').textContent = `${currentWord.freq} Hz`;
+      document.getElementById('infoGeom').textContent = currentWord.geometry.replace(/_/g, ' ');
+      document.getElementById('infoSig').textContent = currentWord.significance;
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    function drawCymatics() {
+      resizeCanvas();
+      const cw = canvas.width, ch = canvas.height;
+      const cx = cw / 2, cy = ch / 2;
+      const t = Date.now() / 500;
+
+      // Clear with fade
+      ctx.fillStyle = 'rgba(5, 5, 16, 0.08)';
+      ctx.fillRect(0, 0, cw, ch);
+
+      const color = currentWord.color;
+      const geom = currentWord.geometry;
+      const complexity = Math.round(1 + (Math.log2(currentWord.freq / 210.42) % 1) * 12);
+
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+
+      if (geom === 'expanding_circles') {
+        // AH — expanding circles
+        for (let i = 0; i < 12; i++) {
+          const r = 30 + (i * 25) + Math.sin(t + i) * 10;
+          ctx.globalAlpha = 0.3 - (i * 0.02);
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      } else if (geom === 'figure_8') {
+        // SA — figure 8 / lemniscate
+        ctx.globalAlpha = 0.5;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let angle = 0; angle < Math.PI * 4; angle += 0.01) {
+          const r = 80 * Math.cos(angle * 0.5 + t * 0.5);
+          const x = cx + r * Math.cos(angle);
+          const y = cy + r * Math.sin(angle * 2);
+          angle === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      } else if (geom === 'three_petal') {
+        // LA — 3-petal rose
+        ctx.globalAlpha = 0.6;
+        ctx.lineWidth = 1;
+        for (let petal = 0; petal < 3; petal++) {
+          const baseAngle = (petal / 3) * Math.PI * 2;
+          ctx.beginPath();
+          for (let i = 0; i <= 100; i++) {
+            const angle = (i / 100) * Math.PI * 2;
+            const r = 80 * Math.cos(angle * 3);
+            const x = cx + Math.cos(baseAngle + angle) * r;
+            const y = cy + Math.sin(baseAngle + angle) * r;
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      } else if (geom === 'four_radial') {
+        // RA — 4-point radial
+        ctx.globalAlpha = 0.6;
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 4; i++) {
+          const angle = (i / 4) * Math.PI * 2;
+          const r = 100 + Math.sin(t + i) * 20;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+          ctx.stroke();
+          // Arc
+          ctx.beginPath();
+          ctx.arc(cx + Math.cos(angle) * r * 0.5, cy + Math.sin(angle) * r * 0.5, r * 0.3, angle, angle + Math.PI * 0.5);
+          ctx.stroke();
+        }
+      } else if (geom === 'five_star') {
+        // DA — 5-point star
+        ctx.globalAlpha = 0.7;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+          const angle = (i / 10) * Math.PI * 2 + t;
+          const r = (i % 2 === 0 ? 100 : 50);
+          const x = cx + Math.cos(angle) * r;
+          const y = cy + Math.sin(angle) * r;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      } else if (geom === 'six_hexagon') {
+        // HA — hexagon / seed of life
+        ctx.globalAlpha = 0.6;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI * 2 + t * 0.3;
+          const x = cx + Math.cos(angle) * 80;
+          const y = cy + Math.sin(angle) * 80;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        // Inner circles (seed of life)
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI * 2;
+          const x = cx + Math.cos(angle) * 70;
+          const y = cy + Math.sin(angle) * 70;
+          ctx.beginPath();
+          ctx.arc(x, y, 40, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      } else if (geom === 'standing_wave') {
+        // NA — standing wave / null
+        ctx.globalAlpha = 0.5;
+        ctx.lineWidth = 1;
+        // Double helix approaching center
+        for (let line = 0; line < 2; line++) {
+          ctx.beginPath();
+          for (let i = 0; i < 100; i++) {
+            const progress = i / 100;
+            const angle = progress * Math.PI * 6;
+            const wave = Math.sin(angle * 10 + t) * 40 * (1 - progress);
+            const x = cx + (progress - 0.5) * 200;
+            const y = cy + (line === 0 ? wave : -wave);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+        // Zero point cross
+        if (true) {
+          ctx.globalAlpha = 0.4 + Math.sin(t * 2) * 0.2;
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = '#fff';
+          ctx.beginPath();
+          ctx.moveTo(cx - 50, cy);
+          ctx.lineTo(cx + 50, cy);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - 50);
+          ctx.lineTo(cx, cy + 50);
+          ctx.stroke();
+        }
+      } else if (geom === 'phi_spiral') {
+        // OM — golden spiral
+        ctx.globalAlpha = 0.7;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let i = 0; i < 200; i++) {
+          const angle = (i / 200) * Math.PI * 6 + t;
+          const phi = 1.618;
+          const r = Math.pow(phi, angle / (2 * Math.PI)) * 20;
+          const x = cx + Math.cos(angle) * r;
+          const y = cy + Math.sin(angle) * r;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      } else if (geom === 'thirteen_burst') {
+        // TAO — 13-point burst
+        ctx.globalAlpha = 0.8;
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 13; i++) {
+          const angle = (i / 13) * Math.PI * 2;
+          const r1 = 80;
+          const r2 = 120 + Math.sin(t + i) * 15;
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(angle) * r1, cy + Math.sin(angle) * r1);
+          ctx.lineTo(cx + Math.cos(angle) * r2, cy + Math.sin(angle) * r2);
+          ctx.stroke();
+        }
+      }
+
+      // Center point
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = 1;
+      animId = requestAnimationFrame(drawCymatics);
+    }
+
+    buildControls();
+    updateInfo();
+    drawCymatics();
+  </script>
+</body>
+</html>

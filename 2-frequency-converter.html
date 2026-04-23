@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frequency Converter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Monaco', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%);
+      color: #e8f4f8;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    .container { max-width: 600px; margin: 0 auto; }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #3498db, #f39c12);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle { text-align: center; color: #888; font-size: 12px; margin-bottom: 30px; }
+    
+    .input-section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .input-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      background: rgba(255,255,255,0.05);
+      color: #e8f4f8;
+      font-family: 'Monaco', monospace;
+      font-size: 14px;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+    }
+    
+    .result {
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(52, 152, 219, 0.3);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .result.found {
+      border-color: #2ecc71;
+      background: rgba(46, 204, 113, 0.05);
+    }
+    
+    .result-label {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .result-value {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 8px 0;
+    }
+    
+    .result-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+      font-size: 11px;
+    }
+    
+    .detail-item {
+      background: rgba(255,255,255,0.02);
+      padding: 8px;
+      border-radius: 4px;
+    }
+    
+    .detail-label { color: #666; }
+    .detail-value { font-weight: bold; color: #e8f4f8; }
+    
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(52, 152, 219, 0.1);
+      color: #3498db;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    button:hover {
+      background: rgba(52, 152, 219, 0.2);
+    }
+    
+    .reference-table {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+    
+    .reference-table h3 {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    table {
+      width: 100%;
+      font-size: 10px;
+      border-collapse: collapse;
+    }
+    
+    th {
+      text-align: left;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      color: #888;
+    }
+    
+    td {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎼 Frequency Converter</h1>
+    <p class="subtitle">Input Hz → Find closest proto-word</p>
+    
+    <div class="input-section">
+      <div class="input-group">
+        <label for="freqInput">Frequency (Hz)</label>
+        <input type="number" id="freqInput" placeholder="e.g., 432, 528, 741" oninput="convert()">
+      </div>
+      
+      <button onclick="playFrequency()">▶ Play Frequency</button>
+    </div>
+    
+    <div class="result" id="result" style="display:none;">
+      <div class="result-label">Closest Proto-Word</div>
+      <div class="result-value" id="resultWord" style="color: #3498db;">—</div>
+      <div class="result-details">
+        <div class="detail-item">
+          <div class="detail-label">Frequency</div>
+          <div class="detail-value" id="resultFreq">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Planet</div>
+          <div class="detail-value" id="resultPlanet">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Distance</div>
+          <div class="detail-value" id="resultDistance">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Significance</div>
+          <div class="detail-value" id="resultSig">—</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="reference-table">
+      <h3>Proto-Word Reference</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Word</th>
+            <th>Hz</th>
+            <th>Planet</th>
+            <th>Significance</th>
+          </tr>
+        </thead>
+        <tbody id="refTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const PROTO_WORDS = [
+      { word: 'AH', freq: 210.42, planet: 'Moon', significance: 'First breath' },
+      { word: 'SA', freq: 222.93, planet: 'Mercury', significance: 'The bridge' },
+      { word: 'LA', freq: 236.19, planet: 'Venus', significance: 'Proportion' },
+      { word: 'RA', freq: 250.23, planet: 'Sun', significance: 'Fire · Light' },
+      { word: 'DA', freq: 265.11, planet: 'Mars', significance: 'Will · Surge' },
+      { word: 'HA', freq: 280.88, planet: 'Jupiter', significance: 'Harmony' },
+      { word: 'NA', freq: 297.58, planet: 'Zero Point', significance: 'Silence' },
+      { word: 'OM', freq: 334.02, planet: 'Ophiuchus', significance: 'Threshold' },
+      { word: 'TAO', freq: 420.84, planet: 'Yew', significance: 'Full cycle' }
+    ];
+
+    let audioContext, currentOsc = null;
+
+    function buildReferenceTable() {
+      const tbody = document.getElementById('refTable');
+      PROTO_WORDS.forEach(pw => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-weight:bold;">${pw.word}</td>
+          <td>${pw.freq}</td>
+          <td>${pw.planet}</td>
+          <td>${pw.significance}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function convert() {
+      const input = parseFloat(document.getElementById('freqInput').value);
+      if (!input || input <= 0) {
+        document.getElementById('result').style.display = 'none';
+        return;
+      }
+
+      // Normalize to lunar octave [210.42 - 420.84] by doubling/halving
+      let normalized = input;
+      while (normalized > 420.84) normalized /= 2;
+      while (normalized < 210.42) normalized *= 2;
+
+      // Find closest proto-word
+      let closest = PROTO_WORDS[0];
+      let minDist = Math.abs(closest.freq - normalized);
+      
+      PROTO_WORDS.forEach(pw => {
+        const dist = Math.abs(pw.freq - normalized);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = pw;
+        }
+      });
+
+      // Display result
+      const result = document.getElementById('result');
+      result.style.display = 'block';
+      result.classList.add('found');
+      
+      document.getElementById('resultWord').textContent = closest.word;
+      document.getElementById('resultFreq').textContent = `${closest.freq} Hz`;
+      document.getElementById('resultPlanet').textContent = closest.planet;
+      document.getElementById('resultDistance').textContent = `${Math.abs(minDist).toFixed(2)} Hz`;
+      document.getElementById('resultSig').textContent = closest.significance;
+    }
+
+    function playFrequency() {
+      const input = parseFloat(document.getElementById('freqInput').value);
+      if (!input || input <= 0) return;
+
+      if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioContext.state === 'suspended') audioContext.resume();
+
+      if (currentOsc) {
+        try { currentOsc.stop(); } catch(e) {}
+      }
+
+      const gain = audioContext.createGain();
+      gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
+      gain.connect(audioContext.destination);
+
+      currentOsc = audioContext.createOscillator();
+      currentOsc.type = 'sine';
+      currentOsc.frequency.setValueAtTime(input, audioContext.currentTime);
+      currentOsc.connect(gain);
+      currentOsc.start();
+      currentOsc.stop(audioContext.currentTime + 2);
+    }
+
+    buildReferenceTable();
+  </script>
+</body>
+</html>

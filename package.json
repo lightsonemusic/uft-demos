@@ -1,0 +1,32 @@
+{
+  "name": "uft-demos",
+  "version": "1.0.0",
+  "description": "Interactive cosmic frequency demonstrations - 3 educational toys for exploring proto-words, frequencies, and cymatic geometry",
+  "main": "index.html",
+  "scripts": {
+    "start": "open index.html"
+  },
+  "keywords": [
+    "cosmic",
+    "frequency",
+    "music",
+    "cymatic",
+    "geometry",
+    "web-audio",
+    "educational",
+    "interactive",
+    "visualization"
+  ],
+  "author": "UFT Project",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lightsonemusic/uft-demos.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lightsonemusic/uft-demos/issues"
+  },
+  "homepage": "https://github.com/lightsonemusic/uft-demos#readme",
+  "dependencies": [],
+  "devDependencies": {}
+}

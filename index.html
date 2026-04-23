@@ -3,504 +3,216 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UFT v4.1 - Universal Frequency Translator</title>
+  <title>UFT Music Toys</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
-      font-family: 'Monaco', 'Courier New', monospace;
-      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0c29 100%);
+      font-family: 'Monaco', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%);
       color: #e8f4f8;
-      padding: 40px 20px;
+      padding: 60px 20px;
       min-height: 100vh;
     }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+    .container { max-width: 900px; margin: 0 auto; }
     
     h1 {
-      font-size: 48px;
-      color: #00ffff;
-      margin-bottom: 10px;
-      text-shadow: 0 0 30px rgba(0, 255, 255, 0.7);
       text-align: center;
+      font-size: 36px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #1abc9c, #f39c12, #8e44ad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     
-    .tagline {
+    .subtitle {
       text-align: center;
-      color: #00d4d4;
-      font-size: 16px;
+      color: #888;
+      font-size: 14px;
       margin-bottom: 40px;
     }
     
-    .grid-3 {
+    .toys-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
-      margin: 40px 0;
+      margin-bottom: 40px;
     }
     
-    .card {
-      background: linear-gradient(135deg, rgba(20, 50, 100, 0.6), rgba(30, 70, 120, 0.4));
-      border: 1px solid rgba(0, 200, 255, 0.4);
-      border-radius: 8px;
-      padding: 25px;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-    
-    .card:hover {
-      border-color: rgba(0, 255, 255, 0.8);
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-      transform: translateY(-5px);
-    }
-    
-    .card h2 {
-      font-size: 20px;
-      color: #00ffff;
-      margin-bottom: 10px;
-    }
-    
-    .card p {
-      font-size: 12px;
-      color: #a0c8d8;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    
-    .card a {
-      display: inline-block;
-      background: linear-gradient(135deg, #00d4ff, #00ffff);
-      color: #0a0e27;
-      padding: 8px 16px;
-      border-radius: 4px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 11px;
-      transition: all 0.3s ease;
-    }
-    
-    .card a:hover {
-      transform: scale(1.05);
-    }
-    
-    .cosmic { border-left: 4px solid #ff00ff; }
-    .lunar { border-left: 4px solid #00aaff; }
-    .solar { border-left: 4px solid #ffaa00; }
-    .medical { border-left: 4px solid #ff6666; }
-    .test { border-left: 4px solid #00ff88; }
-    
-    .section {
-      margin: 40px 0;
-      padding: 20px;
-      background: rgba(20, 50, 80, 0.4);
-      border-left: 3px solid #00d4d4;
-      border-radius: 4px;
-    }
-    
-    .section h2 {
-      color: #00ffff;
-      margin-bottom: 15px;
-      font-size: 18px;
-    }
-    
-    .section p {
-      color: #a0c8d8;
-      font-size: 13px;
-      line-height: 1.8;
-      margin-bottom: 10px;
-    }
-    
-    code {
-      background: rgba(0, 0, 0, 0.5);
-      padding: 2px 6px;
-      border-radius: 3px;
-      color: #00ff88;
-    }
-    
-    .tree {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(0, 200, 255, 0.2);
-      border-radius: 4px;
-      padding: 15px;
-      font-size: 11px;
-      overflow-x: auto;
-      margin: 15px 0;
-    }
-    
-    .footer {
+    .toy-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 30px;
       text-align: center;
-      margin-top: 50px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(0, 200, 255, 0.2);
-      color: #708090;
+      transition: all 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .toy-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .toy-emoji {
+      font-size: 48px;
+    }
+    
+    .toy-name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .toy-description {
+      font-size: 12px;
+      color: #aaa;
+      flex: 1;
+    }
+    
+    .toy-link {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .toy-card:hover .toy-link {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .info-section {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 25px;
+      margin-top: 30px;
+    }
+    
+    .info-section h2 {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .info-content {
+      font-size: 12px;
+      line-height: 1.8;
+      color: #aaa;
+    }
+    
+    .proto-words {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .proto-word-badge {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 8px;
+      text-align: center;
       font-size: 11px;
     }
+    
+    .proto-word-badge .word { font-weight: bold; font-size: 16px; }
+    .proto-word-badge .freq { color: #888; font-size: 9px; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🌌 UFT v4.1</h1>
-    <p class="tagline">Universal Frequency Translator | 12:21 Cosmic Module | Lunar × Solar Integration</p>
+    <h1>🎵 UFT Music Toys</h1>
+    <p class="subtitle">Simple, shareable cosmic frequency demonstrations</p>
     
-    <!-- Quick Access Cards -->
-    <div class="grid-3">
-      <div class="card cosmic">
-        <h2>⭐ Cosmic Translator</h2>
-        <p>12:21 module with phase function, spiral geometry, and 21-state cycle.</p>
-        <a href="modules/12-21/cosmic-translator-12-21.js">View Module</a>
-      </div>
+    <div class="toys-grid">
+      <a href="1-proto-word-sound-gallery.html" class="toy-card">
+        <div class="toy-emoji">🎵</div>
+        <div class="toy-name">Proto-Word Sound Gallery</div>
+        <div class="toy-description">
+          Click any proto-word to hear its cosmic frequency in real-time
+        </div>
+        <div class="toy-link">→ Open</div>
+      </a>
       
-      <div class="card lunar">
-        <h2>🌙 Lunar Module</h2>
-        <p>13-moon calendar, synodic period frequencies, proto-word mapping.</p>
-        <a href="modules/lunar/lunar-module.js">View Module</a>
-      </div>
+      <a href="2-frequency-converter.html" class="toy-card">
+        <div class="toy-emoji">🎼</div>
+        <div class="toy-name">Frequency Converter</div>
+        <div class="toy-description">
+          Input any Hz → find the closest proto-word and cosmic association
+        </div>
+        <div class="toy-link">→ Open</div>
+      </a>
       
-      <div class="card solar">
-        <h2>☀️ Solar Module</h2>
-        <p>12 zodiac signs, 365.25-day calendar, chromatic scale tuning.</p>
-        <a href="modules/solar/solar-module.js">View Module</a>
-      </div>
-      
-      <div class="card test">
-        <h2>🔬 Extended Math Tests</h2>
-        <p>30+ verification suites with 100+ mathematical tests.</p>
-        <a href="tests/math-verification-extended.html" target="_blank">Run Tests</a>
-      </div>
-      
-      <div class="card test">
-        <h2>🔌 Integration Test</h2>
-        <p>UFT Machine orchestrating lunar, solar, and cosmic modules.</p>
-        <a href="tests/integration-test.html" target="_blank">Run Test</a>
-      </div>
-      
-      <div class="card medical">
-        <h2>🏥 Medical Visualization</h2>
-        <p>Skin cancer healing protocol with cymatic patterns.</p>
-        <a href="visualizations/medical-test-visualization.html" target="_blank">View Visualization</a>
-      </div>
-      
-      <div class="card test">
-        <h2>⚙️ Hardware Build Dossier</h2>
-        <p>20-section professional hardware specifications, assembly guides, and troubleshooting.</p>
-        <a href="hardware/UFT_v4.1_Hardware_Build_Dossier.html" target="_blank">View Dossier</a>
-      </div>
-      
-      <div class="card solar">
-        <h2>🔧 Tier 1 BOM (€50)</h2>
-        <p>Starter build: breadboard, no soldering, 4-6 hours, 17 components.</p>
-        <a href="hardware/TIER_1_BOM.html" target="_blank">View BOM</a>
-      </div>
-      
-      <div class="card lunar">
-        <h2>🔩 Tier 2 BOM (€100)</h2>
-        <p>Full v4.1: proto PCB, DDS, CV outputs, 10-14 hours, 33 components.</p>
-        <a href="hardware/TIER_2_BOM.html" target="_blank">View BOM</a>
-      </div>
-      
-      <div class="card cosmic">
-        <h2>💎 Tier 3 BOM (€250)</h2>
-        <p>Professional: custom PCB, ESP32-S3, camera, biomorph, 20-30 hours.</p>
-        <a href="hardware/TIER_3_BOM.html" target="_blank">View BOM</a>
-      </div>
-      
-      <div class="card test">
-        <h2>🧪 Complete Test Suite</h2>
-        <p>Master test runner: all verification, integration, and hardware tests in one place.</p>
-        <a href="tests/TEST_RUNNER.html" target="_blank">Launch Tests</a>
-      </div>
-    </div>
-    
-    <!-- Core Innovation: Three Unique Calendars -->
-    <div class="section">
-      <h2>🔑 CORE INNOVATION: Three Unique Calendars (Modular & Flexible)</h2>
-      <p>
-        <strong><a href="UFT_UNIQUE_CALENDARS_DAILY_MAINTENANCE.txt" target="_blank" style="color: #ffff00; font-size: 14px;">⭐ CRITICAL: UFT's Three Different Calendars & Daily Verification</a></strong><br>
-        <strong>This is the KEY to UFT's success.</strong> Complete explanation why THREE mathematically-derived calendars (not society's single arbitrary Gregorian calendar) are essential for harmonic coherency.<br><br>
-        
-        <strong><a href="UFT_MODULAR_CALENDAR_MODES.txt" target="_blank" style="color: #00ffff; font-size: 14px;">🎯 Modular Calendar Architecture: 7 Operating Modes</a></strong><br>
-        <strong>Calendars work TOGETHER or SEPARATELY based on user needs:</strong><br>
-        • <strong>MODE 1:</strong> All Three Synchronized (Full Harmonic Coherency, 3,276 states)<br>
-        • <strong>MODE 2:</strong> Lunar Only (Sleep optimization, 9 frequencies, 20% CPU)<br>
-        • <strong>MODE 3:</strong> Solar Only (Seasonal tracking, 12 frequencies, 15% CPU)<br>
-        • <strong>MODE 4:</strong> Cosmic Only (Circadian rhythm, 21 states, 15% CPU)<br>
-        • <strong>MODE 5:</strong> Lunar + Solar (108 states, no time-of-day modulation)<br>
-        • <strong>MODE 6:</strong> Lunar + Cosmic (189 states, lunar + circadian)<br>
-        • <strong>MODE 7:</strong> Solar + Cosmic (252 states, seasonal + circadian)<br><br>
-        
-        <strong>Each Calendar Module:</strong><br>
-        • <strong>LUNAR Calendar (13 months × 28 days = 364 days)</strong> - Derived from Moon's 29.5306-day synodic period → 210.4186 Hz (+ 9 proto-word harmonics)<br>
-        • <strong>SOLAR Calendar (12 zodiac × 30.4375 days ≈ 365.25 days)</strong> - Derived from Earth's 365.25-day tropical year → 256 Hz (12-tone chromatic scale)<br>
-        • <strong>COSMIC Calendar (21 states × 24-hour cycle = 86400 seconds)</strong> - Derived from Earth's 24-hour rotation → φ-based spiral with triangular envelope<br><br>
-        
-        <strong>Modular Features:</strong><br>
-        ✓ Each calendar operates independently (can be enabled/disabled via config.h)<br>
-        ✓ All three synchronized when enabled (locked to 44.1 kHz crystal clock)<br>
-        ✓ User selects mode based on application (medical, sleep, seasonal, fitness, etc.)<br>
-        ✓ Switch modes at runtime (via serial command or mobile app)<br>
-        ✓ CPU/power consumption optimized for each mode<br>
-        ✓ Core mathematics NEVER changes in any mode (φ, frequencies, periods immutable)<br><br>
-        
-        <strong>Daily Verification Protocol (Maintenance):</strong><br>
-        Execute every 24 hours (applies to ALL modes):<br>
-        □ Verify active calendars (whichever are enabled)<br>
-        □ Check frequencies ±0.001 Hz (per selected calendar)<br>
-        □ Verify cross-calendar sync (if multiple calendars active)<br>
-        □ Validate mathematical constants unchanged (φ=1.6180339887, LUNAR_ROOT=210.4186, SOLAR_ROOT=256)<br><br>
-        
-        <strong>Critical Protection Rules (Never Violate - ALL Modes):</strong><br>
-        🛑 DO NOT modify core math (φ, frequencies, calendar periods)<br>
-        🛑 DO NOT disable daily verification checks<br>
-        🛑 DO NOT allow frequency errors &gt;0.001 Hz or precision degradation<br>
-        ✓ All enabled calendars remain synchronized to crystal clock (nanosecond precision)
-      </p>
-    </div>
+      <a href="3-cymatic-geometry-player.html" class="toy-card">
+        <div class="toy-emoji">🌊</div>
+        <div class="toy-name">Cymatic Geometry Player</div>
+        <div class="toy-description">
+          Visualize the animated cosmic geometry of each proto-word
+        </div>
+        <div class="toy-link">→ Open</div>
+      </a>
 
-    <!-- Project Structure -->
-    <div class="section">
-      <h2>📁 Project Structure (v4.1 Modular Architecture)</h2>
-      <div class="tree">
-UFT_Project/
-├── core-machine/
-│   └── uft-machine-v4.1.js          ← Orchestrator (Lunar × Solar × 12:21)
-├── modules/
-│   ├── lunar/
-│   │   └── lunar-module.js          ← 13-moon calendar, synodic frequencies
-│   ├── solar/
-│   │   └── solar-module.js          ← 12-zodiac calendar, chromatic tuning
-│   └── 12-21/
-│       └── cosmic-translator-12-21.js ← Primary: Phase function, spiral, 21-state
-├── tests/
-│   ├── math-verification-extended.html ← 30+ suites, 100+ tests (3x expanded)
-│   ├── integration-test.html            ← UFT Machine integration test
-│   └── medical-test-skin-cancer.js
-├── visualizations/
-│   └── medical-test-visualization.html  ← Interactive medical protocol display
-├── hardware/
-│   ├── UFT_v4.1_Hardware_Build_Dossier.html ← Professional 20-section hardware spec
-│   ├── TIER_1_BOM.html                  ← Starter build (€50, 4–6h)
-│   ├── TIER_2_BOM.html                  ← Full build (€100, 10–14h)
-│   └── TIER_3_BOM.html                  ← Professional (€250, 20–30h)
-├── docs/
-│   ├── README.md
-│   └── REFERENCE.md                     ← Full technical specification
-└── index.html                           ← This file
+      <a href="8-schauberger-water-garden.html" class="toy-card" style="border-color:rgba(82,199,126,0.25);">
+        <div class="toy-emoji">🌿</div>
+        <div class="toy-name">Schauberger × UFT Garden Protocol</div>
+        <div class="toy-description">
+          Live lunar position → irrigation timing, frequency water pre-treatment and Schauberger vortex phase guide. Logs sessions to CSV.
+        </div>
+        <div class="toy-link" style="color:#52c77e;border-color:rgba(82,199,126,0.3);">→ Open</div>
+      </a>
+
+      <a href="9-ferrofluid-frequency.html" class="toy-card" style="border-color:rgba(249,115,22,0.25);">
+        <div class="toy-emoji">🧲</div>
+        <div class="toy-name">Ferrofluid Frequency Portal <span style="color:#00d9ff;font-size:12px;">⭐ NEW</span></div>
+        <div class="toy-description">
+          HA 280.88 Hz excites ferrofluid (6-petal hexagon). NA 297.58 Hz holds equilibrium. TAO 420.84 Hz + Anti-phase erases. NEW: Zero Point grounding (136.10 Hz), Binaural Calm (13.88 Hz stereo beat), 2147 Protocol (automated 10.5s cure sequence).
+        </div>
+        <div class="toy-link" style="color:#f97316;border-color:rgba(249,115,22,0.3);">→ Open</div>
+      </a>
+    </div>
+    
+    <div class="info-section">
+      <h2>Proto-Words Reference</h2>
+      <div class="info-content">
+        9 frequencies that resonate with cosmic cycles. Each has a unique geometric pattern (cymatic geometry) and planetary association.
+      </div>
+      <div class="proto-words">
+        <div class="proto-word-badge"><div class="word">AH</div><div class="freq">210.42 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">SA</div><div class="freq">222.93 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">LA</div><div class="freq">236.19 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">RA</div><div class="freq">250.23 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">DA</div><div class="freq">265.11 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">HA</div><div class="freq">280.88 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">NA</div><div class="freq">297.58 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">OM</div><div class="freq">334.02 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">TAO</div><div class="freq">420.84 Hz</div></div>
       </div>
     </div>
     
-    <!-- Architecture Overview -->
-    <div class="section">
-      <h2>🏗️ System Architecture</h2>
-      <p><strong>Primary Module (Default):</strong> 12:21 Cosmic Translator</p>
-      <p>The 12:21 module provides the core frequency translation engine with:</p>
-      <p>
-        • <code>phaseFunction(t)</code> - Converts time to 0-2π phase angle<br>
-        • <code>spiralFunction(t, r₀)</code> - Golden spiral growth on logarithmic scale<br>
-        • <code>segmentationFunction(t)</code> - Maps to 21-state cosmic cycle<br>
-        • <code>RealtimeMapping.translate(input)</code> - Master translation function
-      </p>
-      
-      <p style="margin-top: 15px;"><strong>Supporting Modules:</strong></p>
-      <p>
-        • <strong>Lunar Module:</strong> 13-moon calendar, 29.5306-day synodic period, proto-words, torus (13,21) topology<br>
-        • <strong>Solar Module:</strong> 12-zodiac signs, 365.25-day tropical year, chromatic scale (256-512 Hz)
-      </p>
-      
-      <p style="margin-top: 15px;"><strong>Integration:</strong></p>
-      <p>
-        The UFT Machine (core-machine/uft-machine-v4.1.js) orchestrates all three modules, enabling:<br>
-        • Multi-domain frequency translation<br>
-        • Coherency scoring across lunar/solar/cosmic domains<br>
-        • Medical frequency analysis and healing protocols<br>
-        • Proto-word to cymatic geometry mapping
-      </p>
-    </div>
-    
-    <!-- Key Features -->
-    <div class="section">
-      <h2>✨ Key Features</h2>
-      <p>
-        <strong>Mathematical Coherency:</strong> All systems verified through 30+ test suites covering golden ratio, harmonic intervals, fibonacci sequences, calendar structures, and frequency formulas.<br><br>
-        <strong>Multi-Domain Integration:</strong> Lunar (13 moons), Solar (12 zodiac), and Cosmic (21-state) cycles unified through frequency translation.<br><br>
-        <strong>Medical Applications:</strong> Frequency deviation analysis, proto-word healing protocols, cymatic geometry visualization for patient assessment.<br><br>
-        <strong>Real-Time Mapping:</strong> Input signals translated to cosmic phase, harmonic frequencies, music parameters, and visual geometry simultaneously.
-      </p>
-    </div>
-    
-    <!-- Quick Start -->
-    <div class="section">
-      <h2>🚀 Quick Start</h2>
-      <p>
-        1. <strong>Initialize UFT Machine:</strong> Load all three modules<br>
-        2. <strong>Call translate(time):</strong> Returns cosmic state + lunar context + solar context<br>
-        3. <strong>Analyze medical:</strong> Use translateMedical(frequency) for patient assessment<br>
-        4. <strong>Verify math:</strong> Run extended verification tests (100+ checks)
-      </p>
-    </div>
-    
-    <!-- Documentation -->
-    <div class="section">
-      <h2>📚 Documentation</h2>
-      <p>
-        • <a href="docs/README.md" style="color: #00ffff;">README.md</a> - Project overview and quick reference<br>
-        • <a href="docs/REFERENCE.md" style="color: #00ffff;">REFERENCE.md</a> - Complete technical specification (14 sections)<br>
-        • Module files include comprehensive JSDoc comments
-      </p>
-    </div>
-    
-    <!-- Testing Suite -->
-    <div class="section">
-      <h2>🧪 Testing & Verification</h2>
-      <p>
-        <strong>Extended Math Tests (20 suites, 100+ tests):</strong><br>
-        Golden Ratio (12), 12-Tone Temperament (8), Frequency Formula (12), Lunar Calendar (8), Solar Calendar (8), Zero Point (6), Fibonacci (10), Phi Convergence (8), Harmonic Intervals (12), 21-State Cycle (10), Golden Spiral (8), Torus Topology (6), Chakra Frequencies (7), Solfeggio Frequencies (6), Proto-Words (9), Complex Exponentials (5), Harmonic Overtones (8), Quantum Frequency (5), Advanced Phi (8), Phase & Frequency (7)<br><br>
-        <strong>Integration Test:</strong><br>
-        Demonstrates UFT Machine orchestrating lunar, solar, and cosmic modules in real-time.
-      </p>
-    </div>
-    
-    <!-- Hardware -->
-    <div class="section">
-      <h2>🛠️ Hardware Build Documentation</h2>
-      <p>
-        Complete UFT v4.1 hardware specifications with three deployment tiers, sourcing guides, and assembly instructions.<br><br>
-        
-        <strong><a href="hardware/UFT_v4.1_Hardware_Build_Dossier.html" target="_blank" style="color: #00ffff;">Professional Hardware Build Dossier</a></strong><br>
-        20 sections: System architecture, microcontroller selection, audio I/O chains, DDS analog synthesis, CV outputs, 7 piezo types, displays, 10 sensor types, video capture, RTC, power systems, passive components, procurement links, budget summary, build guides, firmware configuration, wiring reference, troubleshooting.<br><br>
-        
-        <strong>Bill of Materials by Tier:</strong><br>
-        • <a href="hardware/TIER_1_BOM.html" target="_blank" style="color: #00ffff;">Tier 1 Starter (€47.50)</a> — 4–6 hours, breadboard, no soldering, 17 components<br>
-        • <a href="hardware/TIER_2_BOM.html" target="_blank" style="color: #00ffff;">Tier 2 Full (€96.80)</a> — 10–14 hours, proto PCB, 33 components (adds DDS, CV, advanced cymatics)<br>
-        • <a href="hardware/TIER_3_BOM.html" target="_blank" style="color: #00ffff;">Tier 3 Professional (€252.30)</a> — 20–30 hours, custom PCB, 49+ components (ESP32-S3, camera, biomorph, sensors, oscilloscope)<br><br>
-        
-        <strong>Key Hardware Features:</strong><br>
-        • <strong>Microcontroller:</strong> ESP32 DevKit v1 (Tier 1/2) or ESP32-S3 (Tier 3) with dual I²S peripherals<br>
-        • <strong>Audio Output:</strong> PCM5102A 32-bit DAC + amplification chain (3W mono → 50W+ stereo)<br>
-        • <strong>Audio Input:</strong> INMP441 MEMS microphone for FFT analysis<br>
-        • <strong>DDS Synthesis:</strong> AD9833 28-bit direct digital synthesizer (Tier 2+)<br>
-        • <strong>CV Outputs:</strong> Dual MCP4725 12-bit DACs for Solar/Lunar control voltages (Tier 2+)<br>
-        • <strong>Cymatics Transducers:</strong> 27mm/35mm piezo discs + bimorph stacks (Tier 3) + ultrasonic 40kHz (Tier 3)<br>
-        • <strong>Display:</strong> ILI9341 2.4" TFT (Tier 1/2) or ILI9488 3.5" touch (Tier 3)<br>
-        • <strong>LED Indicators:</strong> 12-LED zodiac ring (Tier 1) or 64-LED matrix (Tier 3)<br>
-        • <strong>Sensors:</strong> DS3231 RTC (Tier 1), +BME280/MPU-6050/APDS-9960 (Tier 3)<br>
-        • <strong>Video:</strong> ESP32-CAM 2MP WiFi streaming (Tier 3)<br>
-        • <strong>Power:</strong> LiPo battery with TP4056 charger (1000mAh→4000mAh scaling across tiers)<br>
-        • <strong>Assembly:</strong> No soldering (Tier 1) → soldering + proto PCB (Tier 2) → manufacturing + custom enclosure (Tier 3)
-      </p>
-    </div>
-    
-    <!-- Hardware-Software Coherency -->
-    <div class="section">
-      <h2>🔗 Hardware-Software Coherency</h2>
-      <p>
-        Complete integration documentation ensuring mathematical algorithms, firmware architecture, and physical hardware are fully coherent.<br><br>
-        
-        <strong><a href="COMPLETE_COHERENCY_VERIFICATION.html" target="_blank" style="color: #00ffff;">Complete Coherency Verification (MASTER DOCUMENT)</a></strong><br>
-        Comprehensive final verification covering all three layers: Mathematical (100+ tests verified), Architectural (3 modular layers), and Hardware (3 deployment tiers). Start here for complete system overview and verification matrix.<br><br>
-        
-        <strong><a href="hardware/HARDWARE_SOFTWARE_INTEGRATION.html" target="_blank" style="color: #00ffff;">Hardware-Software Integration Map</a></strong><br>
-        Complete GPIO pinout reference, I²C address table, SPI configuration, real-time timing constraints, power budget validation, and firmware-to-hardware constants mapping. Essential reference for firmware developers.<br><br>
-        
-        <strong><a href="hardware/SOFTWARE_ARCHITECTURE.html" target="_blank" style="color: #00ffff;">Software Architecture & Hardware Bridge</a></strong><br>
-        Module-to-hardware mapping showing how Lunar, Solar, and 12:21 Cosmic modules translate to PCM5102A audio output, TFT display, LED indicators, AD9833 DDS synthesis, CV outputs, and sensor inputs. Includes FreeRTOS task scheduling, real-time timing deadlines, and C++ firmware interface specifications.<br><br>
-        
-        <strong><a href="COHERENCY_COMPARISON.html" target="_blank" style="color: #00ffff;">Complete Coherency Analysis</a></strong><br>
-        Verification matrix confirming 100% mathematical preservation across restructuring, plus new hardware-software coherency validation checklist covering GPIO assignments, I²C addresses, power budgets, and deployment tier progression (Tier 1 → 3).<br><br>
-        
-        <strong>Key Coherency Points:</strong><br>
-        • <strong>Frequency Ranges:</strong> All tiers synthesize 210–512 Hz (lunar + solar + zero point) with 44.1 kHz sampling<br>
-        • <strong>GPIO Mapping:</strong> 38 ESP32 pins assigned, no conflicts, input-only pins (34/35/36/39) respected<br>
-        • <strong>I²C Bus:</strong> 7 devices max (0x57, 0x60, 0x61, 0x3C, 0x68, 0x77, 0x39), all addresses verified non-conflicting<br>
-        • <strong>SPI Bus:</strong> Shared TFT (GPIO15 CS) + DDS (GPIO5 CS) with spiMutex protection on dual-core<br>
-        • <strong>Audio I/O:</strong> Dual independent I²S buses (output on Core 0, input on Core 1) for simultaneous DAC + microphone<br>
-        • <strong>Real-Time Deadlines:</strong> I²S audio at 5.8 ms (44.1 kHz), TFT refresh at 33 ms (30 Hz), calendar at 86400 seconds (24h)<br>
-        • <strong>Power Budget:</strong> Tier 1 ~280 mA typical (3.5h on 1000 mAh), Tier 3 ~400 mA (10h on 4000 mAh)<br>
-        • <strong>Mathematical Constants:</strong> LUNAR_ROOT 210.4186 Hz, SOLAR_ROOT 256 Hz, PHI 1.6180339887, ZERO_POINT 297.5768 Hz all hardcoded in firmware config.h
-      </p>
-    </div>
-    
-    <!-- Advanced Engineering Documentation -->
-    <div class="section">
-      <h2>🔬 Advanced Engineering Analysis</h2>
-      <p>
-        Professional-grade technical specifications and real-time performance analysis for production deployment.<br><br>
-        
-        <strong><a href="ADVANCED_TECHNICAL_SPECIFICATIONS.html" target="_blank" style="color: #00ffff;">Advanced Technical Specifications</a></strong><br>
-        Engineering-grade analysis covering signal integrity (112 dB SNR, &lt;113 ns jitter tolerance), impedance matching (50Ω SPI traces, I²C 4.7kΩ pull-ups), EMI/RFI shielding strategy by tier, component tolerances & derating, thermal management, power distribution network (PDN) analysis, frequency domain integrity (Nyquist compliance), and crystal oscillator timing. Maintains all core mathematical coherency.<br><br>
-        
-        <strong><a href="REAL_TIME_PERFORMANCE_ANALYSIS.html" target="_blank" style="color: #00ffff;">Real-Time Performance Analysis</a></strong><br>
-        Deterministic scheduling proof: End-to-end latency 35.8 ms (input→output), jitter &lt;21 ns RMS, CPU cycle budgeting (Core 0: 95%, Core 1: 99.7% utilization on FreeRTOS), WCET profiling for I²S audio ISR (&lt;50 µs), priority inversion analysis, rate-monotonic schedulability theorem verification. Hard real-time deadline guarantees (I²S 5.8ms, Piezo PWM 200µs) proven mathematically.<br><br>
-        
-        <strong><a href="REAL_TIME_CALENDAR_VERIFICATION.html" target="_blank" style="color: #00ff99;">✅ Real-Time Multi-Calendar Verification</a></strong><br>
-        <strong>ANSWER TO: "UFT can achieve real-time functionality at milliseconds on different calendars?"</strong> YES - DEFINITIVELY PROVEN. Complete proof that UFT operates with millisecond-precision real-time functionality across all three calendars simultaneously: Cosmic 21-state cycle (24-hour period), Lunar calendar (13 months × 364 days), Solar calendar (12 zodiac × 365.25 days). All synchronized to I²S audio clock with &lt;20 ns jitter, nanosecond-class precision, Rate-Monotonic mathematical proof, and &lt;1 ms accumulated daily error. Includes detailed timing calculations for each calendar cycle, code implementation verification, frequency accuracy proofs, and simultaneous multi-calendar operation proof.<br><br>
-      </p>
-    </div>
-
-    <!-- Security & Frequency Shield -->
-    <div class="section">
-      <h2>🛡️ Security & Frequency Shield</h2>
-      <p>
-        Advanced frequency-based security protecting your project folder from WiFi intrusion. Only UFT's core frequencies (210.4186 Hz Lunar + 256 Hz Solar) can authenticate access.<br><br>
-        
-        <strong><a href="FREQUENCY_SECURITY_SHIELD.html" target="_blank" style="color: #00ffff;">Frequency-Based Security Shield (MASTER)</a></strong><br>
-        Complete security architecture: WiFi frequency isolation (2.4/5/6 GHz blocked), harmonic authentication system (challenge-response via φ-based validation), cryptographic key derivation (AES-256-GCM), file system encryption (NTFS), network firewall rules (SMB/RDP/DNS blocked), and monitoring. Only your frequency passes through all layers. Threat mitigation matrix included.<br><br>
-        
-        <strong><a href="UFT_Security_Shield_Deploy.ps1" target="_blank" style="color: #00ffff;">PowerShell Deployment Script</a></strong><br>
-        Automated Windows security implementation. Run as Administrator to enable: NTFS encryption, admin-only permissions, Windows Firewall rules (blocks WiFi/SMB/RDP), network isolation, harmonic master key generation, and audit logging. Usage: <code>powershell -ExecutionPolicy Bypass -File UFT_Security_Shield_Deploy.ps1 -Full</code><br><br>
-      </p>
-    </div>
-
-    <!-- Firmware Development -->
-    <div class="section">
-      <h2>🚀 Firmware Implementation (ESP32 - VSCode + PlatformIO)</h2>
-      <p>
-        Professional C++ firmware for dual-core real-time audio synthesis on ESP32.<br><br>
-        
-        <strong><a href="firmware/README.md" target="_blank" style="color: #00ffff;">Firmware Setup Guide</a></strong><br>
-        Complete VSCode + PlatformIO installation and build instructions. Build and upload UFT firmware in 5 minutes. Includes GPIO pin maps, I²C addresses, real-time task scheduling, and troubleshooting.<br><br>
-        
-        <strong><a href="FIRMWARE_STATUS.txt" target="_blank" style="color: #ffff00;">📋 Firmware Status Report</a></strong><br>
-        Complete development status (100% ready). Dual-core architecture, real-time task scheduling, mathematical verification, hardware integration checklist, and next steps.<br>
-        
-        <strong><a href="FIRMWARE_QUICK_START.txt" target="_blank" style="color: #00ff00;">⚡ Quick Start Guide (10 min)</a></strong><br>
-        Fast setup reference with 5-step quick start, keyboard shortcuts, and troubleshooting matrix.
-        
-        <strong><a href="FIRMWARE_COMPLETE_SUMMARY.txt" target="_blank" style="color: #ffaa00;">🎯 Complete Summary & Roadmap</a></strong><br>
-        Comprehensive project overview with technical specifications, file descriptions, verification checklist, and 4-phase development roadmap.<br><br>
-        
-        <strong>Firmware Architecture:</strong><br>
-        • <strong>Core 0 (Non-Real-Time):</strong> Display, I²C, Solar CV, WiFi management<br>
-        • <strong>Core 1 (Real-Time Audio):</strong> I²S synthesis (5.8ms hard deadline), Lunar generation, Cymatics driver<br>
-        • <strong>Language:</strong> C++ with FreeRTOS dual-core scheduling<br>
-        • <strong>Sample Rate:</strong> 44.1 kHz stereo (PCM5102A DAC)<br>
-        • <strong>Modules:</strong> Lunar (210.4186 Hz), Solar (256 Hz chromatic), Cosmic (21-state phase)<br><br>
-        
-        <strong>Source Files:</strong><br>
-        • <code>uft_firmware_v4_1.cpp</code> — Main orchestrator with I²S, GPIO, task creation<br>
-        • <code>cosmic_translator.h</code> — 21-state spiral phase engine (φ, θ, spiral functions)<br>
-        • <code>lunar_module.h</code> — 13-moon calendar + proto-word synthesis (9 proto-words)<br>
-        • <code>solar_module.h</code> — 12-zodiac calendar + chromatic scale CV (2^(1/12) tuning)<br>
-        • <code>platformio.ini</code> — Build configuration for ESP32 DevKit v1<br><br>
-        
-        <strong>Key Features:</strong><br>
-        ✓ Modular firmware matching software architecture<br>
-        ✓ Real-time guarantees (Rate-Monotonic Analysis proven)<br>
-        ✓ 100% mathematical coherency preserved (φ, frequencies, states)<br>
-        ✓ Dual-core FreeRTOS task scheduling<br>
-        ✓ Synchronized I²S audio I/O (input + output independent)<br>
-        ✓ I²C/SPI bus arbitration with mutexes<br>
-        ✓ GPIO pin assignments verified zero-conflict<br>
-        ✓ Power budget validated (280-400 mA across tiers)<br>
-        ✓ Ready to upload and test on real ESP32 hardware
-      </p>
-    </div>
-    
-    <div class="footer">
-      <p>UFT v4.1 | 12:21 Cosmic Translator Module | Modular Architecture | Mathematical Verification Complete</p>
-      <p>Hardware-Software Coherency Verified | Advanced Engineering Specifications Available | Frequency-Based Security Active | Firmware Ready</p>
+    <div class="info-section">
+      <h2>How to Use</h2>
+      <div class="info-content">
+        <strong>No installation needed.</strong> All toys are standalone HTML files that run in any modern web browser.
+        <br><br>
+        <strong>Features:</strong> Real-time Web Audio synthesis, interactive visualizations, instant frequency mapping.
+        <br><br>
+        <strong>No dependencies:</strong> Pure vanilla JavaScript. No frameworks, no build tools, no external data.
+        <br><br>
+        <strong>Shareable:</strong> All code and data are public. No sensitive keys or private information.
+      </div>
     </div>
   </div>
 </body>

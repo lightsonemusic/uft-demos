@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UFT Light App</title>
+  <style>
+    :root {
+      --solar: #f4c842; /* yellow */
+      --lunar: #7eb8d4;
+      --zero: #c4a7e7;
+      --gold: #c9a84c;
+      --silver: #8fa8b8;
+      --ink: #080c14;
+      --deep: #0d1520;
+      --glass: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Crimson Pro', serif;
+      --font-mono: 'Share Tech Mono', monospace;
+      --conv: #c4a86c;
+      --font-yellow: #ffe066;
+      --font-red: #ff4d6d;
+      --font-violet: #a259f7;
+    }
+    body {
+      font-family: var(--font-body, 'Crimson Pro', serif);
+      margin: 0; padding: 0;
+      background: var(--deep, #0d1520);
+      color: var(--font-yellow, #ffe066);
+    }
+    header {
+      background: var(--ink, #080c14);
+      color: var(--font-yellow, #ffe066);
+      padding: 1rem; text-align: center;
+      font-family: var(--font-display, 'Cinzel', serif);
+      letter-spacing: 0.04em;
+      border-bottom: 2px solid var(--font-yellow, #ffe066);
+    }
+    nav {
+      display: flex; justify-content: center;
+      background: var(--glass, rgba(255,255,255,0.04));
+      border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
+    }
+    nav button {
+      margin: 0.5rem; padding: 0.5rem 1rem;
+      border: none;
+      background: var(--ink, #080c14);
+      color: var(--font-violet, #a259f7);
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--font-mono, monospace);
+      font-size: 1rem;
+      transition: background 0.2s, color 0.2s;
+      border: 1.5px solid var(--font-violet, #a259f7);
+    }
+    nav button.active {
+      background: var(--font-yellow, #ffe066);
+      color: var(--font-red, #ff4d6d);
+      border: 2px solid var(--font-red, #ff4d6d);
+    }
+    main {
+      max-width: 600px;
+      margin: 2rem auto;
+      background: var(--glass, rgba(255,255,255,0.04));
+      border-radius: 12px;
+      box-shadow: 0 2px 16px #0002;
+      padding: 2rem;
+      border: 1px solid var(--border, rgba(255,255,255,0.08));
+      color: var(--silver, #8fa8b8);
+    }
+    .section { display: none; }
+    .section.active { display: block; }
+    label, select {
+      font-size: 1rem;
+      font-family: var(--font-mono, monospace);
+      color: var(--solar, #f4c842);
+    }
+    .visualization {
+      width: 100%; height: 220px;
+      background: rgba(196, 167, 231, 0.35); /* semi-transparent violet */
+      border-radius: 10px;
+      margin: 1rem 0;
+      border: 1.5px solid var(--gold, #c9a84c);
+      box-shadow: 0 1px 8px #0002;
+      overflow: hidden;
+      backdrop-filter: blur(2px);
+    }
+    .settings-row { margin: 1rem 0; }
+    select, input[type="number"] {
+      background: var(--glass, rgba(255,255,255,0.04));
+      border: 1px solid var(--border, rgba(255,255,255,0.08));
+      color: #fff;
+      border-radius: 4px;
+      padding: 0.2em 0.5em;
+    }
+    h2 {
+      color: var(--font-red, #ff4d6d);
+      font-family: var(--font-display, 'Cinzel', serif);
+      letter-spacing: 0.03em;
+      text-shadow: 0 2px 8px #000a;
+    }
+    ul, p {
+      color: var(--font-yellow, #ffe066);
+    }
+    a { color: var(--font-violet, #a259f7); text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>UFT Light App</h1>
+    <p>Experience Universal Frequency Translator — No hardware required</p>
+  </header>
+  <nav>
+    <button id="tab-play" class="active">Play</button>
+    <button id="tab-visualize">Visualize</button>
+    <button id="tab-protocols">Protocols</button>
+    <button id="tab-settings">Settings</button>
+    <button id="tab-about">About</button>
+  </nav>
+  <main>
+    <section id="section-play" class="section active">
+      <h2>Play UFT Scales & Proto-Words</h2>
+      <div class="settings-row">
+        <label for="scale-select">Scale:</label>
+        <select id="scale-select"></select>
+      </div>
+      <div class="settings-row">
+        <label for="note-select">Note/Proto-Word:</label>
+        <select id="note-select"></select>
+        <button id="play-btn">Play Once</button>
+        <button id="play-continuous-btn">Play Continuous</button>
+        <button id="stop-btn" style="display:none;">Stop</button>
+      </div>
+      <div class="visualization" id="play-visualization"></div>
+    </section>
+    <section id="section-visualize" class="section">
+      <h2>Visualize Frequencies</h2>
+      <div class="settings-row">
+        <label for="vis-frequency">Frequency (Hz):</label>
+        <input type="number" id="vis-frequency" value="432" min="20" max="20000">
+        <button id="vis-play-btn">Play & Visualize</button>
+      </div>
+      <div class="visualization" id="vis-visualization"></div>
+    </section>
+    <section id="section-protocols" class="section">
+      <h2>Guided Protocols</h2>
+      <select id="protocol-select">
+        <option value="water">Water Test</option>
+        <option value="plant">Plant Test</option>
+        <option value="bio">Biological Test</option>
+      </select>
+      <div id="protocol-steps"></div>
+    </section>
+    <section id="section-settings" class="section">
+      <h2>Settings</h2>
+      <div class="settings-row">
+        <label for="output-select">Audio Output Device:</label>
+        <select id="output-select"></select>
+      </div>
+      <div class="settings-row">
+        <label for="input-select">Audio Input Device:</label>
+        <select id="input-select"></select>
+      </div>
+      <p>For best results with external sound cards, connect before launching the app and select here.</p>
+    </section>
+    <section id="section-about" class="section">
+      <h2>About UFT Light</h2>
+      <p>This app lets you explore UFT frequencies, proto-words, and protocols using your device’s speakers and microphone. No hardware required. For advanced features, connect to UFT hardware (coming soon).</p>
+      <p><b>Coherence:</b> All frequencies, proto-words, and tuning systems in this app are sourced from the canonical UFT modules and REFERENCE.md. No invented or placeholder values are used—ensuring full coherence with the Universal Frequency Translator’s scientific foundation.</p>
+      <ul>
+        <li><b>Use Case 1:</b> Explore UFT scales and proto-words in the Play tab.</li>
+        <li><b>Use Case 2:</b> Try the Water Protocol in Protocols tab.</li>
+        <li><b>Use Case 3:</b> Run Plant Growth experiments in Protocols tab.</li>
+      </ul>
+        <p><a href="https://github.com/lightsonemusic" id="feedback-link" target="_blank">Feedback and community: https://github.com/lightsonemusic</a></p>
+    </section>
+  </main>
+  <script type="module" src="uft-light-app.js"></script>
+</body>
+</html>

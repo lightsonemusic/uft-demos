@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFT &middot; Bass Multi-Layer &middot; Nervous System</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:#020409;color:#c0ccd8;
+  font-family:'Courier New',monospace;
+  height:100vh;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+/* TOP BAR */
+#topBar{
+  flex-shrink:0;display:flex;align-items:center;gap:14px;
+  padding:9px 18px;
+  background:rgba(4,8,20,0.98);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  flex-wrap:wrap;
+}
+#tNote{font-size:2em;color:#4ade80;min-width:70px;}
+#tHz{font-size:1.1em;color:#7ec8ff;min-width:130px;}
+#tCents{font-size:.82em;min-width:90px;}
+#tFormula{font-size:.58em;color:#4a6070;flex:1;}
+button{
+  padding:7px 20px;background:rgba(4,8,20,0.9);
+  border:1px solid #60a5fa;color:#60a5fa;
+  font-family:'Courier New',monospace;font-size:.75em;
+  cursor:pointer;letter-spacing:2px;transition:.2s;
+}
+button.active{border-color:#4ade80;color:#4ade80;}
+#centsWrap{display:flex;flex-direction:column;gap:2px;}
+#centsBar{
+  position:relative;width:120px;height:8px;
+  background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.12);
+  border-radius:3px;
+}
+#cMid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.2);}
+#cFill{position:absolute;top:1px;bottom:1px;border-radius:2px;transition:left .05s,width .05s,background .15s;}
+#cLbls{display:flex;justify-content:space-between;font-size:.52em;color:#4a6070;}
+
+/* MAIN GRID */
+#main{
+  flex:1;overflow:hidden;
+  display:grid;
+  grid-template-columns:215px 1fr 265px;
+}
+
+/* PANELS */
+.panel{padding:11px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;}
+#leftPanel{background:rgba(4,8,22,0.98);border-right:1px solid rgba(255,255,255,0.07);}
+#rightPanel{background:rgba(4,8,22,0.98);border-left:1px solid rgba(255,255,255,0.07);}
+#centerPanel{background:rgba(3,6,15,0.98);overflow-y:auto;padding:0;}
+
+.sct{font-size:.57em;color:#4a6080;letter-spacing:3px;text-transform:uppercase;
+  border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:4px;margin-bottom:5px;}
+.dr{display:flex;flex-direction:column;gap:3px;padding:8px;
+  background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.07);}
+.dl{font-size:.58em;color:#5a8090;letter-spacing:2px;text-transform:uppercase;}
+.dv{font-size:.88em;color:#d0dce8;line-height:1.4;}
+.ds{font-size:.65em;color:#6a8898;line-height:1.4;}
+
+/* §IV Body column */
+.bcell{
+  padding:4px 8px;font-size:.62em;
+  border:1px solid rgba(255,255,255,0.04);
+  color:#2a4050;transition:all .35s;
+  display:flex;justify-content:space-between;align-items:center;
+  border-radius:2px;
+}
+.bcell.active{
+  color:#e0ecf8;border-color:currentColor;
+  background:rgba(255,255,255,0.05);
+  box-shadow:0 0 6px currentColor;
+}
+.bcell .bnote{min-width:24px;opacity:.5;}
+.bcell.active .bnote{opacity:1;}
+
+/* SIGNAL LAYERS */
+.layer{
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  padding:11px 14px;
+  display:flex;flex-direction:column;gap:5px;
+  flex-shrink:0;transition:background .2s;
+}
+.layer:hover{background:rgba(8,14,28,0.8);}
+.ltitle{
+  font-size:.57em;color:#4a6070;letter-spacing:3px;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+.lnum{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:18px;height:18px;border-radius:50%;
+  border:1px solid rgba(255,255,255,0.15);font-size:.85em;color:#7aaccc;flex-shrink:0;
+}
+.lmain{font-size:1.05em;color:#d0dce8;min-height:22px;}
+.lsub{font-size:.7em;color:#8aacbc;line-height:1.5;}
+.lbar-wrap{position:relative;height:10px;background:rgba(0,0,0,0.5);
+  border:1px solid rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;}
+.lbar{height:100%;border-radius:2px;width:0;transition:width .08s,background .3s;}
+
+/* Vibrato scope canvas */
+#vScope{display:block;width:100%;height:72px;border:1px solid rgba(255,255,255,0.08);background:#010307;}
+
+/* Geometry mini canvas */
+#geomCanvas{display:block;border:1px solid rgba(255,255,255,0.08);background:#010307;}
+
+/* NS classification */
+.nscls{
+  display:inline-block;padding:3px 12px;font-size:.75em;
+  border:1px solid rgba(255,255,255,0.10);border-radius:2px;
+  margin-top:2px;
+}
+
+/* §V body faculty tags */
+.bfac{
+  display:flex;align-items:center;gap:6px;padding:5px 8px;
+  border:1px solid rgba(255,255,255,0.06);font-size:.72em;
+  color:#3a5060;transition:all .3s;
+}
+.bfac.active{color:#d0dce8;border-color:currentColor;background:rgba(255,255,255,0.04);}
+
+/* Room mode dots */
+.rmdots{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px;}
+.rmdot{
+  display:inline-flex;flex-direction:column;align-items:center;
+  font-size:.55em;padding:3px 6px;
+  border:1px solid rgba(255,255,255,0.07);color:#3a5060;gap:1px;transition:all .4s;
+}
+.rmdot.active{color:#d0dce8;border-color:currentColor;}
+
+/* BOTTOM */
+#bottomBar{
+  flex-shrink:0;padding:5px 14px;
+  background:rgba(4,8,20,0.98);border-top:1px solid rgba(255,255,255,0.08);
+}
+#specLabel{font-size:.52em;color:#4a6070;letter-spacing:3px;margin-bottom:2px;}
+#specCanvas{display:block;width:100%;height:52px;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topBar">
+  <span id="tNote">—</span>
+  <span id="tHz">— Hz</span>
+  <div id="centsWrap">
+    <span id="tCents">— ¢</span>
+    <div id="centsBar"><div id="cMid"></div><div id="cFill"></div></div>
+    <div id="cLbls"><span>−50¢</span><span>0</span><span>+50¢</span></div>
+  </div>
+  <span id="tFormula">f = 256 × 2^(n/12)</span>
+  <button id="startBtn" onclick="startAudio()">▶ START</button>
+</div>
+
+<!-- MAIN GRID -->
+<div id="main">
+
+  <!-- LEFT: §IV Body Layer + §F Geometry -->
+  <div id="leftPanel" class="panel">
+
+    <div class="sct">§IV · Lunar Body Map</div>
+    <div id="bodyCol"><!-- built by JS --></div>
+
+    <div class="sct" style="margin-top:4px">§IV · Current Location</div>
+    <div class="dr">
+      <span class="dl">Body</span><span class="dv" id="lBody">—</span>
+      <span class="dl">Sap Phase</span><span class="dv" id="lSap">—</span>
+      <span class="dl">Tree · Ogham</span><span class="dv" id="lTree">—</span>
+      <span class="dl">Proto-Word</span><span class="dv" id="lProto">—</span>
+      <span class="dl">Fibonacci</span><span class="dv" id="lFib">—</span>
+    </div>
+
+    <div class="sct">§F · Cymatic Form</div>
+    <canvas id="geomCanvas" width="188" height="120"></canvas>
+    <div class="ds" id="geomLabel">—</div>
+
+  </div>
+
+  <!-- CENTER: 5 Signal Layers -->
+  <div id="centerPanel">
+
+    <div class="layer">
+      <div class="ltitle"><span class="lnum">1</span> Fundamental · 432 Hz Scale</div>
+      <div class="lmain" id="l1main">No signal</div>
+      <div class="lsub" id="l1sub">Waiting for bass input…</div>
+      <div class="lbar-wrap"><div class="lbar" id="l1bar"></div></div>
+    </div>
+
+    <div class="layer">
+      <div class="ltitle"><span class="lnum">2</span> 2nd Harmonic · Octave Identity</div>
+      <div class="lmain" id="l2main">—</div>
+      <div class="lsub" id="l2sub">Expected at fundamental × 2</div>
+      <div class="lbar-wrap"><div class="lbar" id="l2bar"></div></div>
+    </div>
+
+    <div class="layer">
+      <div class="ltitle"><span class="lnum">3</span> 3rd Harmonic · Perfect 5th · §VII 3:2</div>
+      <div class="lmain" id="l3main">—</div>
+      <div class="lsub" id="l3sub">Expected at fundamental × 3 → §VII Perfect 5th (3:2)</div>
+      <div class="lbar-wrap"><div class="lbar" id="l3bar"></div></div>
+    </div>
+
+    <div class="layer">
+      <div class="ltitle"><span class="lnum">4</span> Attack Envelope · §IV Sap Phase</div>
+      <div class="lmain" id="l4main">—</div>
+      <div class="lsub" id="l4sub">Rise time → §IV sap phase resonance</div>
+      <div class="lbar-wrap"><div class="lbar" id="l4bar"></div></div>
+    </div>
+
+    <div class="layer">
+      <div class="ltitle"><span class="lnum">5</span> Vibrato · 3–8 Hz · Nervous System</div>
+      <div class="lmain" id="l5main">—</div>
+      <div class="lsub" id="l5sub">Tracking frequency modulation rate…</div>
+      <div class="lbar-wrap"><div class="lbar" id="l5bar"></div></div>
+    </div>
+
+    <div class="layer">
+      <div class="ltitle"><span class="lnum">6</span> Technique · Harmonic Clarity</div>
+      <div class="lmain" id="l6main">—</div>
+      <div class="lsub" id="l6sub">Ratio: harmonic energy / total energy</div>
+      <div class="lbar-wrap"><div class="lbar" id="l6bar"></div></div>
+    </div>
+
+    <div class="layer">
+      <div class="ltitle"><span class="lnum">7</span> Room Modes · Acoustic Space · Silence scan</div>
+      <div class="lmain" id="l7main">Scanning ambient…</div>
+      <div class="lsub" id="l7sub">Room standing waves detected in noise floor when you are not playing</div>
+      <div class="lbar-wrap"><div class="lbar" id="l7bar"></div></div>
+    </div>
+
+    <div class="layer">
+      <div class="ltitle"><span class="lnum">8</span> Decay · RT60 · Room Size Estimate</div>
+      <div class="lmain" id="l8main">—</div>
+      <div class="lsub" id="l8sub">After note stops → how fast energy falls in dB/s → room liveness</div>
+      <div class="lbar-wrap"><div class="lbar" id="l8bar"></div></div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: Vibrato scope + nervous system -->
+  <div id="rightPanel" class="panel">
+
+    <div class="sct">Vibrato Scope · ±50¢ window</div>
+    <canvas id="vScope"></canvas>
+    <div class="dr">
+      <span class="dl">Rate</span><span class="dv" id="vRate">— Hz</span>
+      <span class="dl">Depth</span><span class="dv" id="vDepth">— ¢ RMS</span>
+      <span class="dl">Classification</span>
+      <span class="nscls" id="vClass">No signal</span>
+    </div>
+
+    <div class="sct" style="margin-top:4px">§V · Body Faculty Layer</div>
+    <div class="ds" style="color:#5a7080;padding:2px 0">The 4 body faculties from §V — which grammar your note activates:</div>
+    <div id="bfacList"><!-- built by JS --></div>
+
+    <div class="sct" style="margin-top:4px">Nervous System · UFT Reading</div>
+    <div class="dr" id="nsReading">
+      <span class="ds">Play a note to activate nervous system layer</span>
+    </div>
+
+    <div class="sct" style="margin-top:4px">Room · Acoustic Environment</div>
+    <div class="dr">
+      <span class="dl">Dominant room mode</span><span class="dv" id="rmDom">Scanning…</span>
+      <span class="dl">Nearest 432 Hz note</span><span class="dv" id="rmNote">—</span>
+      <span class="dl">Room liveness · RT60</span><span class="dv" id="rmRT">—</span>
+      <span class="dl">Size estimate</span><span class="ds" id="rmSize">—</span>
+      <span class="dl">Ambient hum</span><span class="ds" id="rmHum">—</span>
+    </div>
+    <div class="sct" style="margin-top:2px">Detected room modes</div>
+    <div class="rmdots" id="rmDots"></div>
+    <div class="sct" style="margin-top:4px">Harmonic Series · §VII</div>
+    <div class="dr">
+      <span class="dl">H2 vs H1 · Octave</span><span class="dv" id="h2iv">—</span>
+      <span class="dl">H3 vs H1 · §VII</span><span class="dv" id="h3iv" style="color:#4ade80">Perfect 5th · 3:2 · consonant</span>
+      <span class="dl">H2 level</span><span class="ds" id="h2db">—</span>
+      <span class="dl">H3 level</span><span class="ds" id="h3db">—</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOTTOM: Spectrum -->
+<div id="bottomBar">
+  <div id="specLabel">SPECTRUM · 20–2000 Hz · HARMONIC GRID · f=256×2^(n/12)</div>
+  <canvas id="specCanvas"></canvas>
+</div>
+
+<script>
+// ── CONSTANTS · REFERENCE.md ─────────────────────────────────────────────────
+const ROOT_432  = 256.0000;
+const PHI       = (1 + Math.sqrt(5)) / 2;
+const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const FFT_SIZE   = 8192;
+const SAMPLE_RATE = 48000;
+const BIN_HZ = SAMPLE_RATE / FFT_SIZE;
+const THRESH_DB = -58;
+
+// ── §IV LUNAR BODY MAP (REFERENCE.md §IV — confirmed rows) ───────────────────
+// Sap phases: Rising / Peak / Zero Point / Descending / Dormant / Awakening
+const LUNAR_BODY = [
+  {pc:0,  note:'C',  body:'Root',               sap:'Rising',      sapCol:'#4ade80', tree:'Birch',    ogham:'Beith', proto:'AH',  fib:1,   color:'#60a5fa'},
+  {pc:1,  note:'C#', body:'Throat',             sap:'Rising',      sapCol:'#4ade80', tree:'Rowan',    ogham:'Luis',  proto:'SA',  fib:2,   color:'#818cf8'},
+  {pc:2,  note:'D',  body:'Hands & Lungs',      sap:'Rising',      sapCol:'#4ade80', tree:'Ash',      ogham:'Nion',  proto:'LA',  fib:3,   color:'#a78bfa'},
+  {pc:3,  note:'D#', body:'Stomach',            sap:'Peak',        sapCol:'#facc15', tree:'Alder',    ogham:'Fearn', proto:'RA',  fib:5,   color:'#ef4444'},
+  {pc:4,  note:'E',  body:'Solar Plexus',       sap:'Peak',        sapCol:'#facc15', tree:'Willow',   ogham:'Sail',  proto:'DA',  fib:8,   color:'#e879f9'},
+  {pc:5,  note:'F',  body:'—',                  sap:'Peak',        sapCol:'#facc15', tree:'Hawthorn', ogham:'Huath', proto:'HA',  fib:13,  color:'#a3e635'},
+  {pc:6,  note:'F#', body:'Heart',              sap:'Zero Point',  sapCol:'#facc15', tree:'Oak',      ogham:'Duir',  proto:'NA',  fib:21,  color:'#facc15'},
+  {pc:7,  note:'G',  body:'Spine',              sap:'Descending',  sapCol:'#fb923c', tree:'Holly',    ogham:'Tinne', proto:'KA',  fib:34,  color:'#fb923c'},
+  {pc:8,  note:'G#', body:'The wound as portal',sap:'Descending',  sapCol:'#36D9B8', tree:'Hazel',    ogham:'Coll',  proto:'OM',  fib:55,  color:'#36D9B8'},
+  {pc:9,  note:'A',  body:'The blood',          sap:'Descending',  sapCol:'#fb923c', tree:'Vine',     ogham:'Muin',  proto:'AH',  fib:89,  color:'#f87171'},
+  {pc:10, note:'A#', body:'Deep interior',      sap:'Dormant',     sapCol:'#818cf8', tree:'Ivy',      ogham:'Gort',  proto:'EE',  fib:144, color:'#34d399'},
+  {pc:11, note:'B',  body:'The compost',        sap:'Dormant',     sapCol:'#818cf8', tree:'Elder',    ogham:'Ruis',  proto:'UH',  fib:233, color:'#22d3ee'},
+];
+
+// ── §F CYMATIC GEOMETRY (REFERENCE.md §F — exact node counts) ────────────────
+const PROTO_GEOM = {
+  'AH': {nodes:0,  form:'expanding-circles', label:'Expanding circles · Moon · torus root'},
+  'SA': {nodes:2,  form:'figure-8',          label:'Figure-8 · Mercury · u↔v crossing'},
+  'LA': {nodes:3,  form:'rose-3',            label:'3-petal triangle · Venus · φ geometry'},
+  'RA': {nodes:4,  form:'radial-4',          label:'4-point radial · Sun · fire · peak phase'},
+  'DA': {nodes:5,  form:'star-5',            label:'5-point star · Mars · will · φ boundary'},
+  'HA': {nodes:6,  form:'rose-6',            label:'6-petal hexagon · Jupiter · Seed of Life'},
+  'NA': {nodes:0,  form:'standing-null',     label:'Standing wave null · Zero Point · F#=256×√2'},
+  'KA': {nodes:8,  form:'star-8',            label:'8-point star · Holly/Spine · P rank 8'},
+  'OM': {nodes:0,  form:'phi-spiral',        label:'Phi spiral bloom · Ophiuchus · 8:13'},
+  'EE': {nodes:11, form:'star-11',           label:'11-point star · Ivy/Deep interior · P rank 11'},
+  'UH': {nodes:12, form:'star-12',           label:'12-point star · Elder/The compost · P rank 12'},
+  'TAO':{nodes:13, form:'burst-13',          label:'13-point burst · Yew · full system'},
+};
+
+// ── §V BODY FACULTIES (REFERENCE.md §V — 4 body-level faculties) ─────────────
+const BODY_FACULTIES = [
+  {pc:1,  note:'C#', fac:'Body Sensation', planet:'Venus',   el:'Earth', color:'#f97316'},
+  {pc:4,  note:'E',  fac:'Body Will',      planet:'Sun',     el:'Fire',  color:'#facc15'},
+  {pc:7,  note:'G',  fac:'Body Feeling',   planet:'Mars',    el:'Water', color:'#f87171'},
+  {pc:11, note:'B',  fac:'Body Thinking',  planet:'Neptune', el:'Air',   color:'#c084fc'},
+];
+
+// Vibrato rate physiological ranges (established motor neuroscience — not UFT data)
+const NS_RANGES = [
+  {min:0,   max:2,  label:'Below vibrato range',  sub:'Slow pitch drift',             cls:'slow',   color:'#60a5fa'},
+  {min:2,   max:5,  label:'Natural motor range',  sub:'Conscious vibrato  · 3–5 Hz',  cls:'normal', color:'#4ade80'},
+  {min:5,   max:8,  label:'Upper motor range',    sub:'Fast tight vibrato · 5–8 Hz',  cls:'fast',   color:'#facc15'},
+  {min:8,   max:20, label:'Essential tremor zone',sub:'Involuntary · 8–12 Hz',        cls:'tremor', color:'#f87171'},
+];
+
+// ── BUILD BODY COLUMN ─────────────────────────────────────────────────────────
+const bodyCol = document.getElementById('bodyCol');
+LUNAR_BODY.forEach(b => {
+  const d = document.createElement('div');
+  d.className = 'bcell'; d.id = 'bc-' + b.pc;
+  d.style.color = b.color;
+  d.innerHTML = `<span class="bnote">${b.note}</span><span>${b.body}</span>`;
+  bodyCol.appendChild(d);
+});
+
+// ── BUILD BODY FACULTY LIST ───────────────────────────────────────────────────
+const bfacList = document.getElementById('bfacList');
+BODY_FACULTIES.forEach(f => {
+  const d = document.createElement('div');
+  d.className = 'bfac'; d.id = 'bf-' + f.pc;
+  d.style.color = f.color; d.style.borderColor = f.color + '44';
+  d.innerHTML = `<span style="min-width:26px">${f.note}</span><span style="flex:1">${f.fac}</span><span style="font-size:.85em;opacity:.7">${f.el}·${f.planet}</span>`;
+  bfacList.appendChild(d);
+});
+
+// ── GEOMETRY CANVAS ───────────────────────────────────────────────────────────
+const gCanvas = document.getElementById('geomCanvas');
+const gCtx = gCanvas.getContext('2d');
+let geomT = 0, currentProto = 'AH', currentColor = '#60a5fa';
+
+function drawGeom() {
+  const W = gCanvas.width, H = gCanvas.height;
+  const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.38;
+  gCtx.clearRect(0,0,W,H);
+  gCtx.fillStyle = '#010307'; gCtx.fillRect(0,0,W,H);
+  const col = currentColor;
+  geomT += 0.025;
+
+  function ha(c, a) {
+    const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  gCtx.strokeStyle = col; gCtx.lineWidth = 1.2;
+
+  const form = (PROTO_GEOM[currentProto]||{form:'expanding-circles'}).form;
+
+  if (form === 'expanding-circles') {
+    for (let i=0;i<3;i++){
+      const ph = (geomT*0.4+i/3)%1;
+      gCtx.beginPath(); gCtx.arc(cx,cy,ph*R*1.1,0,Math.PI*2);
+      gCtx.strokeStyle = ha(col,1-ph); gCtx.lineWidth=1.5*(1-ph*0.6); gCtx.stroke();
+    }
+  } else if (form === 'figure-8') {
+    gCtx.beginPath(); gCtx.strokeStyle=col; gCtx.lineWidth=1.2;
+    for(let t=0;t<=Math.PI*2+.01;t+=.02){
+      const x=cx+R*Math.sin(t)*Math.cos(t), y=cy+R*0.6*Math.sin(t);
+      t===0?gCtx.moveTo(x,y):gCtx.lineTo(x,y);
+    } gCtx.stroke();
+  } else if (form === 'rose-3' || form === 'rose-6') {
+    const k = form==='rose-6'?6:3;
+    gCtx.beginPath(); gCtx.strokeStyle=col; gCtx.lineWidth=1.2;
+    for(let t=0;t<=Math.PI*2+.01;t+=.01){
+      const r=R*Math.abs(Math.cos(k/2*t));
+      const x=cx+r*Math.cos(t+geomT*0.2), y=cy+r*Math.sin(t+geomT*0.2);
+      t===0?gCtx.moveTo(x,y):gCtx.lineTo(x,y);
+    } gCtx.stroke();
+  } else if (form === 'radial-4') {
+    for(let i=0;i<4;i++){
+      const a=geomT*0.3+i*Math.PI/2;
+      gCtx.beginPath(); gCtx.strokeStyle=col; gCtx.lineWidth=1.4;
+      gCtx.moveTo(cx,cy); gCtx.lineTo(cx+R*Math.cos(a),cy+R*Math.sin(a)); gCtx.stroke();
+    }
+    gCtx.beginPath(); gCtx.arc(cx,cy,R*0.85,0,Math.PI*2);
+    gCtx.strokeStyle=ha(col,0.3); gCtx.lineWidth=0.7; gCtx.stroke();
+  } else if (form === 'star-5'||form==='star-8'||form==='star-11'||form==='star-12'||form==='burst-13') {
+    const n=form==='star-5'?5:form==='star-8'?8:form==='star-11'?11:form==='star-12'?12:13;
+    const rot=geomT*0.15;
+    gCtx.beginPath(); gCtx.strokeStyle=col; gCtx.lineWidth=1.2;
+    for(let i=0;i<=n;i++){
+      const a=rot+i*Math.PI*2/n;
+      const r=i%2===0?R:R*0.45;
+      i===0?gCtx.moveTo(cx+r*Math.cos(a),cy+r*Math.sin(a)):gCtx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));
+    } gCtx.closePath(); gCtx.stroke();
+    // outer ring dots
+    for(let i=0;i<n;i++){
+      const a=rot+i*Math.PI*2/n;
+      gCtx.beginPath(); gCtx.arc(cx+R*Math.cos(a),cy+R*Math.sin(a),2,0,Math.PI*2);
+      gCtx.fillStyle=ha(col,0.7); gCtx.fill();
+    }
+  } else if (form === 'standing-null') {
+    gCtx.beginPath(); gCtx.strokeStyle=ha(col,0.4); gCtx.lineWidth=1;
+    gCtx.moveTo(cx-R,cy); gCtx.lineTo(cx+R,cy); gCtx.stroke();
+    gCtx.beginPath(); gCtx.arc(cx-R,cy,4,0,Math.PI*2);
+    gCtx.fillStyle=col; gCtx.fill();
+    gCtx.beginPath(); gCtx.arc(cx+R,cy,4,0,Math.PI*2);
+    gCtx.fill();
+    // Faint sine near zero
+    gCtx.beginPath(); gCtx.strokeStyle=ha(col,0.15); gCtx.lineWidth=0.8;
+    for(let x=cx-R;x<=cx+R;x+=1){
+      const y2=cy+R*0.12*Math.sin((x-cx)/(R/Math.PI*3));
+      x===cx-R?gCtx.moveTo(x,y2):gCtx.lineTo(x,y2);
+    } gCtx.stroke();
+  } else if (form === 'phi-spiral') {
+    const b=Math.log(PHI)/Math.PI;
+    gCtx.beginPath(); gCtx.strokeStyle=col; gCtx.lineWidth=1.3;
+    for(let t=0;t<=Math.PI*7;t+=0.03){
+      const r=R*0.04*Math.exp(b*t);
+      if(r>R*1.1) break;
+      const x=cx+r*Math.cos(t+geomT*0.1), y=cy+r*Math.sin(t+geomT*0.1);
+      t===0?gCtx.moveTo(x,y):gCtx.lineTo(x,y);
+    } gCtx.stroke();
+  }
+}
+
+// ── VIBRATO SCOPE ─────────────────────────────────────────────────────────────
+const vScope = document.getElementById('vScope');
+const vCtx   = vScope.getContext('2d');
+const VBUF   = 256;
+const freqBuf = new Float32Array(VBUF);
+let vBufIdx = 0, vBufFilled = 0;
+
+function pushFreq(f) {
+  freqBuf[vBufIdx] = f;
+  vBufIdx = (vBufIdx + 1) % VBUF;
+  if (vBufFilled < VBUF) vBufFilled++;
+}
+
+function getVibrato() {
+  if (vBufFilled < 64) return { rate:0, depth:0 };
+  const N = Math.min(180, vBufFilled);
+  const samp = [];
+  for(let i=N-1;i>=0;i--) samp.push(freqBuf[((vBufIdx-1-i)+VBUF)%VBUF]);
+  const valid = samp.filter(f=>f>30);
+  if (valid.length < 32) return { rate:0, depth:0 };
+  const mean = valid.reduce((a,b)=>a+b,0)/valid.length;
+  const dev = samp.map(f=>f>30 ? 1200*Math.log2(f/mean) : 0);
+  const rms = Math.sqrt(dev.reduce((s,d)=>s+d*d,0)/dev.length);
+  const fps = 60;
+  let bestRate=0, bestMag=0;
+  for(let f=1.5;f<=14;f+=0.25){
+    let re=0,im=0;
+    for(let i=0;i<dev.length;i++){
+      const a=2*Math.PI*f*i/fps;
+      re+=dev[i]*Math.cos(a); im+=dev[i]*Math.sin(a);
+    }
+    const mag=Math.sqrt(re*re+im*im);
+    if(mag>bestMag){bestMag=mag;bestRate=f;}
+  }
+  return { rate: rms>1.5?bestRate:0, depth:rms };
+}
+
+function drawVScope(devArr, vrate) {
+  const W = vScope.width || vScope.offsetWidth, H = vScope.height || 72;
+  vCtx.clearRect(0,0,W,H);
+  vCtx.fillStyle='#010307'; vCtx.fillRect(0,0,W,H);
+  // Centre line
+  vCtx.strokeStyle='rgba(255,255,255,0.07)'; vCtx.lineWidth=1;
+  vCtx.beginPath(); vCtx.moveTo(0,H/2); vCtx.lineTo(W,H/2); vCtx.stroke();
+  // ±10¢ and ±25¢ guides
+  for(const c of [10,25]){
+    const y=H/2 - (c/50)*H/2;
+    vCtx.strokeStyle=`rgba(255,255,255,0.04)`; vCtx.lineWidth=0.7;
+    vCtx.beginPath(); vCtx.moveTo(0,y); vCtx.lineTo(W,y); vCtx.stroke();
+    vCtx.beginPath(); vCtx.moveTo(0,H-y); vCtx.lineTo(W,H-y); vCtx.stroke();
+  }
+  // 3-8 Hz band highlight (when vibrato active)
+  if (vrate>=2 && vrate<=9) {
+    vCtx.fillStyle='rgba(74,222,128,0.04)'; vCtx.fillRect(0,0,W,H);
+  }
+  if (devArr.length < 2) return;
+  // Draw waveform
+  vCtx.beginPath(); vCtx.strokeStyle=currentColor; vCtx.lineWidth=1.4;
+  devArr.forEach((d,i)=>{
+    const x=i/(devArr.length-1)*W;
+    const y=H/2 - Math.max(-50,Math.min(50,d))/50*(H/2-3);
+    i===0?vCtx.moveTo(x,y):vCtx.lineTo(x,y);
+  }); vCtx.stroke();
+}
+
+// ── SPECTRUM ──────────────────────────────────────────────────────────────────
+const specCanvas = document.getElementById('specCanvas');
+const specCtx = specCanvas.getContext('2d');
+const SFREQ_MIN=20, SFREQ_MAX=2000;
+function freqToX(f,W){return W*Math.log2(f/SFREQ_MIN)/Math.log2(SFREQ_MAX/SFREQ_MIN);}
+function resizeSpec(){
+  const r=specCanvas.parentElement.getBoundingClientRect();
+  specCanvas.width=Math.floor(r.width); specCanvas.height=52;
+}
+resizeSpec(); window.addEventListener('resize',resizeSpec);
+
+function drawSpec(data, an, detFreq, fundamental) {
+  const W=specCanvas.width,H=52;
+  specCtx.clearRect(0,0,W,H); specCtx.fillStyle='#010307'; specCtx.fillRect(0,0,W,H);
+  // Grid at 432 Hz harmonics of each note
+  for(let n=-48;n<=12;n++){
+    const f=ROOT_432*Math.pow(2,n/12);
+    if(f<SFREQ_MIN||f>SFREQ_MAX) continue;
+    const x=freqToX(f,W);
+    specCtx.strokeStyle='rgba(255,255,255,0.04)'; specCtx.lineWidth=0.5;
+    specCtx.beginPath(); specCtx.moveTo(x,0); specCtx.lineTo(x,H-8); specCtx.stroke();
+    if(NOTE_NAMES[((n%12)+12)%12]==='C' || NOTE_NAMES[((n%12)+12)%12]==='F#'){
+      specCtx.fillStyle='rgba(255,255,255,0.06)';
+      specCtx.font='7px Courier New';
+      specCtx.fillText(NOTE_NAMES[((n%12)+12)%12],x+1,H-1);
+    }
+  }
+  // FFT bars
+  const grad=specCtx.createLinearGradient(0,0,0,H-10);
+  grad.addColorStop(0,currentColor); grad.addColorStop(1,'#060a12');
+  specCtx.fillStyle=grad;
+  for(let i=1;i<data.length;i++){
+    const f=i*BIN_HZ; if(f<SFREQ_MIN||f>SFREQ_MAX) continue;
+    const x1=freqToX(f,W), x0=freqToX((i-1)*BIN_HZ||SFREQ_MIN,W);
+    const nH=Math.max(0,(data[i]-an.minDecibels)/(an.maxDecibels-an.minDecibels));
+    specCtx.fillRect(x0,H-10-nH*(H-10),Math.max(x1-x0,1),nH*(H-10));
+  }
+  // Detected fundamental
+  if(detFreq>SFREQ_MIN&&detFreq<SFREQ_MAX){
+    const x=freqToX(detFreq,W);
+    specCtx.strokeStyle='#facc15'; specCtx.lineWidth=1.5;
+    specCtx.setLineDash([3,3]); specCtx.beginPath(); specCtx.moveTo(x,0); specCtx.lineTo(x,H-8); specCtx.stroke();
+    specCtx.setLineDash([]);
+  }
+  // Harmonic markers H2, H3
+  if(fundamental>0){
+    [2,3].forEach((h,hi)=>{
+      const hf=fundamental*h; if(hf<SFREQ_MIN||hf>SFREQ_MAX) return;
+      const x=freqToX(hf,W);
+      specCtx.strokeStyle=hi===0?'#818cf8':'#4ade80';
+      specCtx.lineWidth=1; specCtx.setLineDash([2,4]);
+      specCtx.beginPath(); specCtx.moveTo(x,0); specCtx.lineTo(x,H-8); specCtx.stroke();
+      specCtx.setLineDash([]);
+      specCtx.fillStyle=hi===0?'#818cf8':'#4ade80';
+      specCtx.font='8px Courier New'; specCtx.fillText('H'+h,x+2,H-1);
+    });
+  }
+}
+
+// ── AUDIO ENGINE ──────────────────────────────────────────────────────────────
+let audioCtx, analyser, dataArray, animId;
+let envFast=0, envSlow=0, onsetTime=0, riseStart=0, riseMs=0;
+let lastDb=-90, lastNote=-1;
+
+// ── ROOM / ENVIRONMENT ENGINE ──────────────────────────────────────────────────
+// Room mode scan: reads FFT when no instrument signal is present.
+// Peaks in the noise floor 20–300 Hz = room standing wave resonances.
+// f = c / (2L) where c=343 m/s — so dominant mode -> L estimate.
+const SPEED_OF_SOUND = 343;
+let roomModes = [];        // [{f, db, note}]
+let roomScanTimer = 0;    // frames since last scan
+let rt60Buffer = [];       // recent peak dB values for decay tracking
+let rt60 = null;           // seconds
+let rt60Phase = 'idle';    // 'idle'|'sustain'|'decaying'
+let rt60SustainDb = -90;
+let rt60DecayStart = 0;
+let rt60DecayStartDb = -90;
+let ambientHumHz = 0;
+
+function scanRoomModes(data) {
+  // Scan 20–300 Hz for peaks in noise floor
+  const modes = [];
+  const scanMax = Math.floor(300 / BIN_HZ);
+  const scanMin = Math.ceil(20  / BIN_HZ);
+  // Find local peaks above noise floor
+  const noiseFl = -80; // dBFS threshold for room modes in silence
+  for(let i=scanMin+1; i<scanMax-1; i++) {
+    if(data[i] > noiseFl && data[i] > data[i-1] && data[i] > data[i+1]) {
+      const f = parabolicPeak(data, i) * BIN_HZ;
+      const n = freqToNote(f);
+      modes.push({ f: f.toFixed(1), db: data[i].toFixed(1), note: n ? n.name : '?' });
+    }
+  }
+  // Keep top 6 by level
+  modes.sort((a,b) => b.db - a.db);
+  return modes.slice(0, 6);
+}
+
+function detectAmbientHum(data) {
+  // Look for power hum at 50 Hz or 60 Hz (mains) and harmonics
+  const targets = [50, 100, 150, 60, 120, 180];
+  let bestHz = 0, bestDb = -85;
+  for(const f of targets) {
+    const b = Math.round(f / BIN_HZ);
+    if(b < data.length && data[b] > bestDb) {
+      bestDb = data[b]; bestHz = f;
+    }
+  }
+  return bestDb > -80 ? bestHz : 0;
+}
+
+function updateRT60(peakVal, hasSignal) {
+  const now = Date.now();
+  if(hasSignal && peakVal > -50) {
+    // Sustaining
+    if(rt60Phase !== 'sustain') {
+      rt60Phase = 'sustain';
+      rt60SustainDb = peakVal;
+    }
+    rt60SustainDb = Math.max(rt60SustainDb, peakVal);
+    rt60DecayStart = now;
+    rt60DecayStartDb = rt60SustainDb;
+  } else if(rt60Phase === 'sustain') {
+    // Transition to decay
+    rt60Phase = 'decaying';
+    rt60DecayStart = now;
+    rt60DecayStartDb = rt60SustainDb;
+  } else if(rt60Phase === 'decaying') {
+    const elapsed = (now - rt60DecayStart) / 1000;
+    const drop = rt60DecayStartDb - peakVal;
+    if(drop > 10) {
+      // Estimate RT60: time to drop 60 dB proportionally
+      rt60 = elapsed * (60 / drop);
+      if(rt60 > 8) rt60 = 8; // cap
+    }
+    if(elapsed > 4 || peakVal < -80) rt60Phase = 'idle';
+  }
+}
+
+function describeRoom(rt, domHz) {
+  // RT60 -> room size + liveness
+  let size, live;
+  if(rt === null) return { size:'—', live:'measuring…', col:'#4a6070' };
+  if(rt < 0.15)      { size='very small / dead';     live='Anechoic / foam treated'; }
+  else if(rt < 0.35) { size='small room';            live='Dry — studio / bedroom'; }
+  else if(rt < 0.55) { size='medium room';           live='Normal living space'; }
+  else if(rt < 1.0)  { size='large room';            live='Live — hall / church entry'; }
+  else if(rt < 2.0)  { size='very large / reverberant'; live='Concert hall / stone room'; }
+  else               { size='extreme reverb';        live='Cave / cathedral / outdoors echo'; }
+  const col = rt<0.35?'#818cf8':rt<0.7?'#4ade80':rt<1.5?'#facc15':'#f87171';
+  return { size, live, col };
+}
+
+function freqToNote(f){
+  if(f<=0) return null;
+  const n_raw=12*Math.log2(f/ROOT_432);
+  const n=Math.round(n_raw);
+  const pc=((n%12)+12)%12;
+  const tf=ROOT_432*Math.pow(2,n/12);
+  return {n,pc,name:NOTE_NAMES[pc],targetHz:tf,cents:1200*Math.log2(f/tf)};
+}
+function parabolicPeak(d,k){
+  if(k<=0||k>=d.length-1) return k;
+  const y1=d[k-1],y2=d[k],y3=d[k+1],dd=2*y2-y1-y3;
+  return dd===0?k:k+(y3-y1)/(2*dd);
+}
+
+window.startAudio = async function(){
+  const btn=document.getElementById('startBtn');
+  if(audioCtx){audioCtx.close();audioCtx=null;cancelAnimationFrame(animId);btn.textContent='▶ START';btn.classList.remove('active');return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    audioCtx=new AudioContext({sampleRate:SAMPLE_RATE});
+    analyser=audioCtx.createAnalyser();
+    analyser.fftSize=FFT_SIZE; analyser.smoothingTimeConstant=0.75;
+    analyser.minDecibels=-90; analyser.maxDecibels=-10;
+    audioCtx.createMediaStreamSource(stream).connect(analyser);
+    dataArray=new Float32Array(analyser.frequencyBinCount);
+    btn.textContent='■ STOP'; btn.classList.add('active');
+    loop();
+  }catch(e){btn.textContent='MIC ERROR — '+e.message;}
+};
+
+function loop(){
+  animId=requestAnimationFrame(loop);
+  drawGeom();
+  if(!dataArray){return;}
+
+  analyser.getFloatFrequencyData(dataArray);
+  const binMin=Math.ceil(SFREQ_MIN/BIN_HZ), binMax=Math.floor(SFREQ_MAX/BIN_HZ);
+
+  // ── Fundamental detection ───────────────────────────────────────────────────
+  const bassMax=Math.floor(500/BIN_HZ);
+  let peakBin=binMin, peakVal=-Infinity;
+  for(let i=binMin;i<=bassMax;i++) if(dataArray[i]>peakVal){peakVal=dataArray[i];peakBin=i;}
+
+  const hasSignal=peakVal>THRESH_DB;
+  let detFreq=0, note=null;
+
+  if(hasSignal){
+    detFreq=parabolicPeak(dataArray,peakBin)*BIN_HZ;
+    note=freqToNote(detFreq);
+  }
+
+  // ── Amplitude envelope (for attack detection) ───────────────────────────────
+  const amp=Math.max(0,Math.min(1,(peakVal-analyser.minDecibels)/(analyser.maxDecibels-analyser.minDecibels)));
+  const prevFast=envFast;
+  envFast=envFast*0.6+amp*0.4;
+  envSlow=envSlow*0.95+amp*0.05;
+  const onset=envFast>envSlow*1.8&&prevFast<envFast;
+  if(onset&&Date.now()-onsetTime>200){
+    riseStart=Date.now(); onsetTime=Date.now();
+  }
+  if(amp>0.05&&envFast>envSlow) riseMs=Date.now()-riseStart;
+
+  // ── Vibrato buffer ──────────────────────────────────────────────────────────
+  pushFreq(hasSignal&&detFreq>20?detFreq:0);
+  const vib=getVibrato();
+
+  // ── Harmonic analysis ───────────────────────────────────────────────────────
+  let h2db=-90, h3db=-90;
+  if(hasSignal&&detFreq>0){
+    const h2bin=Math.round(detFreq*2/BIN_HZ), h3bin=Math.round(detFreq*3/BIN_HZ);
+    if(h2bin<dataArray.length) h2db=Math.max(h2db,...[h2bin-1,h2bin,h2bin+1].map(b=>b>=0&&b<dataArray.length?dataArray[b]:-90));
+    if(h3bin<dataArray.length) h3db=Math.max(h3db,...[h3bin-1,h3bin,h3bin+1].map(b=>b>=0&&b<dataArray.length?dataArray[b]:-90));
+  }
+
+  // ── Technique clarity ───────────────────────────────────────────────────────
+  let harmE=0, totalE=0;
+  if(hasSignal&&detFreq>0){
+    for(let h=1;h<=8;h++){
+      const hf=detFreq*h; if(hf>SFREQ_MAX) break;
+      const hb=Math.round(hf/BIN_HZ);
+      for(let d=-1;d<=1;d++){
+        const b=hb+d; if(b>=0&&b<dataArray.length&&dataArray[b]>-80){
+          const e=Math.pow(10,dataArray[b]/10);
+          harmE+=e;
+        }
+      }
+    }
+    for(let i=Math.ceil(SFREQ_MIN/BIN_HZ);i<=Math.floor(SFREQ_MAX/BIN_HZ);i++){
+      if(dataArray[i]>-80) totalE+=Math.pow(10,dataArray[i]/10);
+    }
+  }
+  const clarity=totalE>0?Math.min(1,harmE/totalE):0;
+
+  // ── Vibrato deviation array for scope ──────────────────────────────────────
+  const N=Math.min(180,vBufFilled);
+  const sampArr=[];
+  for(let i=N-1;i>=0;i--) sampArr.push(freqBuf[((vBufIdx-1-i)+VBUF)%VBUF]);
+  const validArr=sampArr.filter(f=>f>30);
+  const fmean=validArr.length>4?validArr.reduce((a,b)=>a+b,0)/validArr.length:0;
+  const devArr=sampArr.map(f=>f>30&&fmean>0?1200*Math.log2(f/fmean):0);
+
+  // ── ROOM: RT60 + mode scan ───────────────────────────────────────────────────
+  updateRT60(peakVal, hasSignal);
+  // Scan room modes only when silent (every 90 frames ≈ 1.5s)
+  roomScanTimer++;
+  if(!hasSignal && roomScanTimer > 90) {
+    roomScanTimer = 0;
+    roomModes = scanRoomModes(dataArray);
+    ambientHumHz = detectAmbientHum(dataArray);
+  }
+
+  // ── UPDATE HUD ──────────────────────────────────────────────────────────────
+  updateHUD(hasSignal,detFreq,note,h2db,h3db,riseMs,vib,devArr,clarity,amp);
+  drawVScope(devArr,vib.rate);
+  drawSpec(dataArray,analyser,detFreq,detFreq);
+}
+
+function updateHUD(active, freq, note, h2db, h3db, rise, vib, devArr, clarity, amp){
+  if(!active||!note){
+    document.getElementById('tNote').textContent='—';
+    document.getElementById('tHz').textContent='— Hz';
+    document.getElementById('tCents').textContent='— ¢';
+    document.getElementById('l1main').textContent='No signal';
+    document.getElementById('l1sub').textContent='Waiting for bass input…';
+    document.getElementById('l1bar').style.width='0';
+    document.getElementById('vRate').textContent='— Hz';
+    document.getElementById('vDepth').textContent='— ¢ RMS';
+    document.getElementById('vClass').textContent='No signal';
+    document.getElementById('vClass').style.color='#4a6070';
+    document.getElementById('vClass').style.borderColor='rgba(255,255,255,0.1)';
+    // Fade body col
+    LUNAR_BODY.forEach(b=>document.getElementById('bc-'+b.pc).classList.remove('active'));
+    return;
+  }
+
+  const b = LUNAR_BODY[note.pc];
+  const col = b.color;
+  currentProto = b.proto;
+  currentColor = col;
+
+  // TOP BAR
+  document.getElementById('tNote').textContent=note.name;
+  document.getElementById('tNote').style.color=col;
+  document.getElementById('tHz').textContent=freq.toFixed(2)+' Hz';
+  document.getElementById('tHz').style.color=col;
+  const ac=Math.abs(note.cents);
+  const cc=ac<5?'#4ade80':ac<20?'#facc15':'#f87171';
+  document.getElementById('tCents').textContent=(note.cents>=0?'+':'')+note.cents.toFixed(1)+' ¢';
+  document.getElementById('tCents').style.color=cc;
+  document.getElementById('tFormula').textContent=
+    `f = 256 × 2^(${note.n>=0?'+':''}${note.n}/12) = ${note.targetHz.toFixed(4)} Hz`;
+  const pct=Math.max(0,Math.min(100,50+note.cents));
+  const cf=document.getElementById('cFill');
+  cf.style.left=(pct<50?pct:50)+'%'; cf.style.width=Math.abs(pct-50)+'%'; cf.style.background=cc;
+
+  // Body column
+  LUNAR_BODY.forEach(bd=>{
+    const el=document.getElementById('bc-'+bd.pc);
+    el.classList.toggle('active',bd.pc===note.pc);
+    el.style.color=bd.color;
+  });
+
+  // Left panel
+  document.getElementById('lBody').textContent=b.body; document.getElementById('lBody').style.color=col;
+  document.getElementById('lSap').textContent=b.sap;   document.getElementById('lSap').style.color=b.sapCol;
+  document.getElementById('lTree').textContent=`${b.tree} · ${b.ogham}`;
+  document.getElementById('lProto').textContent=b.proto; document.getElementById('lProto').style.color=col;
+  document.getElementById('lFib').textContent=`F = ${b.fib}`;
+  document.getElementById('geomLabel').textContent=(PROTO_GEOM[b.proto]||{label:'—'}).label;
+  document.getElementById('geomLabel').style.color=col;
+
+  // LAYER 1 — Fundamental
+  const normAmp=Math.max(0,Math.min(1,amp));
+  document.getElementById('l1main').textContent=`${note.name}  ·  ${freq.toFixed(2)} Hz  ·  ${b.body}`;
+  document.getElementById('l1main').style.color=col;
+  document.getElementById('l1sub').textContent=`§IV · ${b.tree}/${b.ogham} · ${b.sap} · Fib ${b.fib} · Proto-word: ${b.proto}`;
+  const l1b=document.getElementById('l1bar');
+  l1b.style.width=(normAmp*100)+'%'; l1b.style.background=col;
+
+  // LAYER 2 — 2nd harmonic
+  const h2f=freq*2; const h2note=freqToNote(h2f);
+  const h2lv=Math.max(0,(h2db-analyser.minDecibels)/(analyser.maxDecibels-analyser.minDecibels));
+  document.getElementById('l2main').textContent=
+    h2db>-80 ? `H2 · ${h2f.toFixed(1)} Hz · ${h2note?h2note.name:'?'} · ${h2db.toFixed(1)} dB` : `H2 · ${h2f.toFixed(1)} Hz · not detected`;
+  document.getElementById('l2main').style.color='#818cf8';
+  document.getElementById('l2sub').textContent=`Octave identity — confirms fundamental. Ratio 2:1`;
+  const l2b=document.getElementById('l2bar');
+  l2b.style.width=(h2lv*100)+'%'; l2b.style.background='#818cf8';
+
+  // LAYER 3 — 3rd harmonic (Perfect 5th above octave)
+  const h3f=freq*3; const h3note=freqToNote(h3f);
+  const h3lv=Math.max(0,(h3db-analyser.minDecibels)/(analyser.maxDecibels-analyser.minDecibels));
+  document.getElementById('l3main').textContent=
+    h3db>-80 ? `H3 · ${h3f.toFixed(1)} Hz · ${h3note?h3note.name:'?'} · ${h3db.toFixed(1)} dB` : `H3 · ${h3f.toFixed(1)} Hz · not detected`;
+  document.getElementById('l3main').style.color='#4ade80';
+  document.getElementById('l3sub').textContent=`§VII Perfect 5th · ratio 3:2 · consonant · most stable interval`;
+  document.getElementById('h2db').textContent=`${h2db.toFixed(1)} dBFS · level vs fundamental`;
+  document.getElementById('h3db').textContent=`${h3db.toFixed(1)} dBFS · level vs fundamental`;
+  document.getElementById('h2iv').textContent=`Octave · 2:1 · unison up one octave`;
+  const l3b=document.getElementById('l3bar');
+  l3b.style.width=(h3lv*100)+'%'; l3b.style.background='#4ade80';
+
+  // LAYER 4 — Attack / Sap Phase
+  let attackLabel, attackSub, attackCol;
+  if(rise<50){
+    attackLabel=`Sharp attack · ${rise.toFixed(0)} ms`; attackCol='#ef4444';
+    attackSub=`§IV Sap: Rising/Peak resonance — fast onset, assertive entry`;
+  } else if(rise<150){
+    attackLabel=`Medium attack · ${rise.toFixed(0)} ms`; attackCol='#facc15';
+    attackSub=`§IV Sap: Transition — balanced energy, controlled entry`;
+  } else if(rise<400){
+    attackLabel=`Slow attack · ${rise.toFixed(0)} ms`; attackCol='#fb923c';
+    attackSub=`§IV Sap: Descending — gradual entry, inward energy`;
+  } else {
+    attackLabel=`Sustained entry · ${rise.toFixed(0)} ms`; attackCol='#818cf8';
+    attackSub=`§IV Sap: Dormant — minimal onset, deep sustained resonance`;
+  }
+  document.getElementById('l4main').textContent=attackLabel;
+  document.getElementById('l4main').style.color=attackCol;
+  document.getElementById('l4sub').textContent=attackSub+`  ·  Current sap: ${b.sap}`;
+  const riseNorm=Math.max(0,Math.min(1,1-rise/500));
+  const l4b=document.getElementById('l4bar');
+  l4b.style.width=(riseNorm*100)+'%'; l4b.style.background=attackCol;
+
+  // LAYER 5 — Vibrato rate
+  const vrate=vib.rate, vdepth=vib.depth;
+  let vrLabel, vrSub, vrCol, vrCls;
+  if(vrate<1.5||vdepth<1.5){
+    vrLabel=`No vibrato · depth ${vdepth.toFixed(1)} ¢`;
+    vrSub='Below detection threshold (< 1.5¢ depth)';
+    vrCol='#4a6070'; vrCls='slow';
+  } else {
+    const r=NS_RANGES.find(r=>vrate>=r.min&&vrate<r.max)||NS_RANGES[NS_RANGES.length-1];
+    vrLabel=`${vrate.toFixed(1)} Hz · ±${vdepth.toFixed(1)} ¢ · ${r.label}`;
+    vrSub=r.sub;
+    vrCol=r.color; vrCls=r.cls;
+  }
+  document.getElementById('l5main').textContent=vrLabel;
+  document.getElementById('l5main').style.color=vrCol;
+  document.getElementById('l5sub').textContent=vrSub;
+  const vNorm=Math.min(1,vrate/12);
+  const l5b=document.getElementById('l5bar');
+  l5b.style.width=(vNorm*100)+'%'; l5b.style.background=vrCol;
+
+  // LAYER 6 — Technique
+  const clarPct=(clarity*100).toFixed(0);
+  const clarCol=clarity>0.65?'#4ade80':clarity>0.35?'#facc15':'#f87171';
+  document.getElementById('l6main').textContent=
+    `Harmonic clarity · ${clarPct}% · ${clarity>0.65?'Clean technique':clarity>0.35?'Mixed — some noise':'Noisy / bright attack'}`;
+  document.getElementById('l6main').style.color=clarCol;
+  document.getElementById('l6sub').textContent='Ratio: harmonic partial energy / total spectral energy 20–2000 Hz';
+  const l6b=document.getElementById('l6bar');
+  l6b.style.width=(clarity*100)+'%'; l6b.style.background=clarCol;
+
+  // LAYER 7 — Room modes
+  const rmCount = roomModes.length;
+  const rmDomF = roomModes.length > 0 ? parseFloat(roomModes[0].f) : 0;
+  const rmDomNote = roomModes.length > 0 ? roomModes[0].note : '?';
+  if(rmCount > 0) {
+    document.getElementById('l7main').textContent =
+      `${rmCount} mode${rmCount>1?'s':''} detected · dominant ${rmDomF.toFixed(1)} Hz (${rmDomNote})`;
+    document.getElementById('l7main').style.color = '#60a5fa';
+    document.getElementById('l7sub').textContent =
+      `Room dimension estimate: ${(SPEED_OF_SOUND/(2*rmDomF)).toFixed(1)} m · scan updates when silent`;
+    document.getElementById('l7bar').style.width = Math.min(100, rmCount*16) + '%';
+    document.getElementById('l7bar').style.background = '#60a5fa';
+    // Update right panel
+    document.getElementById('rmDom').textContent = `${rmDomF.toFixed(1)} Hz`;
+    document.getElementById('rmDom').style.color = '#60a5fa';
+    document.getElementById('rmNote').textContent = `${rmDomNote} in 432 Hz scale`;
+    const dimEst = (SPEED_OF_SOUND/(2*rmDomF)).toFixed(1);
+    document.getElementById('rmSize').textContent =
+      `~${dimEst} m dominant dimension · f=343/(2×L) · ${rmCount} modes found`;
+    // Mode dots
+    const dots = document.getElementById('rmDots');
+    dots.innerHTML = roomModes.map(m=>
+      `<div class="rmdot active" style="color:#60a5fa;border-color:#60a5fa40">
+        <span>${m.f} Hz</span><span>${m.note}</span></div>`).join('');
+  } else {
+    document.getElementById('l7main').textContent = 'Scanning… play then stop to capture ambient';
+    document.getElementById('l7main').style.color = '#4a6070';
+    document.getElementById('l7bar').style.width = '0';
+    document.getElementById('rmDom').textContent = 'Scanning…';
+    document.getElementById('rmNote').textContent = '—';
+    document.getElementById('rmSize').textContent = 'Stop playing to allow ambient scan';
+  }
+  document.getElementById('rmHum').textContent =
+    ambientHumHz > 0 ? `${ambientHumHz} Hz mains hum detected` : 'No mains hum detected';
+
+  // LAYER 8 — RT60 / decay
+  const rd = describeRoom(rt60, rmDomF);
+  if(rt60 !== null) {
+    document.getElementById('l8main').textContent =
+      `RT60 ≈ ${rt60.toFixed(2)} s · ${rd.size}`;
+    document.getElementById('l8main').style.color = rd.col;
+    document.getElementById('l8sub').textContent = rd.live;
+    document.getElementById('l8bar').style.width = Math.min(100, rt60/2*100) + '%';
+    document.getElementById('l8bar').style.background = rd.col;
+    document.getElementById('rmRT').textContent = `${rt60.toFixed(2)} s · ${rd.live}`;
+    document.getElementById('rmRT').style.color = rd.col;
+  } else {
+    document.getElementById('l8main').textContent = 'Play a note then stop — measuring decay';
+    document.getElementById('l8main').style.color = '#4a6070';
+    document.getElementById('rmRT').textContent = 'Play then stop to measure';
+  }
+
+  // RIGHT: vibrato display
+  document.getElementById('vRate').textContent=vrate>1.5?`${vrate.toFixed(2)} Hz`:'— Hz (no vibrato)';
+  document.getElementById('vRate').style.color=vrCol;
+  document.getElementById('vDepth').textContent=`±${vdepth.toFixed(1)} ¢ RMS`;
+  const vcEl=document.getElementById('vClass');
+  vcEl.textContent=vrate>1.5?vrLabel:'No vibrato detected';
+  vcEl.style.color=vrCol; vcEl.style.borderColor=vrCol+'60';
+
+  // Nervous system UFT reading
+  const bf=BODY_FACULTIES.find(f=>f.pc===note.pc);
+  let nsHTML;
+  if(bf){
+    nsHTML=`<span class="dv" style="color:${bf.color}">${bf.fac}</span>
+    <span class="ds">Note ${bf.note} activates §V Body faculty directly.</span>
+    <span class="ds">Your nervous system is playing a body grammar: ${bf.el} · ${bf.planet}</span>`;
+    if(vrate>2&&vrate<8){
+      nsHTML+=`<span class="ds" style="color:#4ade80;margin-top:3px">Vibrato ${vrate.toFixed(1)} Hz detected — motor control frequency visible in tone.</span>`;
+    }
+  } else {
+    nsHTML=`<span class="dv">Playing ${note.name}</span>
+    <span class="ds">No direct §V Body faculty match on this note.</span>
+    <span class="ds">Nearest Body faculties: ${BODY_FACULTIES.map(f=>`${f.note}·${f.fac}`).join(' · ')}</span>`;
+    if(vrate>2&&vrate<8){
+      nsHTML+=`<span class="ds" style="color:#4ade80;margin-top:3px">Vibrato ${vrate.toFixed(1)} Hz — nervous system frequency superimposed on note.</span>`;
+    }
+  }
+  document.getElementById('nsReading').innerHTML=nsHTML;
+
+  // §V Body faculty tags
+  BODY_FACULTIES.forEach(f=>{
+    const el=document.getElementById('bf-'+f.pc);
+    if(!el) return;
+    el.classList.toggle('active',f.pc===note.pc);
+  });
+}
+
+// Start geometry animation immediately
+(function startGeomLoop(){
+  function tick(){requestAnimationFrame(tick);drawGeom();}
+  tick();
+})();
+</script>
+</body>
+</html>
