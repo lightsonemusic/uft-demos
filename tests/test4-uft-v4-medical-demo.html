@@ -352,56 +352,71 @@
             text-align: center;
             width: 100%;
         }
+        #langBtn {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        #langBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div></div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <label style="color: #00ccff; font-weight: bold; margin: 0;">Language:</label>
+                <button id="langBtn" onclick="toggleLanguage()" style="background: linear-gradient(135deg, #00ccff 0%, #00ff88 100%); color: #000; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">EN | PT</button>
+            </div>
+        </div>
+
         <h1>⚡ Universal Frequency Translator (UFT) v4.1 Medical Demo</h1>
-        <p class="subtitle">Human Biometric Input → UFT v4.1 Pipeline → Therapeutic Output</p>
+        <p class="subtitle" data-en="Human Biometric Input → UFT v4.1 Pipeline → Therapeutic Output" data-pt="Entrada Biométrica Humana → Pipeline UFT v4.1 → Saída Terapêutica">Human Biometric Input → UFT v4.1 Pipeline → Therapeutic Output</p>
 
         <div class="disclaimer">
             <div class="disclaimer-icon">⚠️</div>
             <div class="disclaimer-text">
-                <div class="disclaimer-title">TESTING & DEMONSTRATION ONLY</div>
-                This is an experimental research demonstration of the UFT v4.1 system. This is NOT a medical device, NOT FDA approved, and should NOT be used for medical diagnosis or treatment. Results are simulated for educational purposes only. Always consult qualified healthcare professionals for medical advice.
+                <div class="disclaimer-title" data-en="TESTING & DEMONSTRATION ONLY" data-pt="APENAS TESTES E DEMONSTRAÇÃO">TESTING & DEMONSTRATION ONLY</div>
+                <div data-en="This is an experimental research demonstration of the UFT v4.1 system. This is NOT a medical device, NOT FDA approved, and should NOT be used for medical diagnosis or treatment. Results are simulated for educational purposes only. Always consult qualified healthcare professionals for medical advice." data-pt="Esta é uma demonstração de pesquisa experimental do sistema UFT v4.1. Este NÃO é um dispositivo médico, NÃO é aprovado pela FDA e NÃO deve ser usado para diagnóstico ou tratamento médico. Os resultados são simulados apenas para fins educacionais. Sempre consulte profissionais de saúde qualificados para conselhos médicos.">This is an experimental research demonstration of the UFT v4.1 system. This is NOT a medical device, NOT FDA approved, and should NOT be used for medical diagnosis or treatment. Results are simulated for educational purposes only. Always consult qualified healthcare professionals for medical advice.</div>
             </div>
         </div>
 
         <!-- ABOUT UFT SECTION -->
         <div class="panel" style="grid-column: 1 / -1; margin-bottom: 20px; border-color: #00ccff;">
-            <h2>📚 About UFT v4.1 Medical Demo</h2>
+            <h2 data-en="📚 About UFT v4.1 Medical Demo" data-pt="📚 Sobre Demo Médica UFT v4.1">📚 About UFT v4.1 Medical Demo</h2>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.95em;">
                 <div>
-                    <p style="color: #00ff88; margin-bottom: 10px;"><strong>What is UFT?</strong></p>
-                    <p style="color: #ccc; line-height: 1.6;">The Universal Frequency Translator (UFT) v4.1 is a cosmic resonance system that maps human biometric data into the 21-state lunar cycle. It calculates therapeutic frequencies based on optimal health parameters.</p>
+                    <p style="color: #00ff88; margin-bottom: 10px;"><strong data-en="What is UFT?" data-pt="O que é UFT?">What is UFT?</strong></p>
+                    <p style="color: #ccc; line-height: 1.6;" data-en="The Universal Frequency Translator (UFT) v4.1 is a cosmic resonance system that maps human biometric data into the 21-state lunar cycle. It calculates therapeutic frequencies based on optimal health parameters." data-pt="O Tradutor de Frequência Universal (UFT) v4.1 é um sistema de ressonância cósmica que mapeia dados biométricos humanos no ciclo lunar de 21 estados. Calcula frequências terapêuticas baseadas em parâmetros de saúde ótimos.">The Universal Frequency Translator (UFT) v4.1 is a cosmic resonance system that maps human biometric data into the 21-state lunar cycle. It calculates therapeutic frequencies based on optimal health parameters.</p>
                 </div>
                 <div>
-                    <p style="color: #00ff88; margin-bottom: 10px;"><strong>How It Works</strong></p>
-                    <p style="color: #ccc; line-height: 1.6;">Your vital signs (heart rate, temperature, etc.) convert to frequencies → normalize to cosmic range (210-421 Hz) → map to 21 states → extract therapeutic proto-words with Ogham/Chakra significance.</p>
+                    <p style="color: #00ff88; margin-bottom: 10px;"><strong data-en="How It Works" data-pt="Como Funciona">How It Works</strong></p>
+                    <p style="color: #ccc; line-height: 1.6;" data-en="Your vital signs (heart rate, temperature, etc.) convert to frequencies → normalize to cosmic range (210-421 Hz) → map to 21 states → extract therapeutic proto-words with Ogham/Chakra significance." data-pt="Seus sinais vitais (frequência cardíaca, temperatura, etc.) convertem em frequências → normalizam para intervalo cósmico (210-421 Hz) → mapeiam para 21 estados → extraem proto-palavras terapêuticas com significância Ogham/Chakra.">Your vital signs (heart rate, temperature, etc.) convert to frequencies → normalize to cosmic range (210-421 Hz) → map to 21 states → extract therapeutic proto-words with Ogham/Chakra significance.</p>
                 </div>
             </div>
         </div>
 
         <!-- QUICK START GUIDE -->
         <div class="panel" style="grid-column: 1 / -1; margin-bottom: 20px; background: rgba(20, 40, 30, 0.8); border-color: #00ff88;">
-            <h2>🚀 Quick Start Guide</h2>
+            <h2 data-en="🚀 Quick Start Guide" data-pt="🚀 Guia de Início Rápido">🚀 Quick Start Guide</h2>
             <ol style="color: #00ff88; line-height: 2; margin-left: 20px;">
-                <li><strong>Enter Your Measurements:</strong> Fill in your vital signs (default values are already provided for testing)</li>
-                <li><strong>Select Your Condition:</strong> Choose a health focus from the dropdown (Stress, Pain, Sleep, Energy, etc.)</li>
-                <li><strong>Click "Process Through UFT v4.1":</strong> Watch the pipeline visualization process your data</li>
-                <li><strong>View Results:</strong> See your cosmic state, proto-word resonance, and therapeutic recommendation</li>
-                <li><strong>Observe Geometry:</strong> The animated visualization shows your coherency state in real-time</li>
+                <li data-en="Enter Your Measurements: Fill in your vital signs (default values are already provided for testing)" data-pt="Digite Suas Medições: Preencha seus sinais vitais (valores padrão já fornecidos para teste)"><strong>Enter Your Measurements:</strong> Fill in your vital signs (default values are already provided for testing)</li>
+                <li data-en="Select Your Condition: Choose a health focus from the dropdown (Stress, Pain, Sleep, Energy, etc.)" data-pt="Selecione Sua Condição: Escolha um foco de saúde na lista suspensa (Estresse, Dor, Sono, Energia, etc.)"><strong>Select Your Condition:</strong> Choose a health focus from the dropdown (Stress, Pain, Sleep, Energy, etc.)</li>
+                <li data-en="Click &quot;Process Through UFT v4.1&quot;: Watch the pipeline visualization process your data" data-pt="Clique em &quot;Processar através UFT v4.1&quot;: Veja a visualização do pipeline processar seus dados"><strong>Click "Process Through UFT v4.1":</strong> Watch the pipeline visualization process your data</li>
+                <li data-en="View Results: See your cosmic state, proto-word resonance, and therapeutic recommendation" data-pt="Ver Resultados: Veja seu estado cósmico, ressonância de proto-palavra e recomendação terapêutica"><strong>View Results:</strong> See your cosmic state, proto-word resonance, and therapeutic recommendation</li>
+                <li data-en="Observe Geometry: The animated visualization shows your coherency state in real-time" data-pt="Observe Geometria: A visualização animada mostra seu estado de coerência em tempo real"><strong>Observe Geometry:</strong> The animated visualization shows your coherency state in real-time</li>
             </ol>
         </div>
 
         <div class="layout">
             <!-- HUMAN INPUT PANEL -->
             <div class="panel">
-                <h2>📊 Human Measurements</h2>
+                <h2 data-en="📊 Human Measurements" data-pt="📊 Medições Humanas">📊 Human Measurements</h2>
                 
                 <div class="input-group">
                     <div class="input-label">
-                        <label for="heartRate">Heart Rate</label>
+                        <label for="heartRate" data-en="Heart Rate" data-pt="Frequência Cardíaca">Heart Rate</label>
                         <span class="input-unit">bpm</span>
                     </div>
                     <input type="number" id="heartRate" placeholder="60-100 typical" min="40" max="200" value="72">
@@ -409,7 +424,7 @@
 
                 <div class="input-group">
                     <div class="input-label">
-                        <label for="temperature">Body Temperature</label>
+                        <label for="temperature" data-en="Body Temperature" data-pt="Temperatura Corporal">Body Temperature</label>
                         <span class="input-unit">°C</span>
                     </div>
                     <input type="number" id="temperature" placeholder="36-37.5 normal" min="35" max="40" step="0.1" value="37.0">
@@ -417,7 +432,7 @@
 
                 <div class="input-group">
                     <div class="input-label">
-                        <label for="respirationRate">Respiratory Rate</label>
+                        <label for="respirationRate" data-en="Respiratory Rate" data-pt="Frequência Respiratória">Respiratory Rate</label>
                         <span class="input-unit">breaths/min</span>
                     </div>
                     <input type="number" id="respirationRate" placeholder="12-20 typical" min="8" max="40" value="16">
@@ -425,7 +440,7 @@
 
                 <div class="input-group">
                     <div class="input-label">
-                        <label>Blood Pressure</label>
+                        <label data-en="Blood Pressure" data-pt="Pressão Arterial">Blood Pressure</label>
                         <span class="input-unit">mmHg</span>
                     </div>
                     <div class="input-row">
@@ -436,7 +451,7 @@
 
                 <div class="input-group">
                     <div class="input-label">
-                        <label for="bloodGlucose">Blood Glucose (Optional)</label>
+                        <label for="bloodGlucose" data-en="Blood Glucose (Optional)" data-pt="Glicemia (Opcional)">Blood Glucose (Optional)</label>
                         <span class="input-unit">mg/dL</span>
                     </div>
                     <input type="number" id="bloodGlucose" placeholder="70-100 fasting" min="50" max="400" value="95">
@@ -444,7 +459,7 @@
 
                 <div class="input-group">
                     <div class="input-label">
-                        <label for="condition">Health Condition / Symptom</label>
+                        <label for="condition" data-en="Health Condition / Symptom" data-pt="Condição de Saúde / Sintoma">Health Condition / Symptom</label>
                     </div>
                     <select id="condition">
                         <option value="general">General Wellness</option>
@@ -465,18 +480,18 @@
 
             <!-- REFERENCE DATA PANEL -->
             <div class="panel">
-                <h2>📖 Reference Values</h2>
-                <p style="font-size: 0.9em; color: #888; margin-bottom: 15px;">Typical healthy ranges:</p>
+                <h2 data-en="📖 Reference Values" data-pt="📖 Valores de Referência">📖 Reference Values</h2>
+                <p style="font-size: 0.9em; color: #888; margin-bottom: 15px;" data-en="Typical healthy ranges:" data-pt="Intervalos de saúde típicos:">Typical healthy ranges:</p>
                 <div style="font-family: monospace; font-size: 0.9em; color: #00ccff;">
-                    <p><strong>Heart Rate:</strong> 60-100 bpm (resting)</p>
-                    <p><strong>Temperature:</strong> 36.1-37.2°C (core)</p>
-                    <p><strong>Respiration:</strong> 12-20 breaths/min</p>
-                    <p><strong>BP (Systolic):</strong> &lt;120 mmHg</p>
-                    <p><strong>BP (Diastolic):</strong> &lt;80 mmHg</p>
-                    <p><strong>Blood Glucose:</strong> 70-100 mg/dL (fasting)</p>
+                    <p><strong data-en="Heart Rate:" data-pt="Frequência Cardíaca:">Heart Rate:</strong> 60-100 bpm (resting)</p>
+                    <p><strong data-en="Temperature:" data-pt="Temperatura:">Temperature:</strong> 36.1-37.2°C (core)</p>
+                    <p><strong data-en="Respiration:" data-pt="Respiração:">Respiration:</strong> 12-20 breaths/min</p>
+                    <p><strong data-en="BP (Systolic):" data-pt="PA (Sistólica):">BP (Systolic):</strong> &lt;120 mmHg</p>
+                    <p><strong data-en="BP (Diastolic):" data-pt="PA (Diastólica):">BP (Diastolic):</strong> &lt;80 mmHg</p>
+                    <p><strong data-en="Blood Glucose:" data-pt="Glicemia:">Blood Glucose:</strong> 70-100 mg/dL (fasting)</p>
                 </div>
                 <hr style="border: 1px solid #00ff88; margin: 15px 0;">
-                <p style="font-size: 0.9em; color: #888; margin-bottom: 10px;"><strong>UFT Calibration:</strong></p>
+                <p style="font-size: 0.9em; color: #888; margin-bottom: 10px;"><strong data-en="UFT Calibration:" data-pt="Calibração UFT:">UFT Calibration:</strong></p>
                 <div style="font-family: monospace; font-size: 0.9em; color: #00ff88;">
                     <p>COSMIC_ROOT: 210.42 Hz (Lunar)</p>
                     <p>SOLAR_ROOT: 256.00 Hz (432-Hz system)</p>
@@ -1127,6 +1142,143 @@
 
         // Set initial display message
         document.getElementById('medicalRec').textContent = 'Click the green button above to process your measurements and receive your personalized therapeutic recommendation.';
+
+        // Language toggle
+        let currentLanguage = 'en';
+
+        const translations = {
+            en: {
+                'TESTING & DEMONSTRATION ONLY': 'TESTING & DEMONSTRATION ONLY',
+                'disclaimer-text': 'This is an experimental research demonstration of the UFT v4.1 system. This is NOT a medical device, NOT FDA approved, and should NOT be used for medical diagnosis or treatment. Results are simulated for educational purposes only. Always consult qualified healthcare professionals for medical advice.',
+                'about-uft': '📚 About UFT v4.1 Medical Demo',
+                'what-is-uft': 'What is UFT?',
+                'uft-desc': 'The Universal Frequency Translator (UFT) v4.1 is a cosmic resonance system that maps human biometric data into the 21-state lunar cycle. It calculates therapeutic frequencies based on optimal health parameters.',
+                'how-it-works': 'How It Works',
+                'how-works-desc': 'Your vital signs (heart rate, temperature, etc.) convert to frequencies → normalize to cosmic range (210-421 Hz) → map to 21 states → extract therapeutic proto-words with Ogham/Chakra significance.',
+                'quick-start': '🚀 Quick Start Guide',
+                'step1': 'Enter Your Measurements: Fill in your vital signs (default values are already provided for testing)',
+                'step2': 'Select Your Condition: Choose a health focus from the dropdown (Stress, Pain, Sleep, Energy, etc.)',
+                'step3': 'Click "Process Through UFT v4.1": Watch the pipeline visualization process your data',
+                'step4': 'View Results: See your cosmic state, proto-word resonance, and therapeutic recommendation',
+                'step5': 'Observe Geometry: The animated visualization shows your coherency state in real-time',
+                'measurements': '📊 Human Measurements',
+                'heart-rate': 'Heart Rate',
+                'temperature': 'Body Temperature',
+                'respiration': 'Respiratory Rate',
+                'blood-pressure': 'Blood Pressure',
+                'glucose': 'Blood Glucose (Optional)',
+                'condition': 'Health Condition / Symptom',
+                'process-btn': '🔄 Process Through UFT v4.1',
+                'reference': '📖 Reference Values',
+                'healthy-ranges': 'Typical healthy ranges:',
+                'pipeline': '⚙️ UFT v4.1 Processing Pipeline',
+                'visualization': '✨ Cosmic Geometry Visualization',
+                'output': '📡 UFT Diagnostic Output',
+                'primary-freq': 'Primary Frequency',
+                'cosmic-state': 'Cosmic State',
+                'coherency': 'Health Coherency',
+                'proto-word': 'Proto-Word',
+                'therapeutic-freq': '🎯 Recommended Therapeutic Frequency',
+                'ogham': 'Ogham Tree',
+                'chakra': 'Chakra Affinity',
+                'recommendation': '💊 Therapeutic Recommendation',
+                'click-process': 'Click the green button above to process your measurements and receive your personalized therapeutic recommendation.'
+            },
+            pt: {
+                'TESTING & DEMONSTRATION ONLY': 'APENAS TESTES E DEMONSTRAÇÃO',
+                'disclaimer-text': 'Esta é uma demonstração de pesquisa experimental do sistema UFT v4.1. Este NÃO é um dispositivo médico, NÃO é aprovado pela FDA e NÃO deve ser usado para diagnóstico ou tratamento médico. Os resultados são simulados apenas para fins educacionais. Sempre consulte profissionais de saúde qualificados para conselhos médicos.',
+                'about-uft': '📚 Sobre Demo Médica UFT v4.1',
+                'what-is-uft': 'O que é UFT?',
+                'uft-desc': 'O Tradutor de Frequência Universal (UFT) v4.1 é um sistema de ressonância cósmica que mapeia dados biométricos humanos no ciclo lunar de 21 estados. Calcula frequências terapêuticas baseadas em parâmetros de saúde ótimos.',
+                'how-it-works': 'Como Funciona',
+                'how-works-desc': 'Seus sinais vitais (frequência cardíaca, temperatura, etc.) convertem em frequências → normalizam para intervalo cósmico (210-421 Hz) → mapeiam para 21 estados → extraem proto-palavras terapêuticas com significância Ogham/Chakra.',
+                'quick-start': '🚀 Guia de Início Rápido',
+                'step1': 'Digite Suas Medições: Preencha seus sinais vitais (valores padrão já fornecidos para teste)',
+                'step2': 'Selecione Sua Condição: Escolha um foco de saúde na lista suspensa (Estresse, Dor, Sono, Energia, etc.)',
+                'step3': 'Clique em "Processar através UFT v4.1": Veja a visualização do pipeline processar seus dados',
+                'step4': 'Ver Resultados: Veja seu estado cósmico, ressonância de proto-palavra e recomendação terapêutica',
+                'step5': 'Observe Geometria: A visualização animada mostra seu estado de coerência em tempo real',
+                'measurements': '📊 Medições Humanas',
+                'heart-rate': 'Frequência Cardíaca',
+                'temperature': 'Temperatura Corporal',
+                'respiration': 'Frequência Respiratória',
+                'blood-pressure': 'Pressão Arterial',
+                'glucose': 'Glicemia (Opcional)',
+                'condition': 'Condição de Saúde / Sintoma',
+                'process-btn': '🔄 Processar por UFT v4.1',
+                'reference': '📖 Valores de Referência',
+                'healthy-ranges': 'Intervalos de saúde típicos:',
+                'pipeline': '⚙️ Pipeline de Processamento UFT v4.1',
+                'visualization': '✨ Visualização Geometria Cósmica',
+                'output': '📡 Saída de Diagnóstico UFT',
+                'primary-freq': 'Frequência Primária',
+                'cosmic-state': 'Estado Cósmico',
+                'coherency': 'Coerência de Saúde',
+                'proto-word': 'Proto-Palavra',
+                'therapeutic-freq': '🎯 Frequência Terapêutica Recomendada',
+                'ogham': 'Árvore Ogham',
+                'chakra': 'Afinidade Chakra',
+                'recommendation': '💊 Recomendação Terapêutica',
+                'click-process': 'Clique no botão verde acima para processar suas medições e receber sua recomendação terapêutica personalizada.'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'pt' : 'en';
+            updatePageLanguage();
+            document.getElementById('langBtn').textContent = currentLanguage === 'en' ? 'EN | PT' : 'PT | EN';
+        }
+
+        function updatePageLanguage() {
+            const lang = currentLanguage;
+            
+            // Update ALL elements with data-en and data-pt attributes
+            document.querySelectorAll('[data-en][data-pt]').forEach(el => {
+                const text = el.getAttribute(`data-${lang}`);
+                if (text) {
+                    el.textContent = text;
+                }
+            });
+
+            // Update select dropdown options
+            const conditionSelect = document.getElementById('condition');
+            if (conditionSelect) {
+                const options = {
+                    'en': {
+                        'general': 'General Wellness',
+                        'stress': 'Stress/Anxiety',
+                        'inflammation': 'Inflammation',
+                        'pain': 'Chronic Pain',
+                        'sleep': 'Sleep Disorder',
+                        'immune': 'Immune Support',
+                        'energy': 'Low Energy',
+                        'focus': 'Poor Focus/Clarity',
+                        'cardiovascular': 'Cardiovascular Health'
+                    },
+                    'pt': {
+                        'general': 'Bem-estar Geral',
+                        'stress': 'Estresse/Ansiedade',
+                        'inflammation': 'Inflamação',
+                        'pain': 'Dor Crônica',
+                        'sleep': 'Distúrbio do Sono',
+                        'immune': 'Suporte Imunológico',
+                        'energy': 'Baixa Energia',
+                        'focus': 'Foco/Clareza Prejudicados',
+                        'cardiovascular': 'Saúde Cardiovascular'
+                    }
+                };
+                
+                const selectedValue = conditionSelect.value;
+                conditionSelect.innerHTML = '';
+                for (let [val, label] of Object.entries(options[lang])) {
+                    const option = document.createElement('option');
+                    option.value = val;
+                    option.textContent = label;
+                    conditionSelect.appendChild(option);
+                }
+                conditionSelect.value = selectedValue;
+            }
+        }
     </script>
 </body>
 </html>
