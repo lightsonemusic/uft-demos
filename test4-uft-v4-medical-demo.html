@@ -462,15 +462,15 @@
                         <label for="condition" data-en="Health Condition / Symptom" data-pt="Condição de Saúde / Sintoma">Health Condition / Symptom</label>
                     </div>
                     <select id="condition">
-                        <option value="general">General Wellness</option>
-                        <option value="stress">Stress/Anxiety</option>
-                        <option value="inflammation">Inflammation</option>
-                        <option value="pain">Chronic Pain</option>
-                        <option value="sleep">Sleep Disorder</option>
-                        <option value="immune">Immune Support</option>
-                        <option value="energy">Low Energy</option>
-                        <option value="focus">Poor Focus/Clarity</option>
-                        <option value="cardiovascular">Cardiovascular Health</option>
+                        <option value="general" data-en="General Wellness" data-pt="Bem-Estar Geral">General Wellness</option>
+                        <option value="stress" data-en="Stress/Anxiety" data-pt="Estresse/Ansiedade">Stress/Anxiety</option>
+                        <option value="inflammation" data-en="Inflammation" data-pt="Inflamação">Inflammation</option>
+                        <option value="pain" data-en="Chronic Pain" data-pt="Dor Crônica">Chronic Pain</option>
+                        <option value="sleep" data-en="Sleep Disorder" data-pt="Transtorno do Sono">Sleep Disorder</option>
+                        <option value="immune" data-en="Immune Support" data-pt="Suporte Imunológico">Immune Support</option>
+                        <option value="energy" data-en="Low Energy" data-pt="Baixa Energia">Low Energy</option>
+                        <option value="focus" data-en="Poor Focus/Clarity" data-pt="Foco/Clareza Fraco">Poor Focus/Clarity</option>
+                        <option value="cardiovascular" data-en="Cardiovascular Health" data-pt="Saúde Cardiovascular">Cardiovascular Health</option>
                     </select>
                 </div>
 
@@ -544,72 +544,72 @@
             <h2 data-en="📡 UFT Diagnostic Output" data-pt="📡 Saída de Diagnóstico UFT">📡 UFT Diagnostic Output</h2>
             <div class="output-grid">
                 <div class="output-item">
-                    <div class="output-item-label">Primary Frequency</div>
+                    <div class="output-item-label" data-en="Primary Frequency" data-pt="Frequência Primária">Primary Frequency</div>
                     <div class="output-item-value" id="primaryFreq">—</div>
-                    <div class="output-item-detail" id="primaryFreqDetail">Hz (normalized range: 210-421)</div>
+                    <div class="output-item-detail" id="primaryFreqDetail" data-en="Hz (normalized range: 210-421)" data-pt="Hz (intervalo normalizado: 210-421)">Hz (normalized range: 210-421)</div>
                 </div>
                 <div class="output-item">
-                    <div class="output-item-label">Cosmic State</div>
+                    <div class="output-item-label" data-en="Cosmic State" data-pt="Estado Cósmico">Cosmic State</div>
                     <div class="output-item-value" id="cosmicState">—</div>
-                    <div class="output-item-detail" id="cosmicStateDetail">0-20 (29.53-day cycle)</div>
+                    <div class="output-item-detail" id="cosmicStateDetail" data-en="0-20 (29.53-day cycle)" data-pt="0-20 (ciclo de 29,53 dias)">0-20 (29.53-day cycle)</div>
                 </div>
                 <div class="output-item">
-                    <div class="output-item-label">Health Coherency</div>
+                    <div class="output-item-label" data-en="Health Coherency" data-pt="Coerência de Saúde">Health Coherency</div>
                     <div class="output-item-value" id="coherency">—</div>
-                    <div class="output-item-detail">Perfect: 100% | Needs Support: 0%</div>
+                    <div class="output-item-detail" data-en="Perfect: 100% | Needs Support: 0%" data-pt="Perfeito: 100% | Precisa Suporte: 0%">Perfect: 100% | Needs Support: 0%</div>
                 </div>
                 <div class="output-item">
-                    <div class="output-item-label">Proto-Word</div>
+                    <div class="output-item-label" data-en="Proto-Word" data-pt="Proto-Palavra">Proto-Word</div>
                     <div class="output-item-value" id="protoWord">—</div>
-                    <div class="output-item-detail" id="protoWordDetail">Primary cosmic frequency name</div>
+                    <div class="output-item-detail" id="protoWordDetail" data-en="Primary cosmic frequency name" data-pt="Nome da frequência cósmica primária">Primary cosmic frequency name</div>
                 </div>
                 <div class="output-item" style="background: rgba(0, 255, 136, 0.1); border-color: #00ff88;">
-                    <div class="output-item-label" style="color: #00ff88;">🎯 Recommended Therapeutic Frequency</div>
+                    <div class="output-item-label" style="color: #00ff88;" data-en="🎯 Recommended Therapeutic Frequency" data-pt="🎯 Frequência Terapêutica Recomendada">🎯 Recommended Therapeutic Frequency</div>
                     <div class="output-item-value" id="therapeuticFreq">—</div>
-                    <div class="output-item-detail" id="therapeuticFreqDetail">Use for audio synthesis or hardware output</div>
+                    <div class="output-item-detail" id="therapeuticFreqDetail" data-en="Use for audio synthesis or hardware output" data-pt="Use para síntese de áudio ou saída de hardware">Use for audio synthesis or hardware output</div>
                     <div style="margin-top: 10px; display: flex; gap: 10px;">
                         <button id="playFreqBtn" onclick="playTherapeuticFrequency()" style="flex: 1; background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%); color: #000; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9em;">🔊 Play (10s)</button>
                         <button id="stopFreqBtn" onclick="stopTherapeuticFrequency()" style="flex: 1; background: rgba(255, 100, 100, 0.3); color: #ff8888; border: 1px solid #ff8888; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9em; display: none;">⏹️ Stop</button>
                     </div>
                 </div>
                 <div class="output-item">
-                    <div class="output-item-label">Ogham Tree</div>
+                    <div class="output-item-label" data-en="Ogham Tree" data-pt="Árvore Ogham">Ogham Tree</div>
                     <div class="output-item-value" id="oghamTree">—</div>
-                    <div class="output-item-detail" id="oghamTreeDetail">Celtic tree correspondence</div>
+                    <div class="output-item-detail" id="oghamTreeDetail" data-en="Celtic tree correspondence" data-pt="Correspondência de árvore celta">Celtic tree correspondence</div>
                 </div>
                 <div class="output-item">
-                    <div class="output-item-label">Chakra Affinity</div>
+                    <div class="output-item-label" data-en="Chakra Affinity" data-pt="Afinidade de Chakra">Chakra Affinity</div>
                     <div class="output-item-value" id="chakra">—</div>
-                    <div class="output-item-detail" id="chakraDetail">Energy center resonance</div>
+                    <div class="output-item-detail" id="chakraDetail" data-en="Energy center resonance" data-pt="Ressonância do centro de energia">Energy center resonance</div>
                 </div>
             </div>
 
             <div class="medical-recommendation">
-                <div class="medical-recommendation-title">💊 Therapeutic Recommendation</div>
-                <div class="medical-recommendation-text" id="medicalRec">
+                <div class="medical-recommendation-title" data-en="💊 Therapeutic Recommendation" data-pt="💊 Recomendação Terapêutica">💊 Therapeutic Recommendation</div>
+                <div class="medical-recommendation-text" id="medicalRec" data-en="Click the green button above to process your measurements and receive your personalized therapeutic recommendation." data-pt="Clique no botão verde acima para processar suas medições e receber sua recomendação terapêutica personalizada.">
                     Click the green button above to process your measurements and receive your personalized therapeutic recommendation.
                 </div>
             </div>
 
             <!-- INTERPRETATION GUIDE -->
             <div style="background: rgba(20, 30, 50, 0.8); border: 1px solid #00ccff; border-radius: 6px; padding: 15px; margin-top: 15px;">
-                <div style="color: #00ccff; font-weight: bold; margin-bottom: 10px;">📖 How to Interpret Results</div>
+                <div style="color: #00ccff; font-weight: bold; margin-bottom: 10px;" data-en="📖 How to Interpret Results" data-pt="📖 Como Interpretar Resultados">📖 How to Interpret Results</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9em;">
                     <div>
-                        <div style="color: #00ff88; margin-bottom: 5px;"><strong>Coherency:</strong></div>
-                        <p style="color: #ccc; margin: 0;">Shows how well your vital signs align with optimal health. 100% = perfect balance. Lower values suggest areas needing support.</p>
+                        <div style="color: #00ff88; margin-bottom: 5px;"><strong data-en="Coherency:" data-pt="Coerência:">Coherency:</strong></div>
+                        <p style="color: #ccc; margin: 0;" data-en="Shows how well your vital signs align with optimal health. 100% = perfect balance. Lower values suggest areas needing support." data-pt="Mostra como seus sinais vitais se alinham com a saúde ótima. 100% = equilíbrio perfeito. Valores mais baixos sugerem áreas que precisam de suporte.">Shows how well your vital signs align with optimal health. 100% = perfect balance. Lower values suggest areas needing support.</p>
                     </div>
                     <div>
-                        <div style="color: #00ff88; margin-bottom: 5px;"><strong>Cosmic State:</strong></div>
-                        <p style="color: #ccc; margin: 0;">Your position in the 21-state lunar cycle. Different states correspond to different therapeutic frequencies and natural rhythms.</p>
+                        <div style="color: #00ff88; margin-bottom: 5px;"><strong data-en="Cosmic State:" data-pt="Estado Cósmico:">Cosmic State:</strong></div>
+                        <p style="color: #ccc; margin: 0;" data-en="Your position in the 21-state lunar cycle. Different states correspond to different therapeutic frequencies and natural rhythms." data-pt="Sua posição no ciclo lunar de 21 estados. Diferentes estados correspondem a frequências terapêuticas e ritmos naturais diferentes.">Your position in the 21-state lunar cycle. Different states correspond to different therapeutic frequencies and natural rhythms.</p>
                     </div>
                     <div>
-                        <div style="color: #00ff88; margin-bottom: 5px;"><strong>Proto-Word:</strong></div>
-                        <p style="color: #ccc; margin: 0;">Sacred syllables (AH, SA, LA, RA, etc.) that resonate with your current frequency. Each has unique harmonic and symbolic properties.</p>
+                        <div style="color: #00ff88; margin-bottom: 5px;"><strong data-en="Proto-Word:" data-pt="Proto-Palavra:">Proto-Word:</strong></div>
+                        <p style="color: #ccc; margin: 0;" data-en="Sacred syllables (AH, SA, LA, RA, etc.) that resonate with your current frequency. Each has unique harmonic and symbolic properties." data-pt="Sílabas sagradas (AH, SA, LA, RA, etc.) que ressoam com sua frequência atual. Cada uma tem propriedades harmônicas e simbólicas únicas.">Sacred syllables (AH, SA, LA, RA, etc.) that resonate with your current frequency. Each has unique harmonic and symbolic properties.</p>
                     </div>
                     <div>
-                        <div style="color: #00ff88; margin-bottom: 5px;"><strong>Ogham/Chakra:</strong></div>
-                        <p style="color: #ccc; margin: 0;">Ancient Celtic and Hindu correspondences. Trees and energy centers that resonate with your therapeutic frequency profile.</p>
+                        <div style="color: #00ff88; margin-bottom: 5px;"><strong data-en="Ogham/Chakra:" data-pt="Ogham/Chakra:">Ogham/Chakra:</strong></div>
+                        <p style="color: #ccc; margin: 0;" data-en="Ancient Celtic and Hindu correspondences. Trees and energy centers that resonate with your therapeutic frequency profile." data-pt="Correspondências célticas e hindus antigas. Árvores e centros de energia que ressoam com seu perfil de frequência terapêutica.">Ancient Celtic and Hindu correspondences. Trees and energy centers that resonate with your therapeutic frequency profile.</p>
                     </div>
                 </div>
             </div>
