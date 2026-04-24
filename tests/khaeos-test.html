@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KHÆOS Module — Russell Library Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #0ff;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            border-bottom: 2px solid #0ff;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            text-shadow: 0 0 10px #0ff;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #088;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .status-item {
+            padding: 5px 10px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #0ff;
+            border-radius: 3px;
+        }
+        
+        .status-item.active {
+            background: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 5px #0ff;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .panel {
+            border: 1px solid #088;
+            background: rgba(0, 50, 50, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .panel h2 {
+            font-size: 16px;
+            color: #0ff;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #044;
+            padding-bottom: 5px;
+        }
+        
+        .panel h3 {
+            font-size: 13px;
+            color: #0cc;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .data-line {
+            font-size: 12px;
+            margin: 4px 0;
+            color: #0ff;
+        }
+        
+        .data-value {
+            color: #0f0;
+            font-weight: bold;
+        }
+        
+        .data-label {
+            color: #088;
+        }
+        
+        .octave-bar {
+            display: flex;
+            gap: 2px;
+            margin: 10px 0;
+            height: 30px;
+        }
+        
+        .octave-block {
+            flex: 1;
+            background: linear-gradient(180deg, #0ff 0%, #088 100%);
+            border: 1px solid #0ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .octave-block:hover {
+            box-shadow: 0 0 10px #0ff;
+            transform: scale(1.05);
+        }
+        
+        .octave-block.active {
+            background: #0f0;
+            color: #000;
+            box-shadow: 0 0 15px #0f0;
+        }
+        
+        .element-list {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #044;
+            border-radius: 3px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 11px;
+        }
+        
+        .element-item {
+            padding: 4px 6px;
+            margin: 2px 0;
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 2px solid #0ff;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .element-item.master {
+            background: rgba(0, 255, 0, 0.15);
+            border-left-color: #0f0;
+        }
+        
+        .element-item.charging {
+            background: rgba(255, 165, 0, 0.15);
+            border-left-color: #fa0;
+        }
+        
+        .element-item.discharging {
+            background: rgba(255, 100, 100, 0.15);
+            border-left-color: #f44;
+        }
+        
+        button {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid #0ff;
+            color: #0ff;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            transition: all 0.2s;
+            margin: 5px 5px 5px 0;
+        }
+        
+        button:hover {
+            background: rgba(0, 255, 255, 0.4);
+            box-shadow: 0 0 10px #0ff;
+        }
+        
+        .button-group {
+            margin: 15px 0;
+        }
+        
+        .frequency-display {
+            background: #000;
+            border: 2px solid #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #0f0;
+            margin: 10px 0;
+            text-shadow: 0 0 10px #0f0;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #f00;
+            color: #f88;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #0f0;
+            color: #0f8;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #0ff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .scroll-area {
+            height: 400px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #044;
+            border-radius: 3px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ KHÆOS Module — Russell Library Integration Demo</h1>
+            <div class="subtitle">Project KHÆOS Module | Phase 1: Russell Periodic Table Integration</div>
+            <div class="status-bar">
+                <div class="status-item active">
+                    <span class="spinner"></span> Module Status: <strong>ACTIVE</strong>
+                </div>
+                <div class="status-item active">Russell Library: <strong>102 Elements</strong></div>
+                <div class="status-item active">Octaves: <strong>1–10</strong></div>
+                <div class="status-item active">Date: <strong id="current-date"></strong></div>
+            </div>
+        </header>
+        
+        <div class="grid">
+            <!-- Russell Octave Overview -->
+            <div class="panel full-width">
+                <h2>Russell Octave Spectrum (10 Octaves)</h2>
+                <div class="octave-bar" id="octave-bar"></div>
+                <div class="data-line" style="margin-top: 10px;">
+                    <span class="data-label">Base Frequency (Octave 1):</span>
+                    <span class="data-value">256 Hz</span> | 
+                    <span class="data-label">Doubling Law:</span>
+                    <span class="data-value">f = 256 × 2^(octave-1)</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-label">Highest Frequency (Octave 10):</span>
+                    <span class="data-value">131,072 Hz</span>
+                </div>
+            </div>
+            
+            <!-- Russell Octave for Today -->
+            <div class="panel">
+                <h2>Russell Cycle — Today</h2>
+                <div id="today-octave">
+                    <div class="spinner"></div> Loading current octave...
+                </div>
+            </div>
+            
+            <!-- Master Tones -->
+            <div class="panel">
+                <h2>Master Tones (Inertia Line)</h2>
+                <div class="subtitle">Equilibrium Anchors — Octave 5</div>
+                <div id="master-tones">
+                    <div class="spinner"></div> Loading master tones...
+                </div>
+            </div>
+            
+            <!-- Charging Elements -->
+            <div class="panel">
+                <h2>Charging Elements (Compression)</h2>
+                <div class="subtitle">68 Elements — Compression/Convergence</div>
+                <div class="data-line">
+                    <span class="data-label">Count:</span>
+                    <span class="data-value" id="charging-count">—</span>
+                </div>
+                <button onclick="displayChargingElements()">Show Charging Elements</button>
+                <div id="charging-list"></div>
+            </div>
+            
+            <!-- Discharging Elements -->
+            <div class="panel">
+                <h2>Discharging Elements (Expansion)</h2>
+                <div class="subtitle">28 Elements — Expansion/Divergence</div>
+                <div class="data-line">
+                    <span class="data-label">Count:</span>
+                    <span class="data-value" id="discharging-count">—</span>
+                </div>
+                <button onclick="displayDischargingElements()">Show Discharging Elements</button>
+                <div id="discharging-list"></div>
+            </div>
+            
+            <!-- Octave Details Panel -->
+            <div class="panel full-width">
+                <h2>Octave Explorer</h2>
+                <div class="button-group">
+                    <button onclick="exploreOctave(1)">Octave 1 (256–512 Hz)</button>
+                    <button onclick="exploreOctave(2)">Octave 2 (512–1024 Hz)</button>
+                    <button onclick="exploreOctave(3)">Octave 3 (1024–2048 Hz)</button>
+                    <button onclick="exploreOctave(4)">Octave 4 (2048–4096 Hz)</button>
+                    <button onclick="exploreOctave(5)">Octave 5 (4096–8192 Hz)</button>
+                    <button onclick="exploreOctave(6)">Octave 6 (8192–16384 Hz)</button>
+                    <button onclick="exploreOctave(7)">Octave 7 (16384–32768 Hz)</button>
+                    <button onclick="exploreOctave(8)">Octave 8 (32768–65536 Hz)</button>
+                    <button onclick="exploreOctave(9)">Octave 9 (65536–131072 Hz)</button>
+                    <button onclick="exploreOctave(10)">Octave 10 (131072–262144 Hz)</button>
+                </div>
+                <div id="octave-details"></div>
+            </div>
+            
+            <!-- Frequency Finder -->
+            <div class="panel full-width">
+                <h2>Russell Frequency Finder</h2>
+                <div style="display: flex; gap: 10px; margin: 10px 0;">
+                    <input type="number" id="freq-input" placeholder="Enter frequency (Hz)" min="256" max="131072" style="flex: 1; padding: 8px; background: #000; border: 1px solid #0ff; color: #0ff;">
+                    <button onclick="findRussellElement()">Find Element</button>
+                </div>
+                <div id="frequency-result"></div>
+            </div>
+            
+            <!-- Module Info -->
+            <div class="panel full-width">
+                <h2>Module Information</h2>
+                <div class="data-line">
+                    <span class="data-label">Module:</span>
+                    <span class="data-value">khaeos-vortex-machine.js</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-label">Version:</span>
+                    <span class="data-value">0.1.0-russell-integration</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-label">Status:</span>
+                    <span class="data-value">RUSSELL_LIBRARY_ACTIVE</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-label">Data Source:</span>
+                    <span class="data-value">Russell Periodic Table Library (102 elements)</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-label">Phase 1 Focus:</span>
+                    <span class="data-value">Russell octave spectrum & element querying</span>
+                </div>
+                <div class="data-line" style="margin-top: 10px;">
+                    <span class="data-label">Available Functions:</span>
+                </div>
+                <div class="element-list">
+                    <div class="element-item">getRussellOctaves() — All 10 octaves</div>
+                    <div class="element-item master">getMasterTones() — Equilibrium anchors</div>
+                    <div class="element-item">getElementsBySystem(system) — Filter by type</div>
+                    <div class="element-item">getRussellOctaveForDay(dayOfYear) — Daily cycle</div>
+                    <div class="element-item">findClosestRussellElement(freq) — Frequency match</div>
+                    <div class="element-item charging">getChargingElements() — Compression (68)</div>
+                    <div class="element-item discharging">getDischargingElements() — Expansion (28)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Note: KHÆOS module cannot be directly imported in browser environment
+        // Instead, we'll simulate the module's functions based on Russell Library
+        
+        import { RussellPeriodicTable } from '../modules/libraries/russell-periodic-table-library.js';
+        
+        // Initialize UI
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+        
+        // Initialize octave bar
+        function initOctaveBar() {
+            const bar = document.getElementById('octave-bar');
+            for (let i = 1; i <= 10; i++) {
+                const block = document.createElement('div');
+                block.className = 'octave-block';
+                block.textContent = `Oct ${i}`;
+                block.onclick = () => exploreOctave(i);
+                bar.appendChild(block);
+            }
+        }
+        
+        // Display today's Russell octave
+        function displayTodayOctave() {
+            const now = new Date();
+            const startOfYear = new Date(now.getFullYear(), 0, 0);
+            const dayOfYear = Math.floor((now - startOfYear) / 86400000);
+            
+            const octaveCycleLength = 36.5;
+            const totalOctaves = 10;
+            const day = ((dayOfYear - 1) % (octaveCycleLength * totalOctaves)) + 1;
+            const octaveIndex = Math.floor((day - 1) / octaveCycleLength);
+            const octave = Math.min(octaveIndex + 1, totalOctaves);
+            const dayInOctave = day - (octaveIndex * octaveCycleLength);
+            const progress = (dayInOctave / octaveCycleLength * 100).toFixed(1);
+            
+            const frequency = 256 * Math.pow(2, octave - 1);
+            
+            const elementsInOctave = RussellPeriodicTable.getByOctave(octave);
+            const representativeIndex = Math.floor(elementsInOctave.length * (dayInOctave / octaveCycleLength));
+            const representative = elementsInOctave[representativeIndex] || elementsInOctave[0];
+            
+            document.getElementById('today-octave').innerHTML = `
+                <div class="frequency-display">${octave}</div>
+                <div class="data-line">
+                    <span class="data-label">Frequency:</span>
+                    <span class="data-value">${frequency.toFixed(2)} Hz</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-label">Day in Octave:</span>
+                    <span class="data-value">${dayInOctave.toFixed(1)} / 36.5</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-label">Progress:</span>
+                    <span class="data-value">${progress}%</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-label">Representative Element:</span>
+                    <span class="data-value">${representative.element}</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-label">System:</span>
+                    <span class="data-value">${representative.system}</span>
+                </div>
+            `;
+        }
+        
+        // Display master tones
+        function displayMasterTones() {
+            const masters = RussellPeriodicTable.getMasterTones();
+            let html = '<div class="element-list">';
+            
+            masters.forEach(m => {
+                html += `
+                    <div class="element-item master">
+                        <span><strong>${m.element}</strong> (Z=${m.atomic})</span>
+                        <span>${m.frequency432.toFixed(0)} Hz</span>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            document.getElementById('master-tones').innerHTML = html;
+        }
+        
+        // Display charging elements
+        window.displayChargingElements = function() {
+            const charging = RussellPeriodicTable.getBySystem('Charging');
+            document.getElementById('charging-count').textContent = charging.length;
+            
+            let html = '<div class="element-list">';
+            charging.forEach(e => {
+                html += `
+                    <div class="element-item charging">
+                        <span><strong>${e.element}</strong> (Z=${e.atomic}, Oct ${e.octave})</span>
+                        <span>${e.frequency432.toFixed(0)} Hz</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            document.getElementById('charging-list').innerHTML = html;
+        };
+        
+        // Display discharging elements
+        window.displayDischargingElements = function() {
+            const discharging = RussellPeriodicTable.getBySystem('Discharging');
+            document.getElementById('discharging-count').textContent = discharging.length;
+            
+            let html = '<div class="element-list">';
+            discharging.forEach(e => {
+                html += `
+                    <div class="element-item discharging">
+                        <span><strong>${e.element}</strong> (Z=${e.atomic}, Oct ${e.octave})</span>
+                        <span>${e.frequency432.toFixed(0)} Hz</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            document.getElementById('discharging-list').innerHTML = html;
+        };
+        
+        // Explore specific octave
+        window.exploreOctave = function(octave) {
+            const elements = RussellPeriodicTable.getByOctave(octave);
+            const baseFreq = 256 * Math.pow(2, octave - 1);
+            const maxFreq = 256 * Math.pow(2, octave);
+            
+            let html = `
+                <div class="frequency-display">${baseFreq.toFixed(0)} – ${maxFreq.toFixed(0)} Hz</div>
+                <div class="data-line">
+                    <span class="data-label">Elements in this octave:</span>
+                    <span class="data-value">${elements.length}</span>
+                </div>
+                <div class="element-list" style="max-height: 300px;">
+            `;
+            
+            elements.forEach(e => {
+                const itemClass = e.system === 'Master' ? 'master' : e.system === 'Charging' ? 'charging' : e.system === 'Discharging' ? 'discharging' : '';
+                html += `
+                    <div class="element-item ${itemClass}">
+                        <span><strong>${e.element}</strong> (Z=${e.atomic}, ${e.note})</span>
+                        <span>${e.frequency432.toFixed(2)} Hz</span>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            document.getElementById('octave-details').innerHTML = html;
+        };
+        
+        // Find Russell element by frequency
+        window.findRussellElement = function() {
+            const freq = parseFloat(document.getElementById('freq-input').value);
+            
+            if (!freq || freq < 256 || freq > 131072) {
+                document.getElementById('frequency-result').innerHTML = 
+                    '<div class="error">Please enter a frequency between 256–131,072 Hz</div>';
+                return;
+            }
+            
+            const closest = RussellPeriodicTable.getByFrequency(freq, 'tuning432');
+            
+            document.getElementById('frequency-result').innerHTML = `
+                <div class="success">
+                    <div class="data-line">
+                        <span class="data-label">Closest Element:</span>
+                        <span class="data-value">${closest.element}</span>
+                    </div>
+                    <div class="data-line">
+                        <span class="data-label">Atomic Number:</span>
+                        <span class="data-value">${closest.atomic}</span>
+                    </div>
+                    <div class="data-line">
+                        <span class="data-label">Octave:</span>
+                        <span class="data-value">${closest.octave}</span>
+                    </div>
+                    <div class="data-line">
+                        <span class="data-label">Note:</span>
+                        <span class="data-value">${closest.note}</span>
+                    </div>
+                    <div class="data-line">
+                        <span class="data-label">Frequency (432 Hz):</span>
+                        <span class="data-value">${closest.frequency432.toFixed(2)} Hz</span>
+                    </div>
+                    <div class="data-line">
+                        <span class="data-label">System:</span>
+                        <span class="data-value">${closest.system}</span>
+                    </div>
+                    <div class="data-line">
+                        <span class="data-label">Frequency Match:</span>
+                        <span class="data-value">${(Math.abs(freq - closest.frequency432)).toFixed(2)} Hz difference</span>
+                    </div>
+                </div>
+            `;
+        };
+        
+        // Initialize
+        initOctaveBar();
+        displayTodayOctave();
+        displayMasterTones();
+        document.getElementById('charging-count').textContent = RussellPeriodicTable.getBySystem('Charging').length;
+        document.getElementById('discharging-count').textContent = RussellPeriodicTable.getBySystem('Discharging').length;
+    </script>
+</body>
+</html>

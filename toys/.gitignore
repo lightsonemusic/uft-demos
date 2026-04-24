@@ -23,5 +23,3 @@ build/
 # Environment
 .env
 .env.local
-
-docs/**/*.pdf

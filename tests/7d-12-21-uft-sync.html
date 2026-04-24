@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UFT 7D × 12:21 — Input → Translate → Audiovisual Sync</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0c29 100%);
+      color: #e8f4f8;
+      padding: 15px;
+      min-height: 100vh;
+    }
+    .container { max-width: 1920px; margin: 0 auto; }
+    h1 {
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 4px;
+      background: linear-gradient(90deg, #2d5016, #c4a000, #8e44ad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
+    }
+    .subtitle { text-align: center; color: #888; font-size: 11px; margin-bottom: 15px; }
+    .subtitle span { font-weight: bold; }
+    .subtitle .inp { color: #4a7c24; }
+    .subtitle .proc { color: #c4a000; }
+    .subtitle .out { color: #8e44ad; }
+
+    /* PIPELINE FLOW */
+    .pipeline {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 0;
+      align-items: center;
+      margin: 10px 0;
+    }
+    .pipe-stage {
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    .pipe-stage.input { border: 2px solid #2d5016; }
+    .pipe-stage.process { border: 2px solid #c4a000; }
+    .pipe-stage.output { border: 2px solid #8e44ad; }
+    .pipe-stage h3 { font-size: 11px; margin-bottom: 4px; }
+    .pipe-stage.input h3 { color: #4a7c24; }
+    .pipe-stage.process h3 { color: #d4aa20; }
+    .pipe-stage.output h3 { color: #a855f7; }
+    .pipe-stage .val { font-size: 13px; font-weight: bold; }
+    .pipe-stage.input .val { color: #4a7c24; }
+    .pipe-stage.process .val { color: #d4aa20; }
+    .pipe-stage.output .val { color: #a855f7; }
+    .pipe-arrow { color: #555; font-size: 20px; text-align: center; padding: 0 5px; }
+
+    /* CONTROLS */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 10px 15px;
+      margin: 10px 0;
+    }
+    .ctrl { display: flex; flex-direction: column; gap: 3px; }
+    .ctrl label { color: #888; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .ctrl input, .ctrl select {
+      background: rgba(10,14,39,0.8);
+      border: 1px solid #444;
+      color: #e8f4f8;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-family: Monaco, monospace;
+      font-size: 11px;
+    }
+    .ctrl input[type="range"] { width: 100px; accent-color: #c4a000; }
+    button {
+      border: none; color: #fff; padding: 8px 18px; border-radius: 4px;
+      cursor: pointer; font-weight: bold; font-size: 11px; transition: all 0.2s;
+    }
+    .btn-play { background: linear-gradient(135deg, #2d5016, #4a7c24); }
+    .btn-stop { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+    button:hover { transform: scale(1.05); }
+
+    /* MAIN GRID */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 12px;
+      margin: 10px 0;
+    }
+    .panel {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .panel h2 { font-size: 12px; color: #888; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+
+    canvas {
+      width: 100%;
+      height: 480px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 4px;
+    }
+
+    /* STATE DISPLAY */
+    .state-row { display: flex; gap: 3px; margin: 6px 0; }
+    .state-cell {
+      flex: 1; height: 22px; border-radius: 3px; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 7px; color: rgba(255,255,255,0.5); transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+    .state-cell.active { border-color: #fff; color: #fff; transform: scaleY(1.3); }
+
+    .data-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+    .datum {
+      background: rgba(0,0,0,0.3);
+      border-radius: 4px;
+      padding: 6px 8px;
+      text-align: center;
+    }
+    .datum .lbl { color: #666; font-size: 8px; text-transform: uppercase; }
+    .datum .val { font-size: 14px; font-weight: bold; margin-top: 2px; }
+
+    .info-line {
+      background: rgba(0,0,0,0.2);
+      border-left: 3px solid;
+      padding: 6px 10px;
+      margin: 5px 0;
+      border-radius: 3px;
+      font-size: 10px;
+    }
+    .info-line .lbl { color: #666; font-size: 8px; }
+    .info-line .val { font-weight: bold; font-size: 13px; }
+
+    /* 21 STATE INDICATORS */
+    .cosmic-strip { display: flex; gap: 2px; margin: 6px 0; flex-wrap: wrap; }
+    .cs {
+      width: 18px; height: 18px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-size: 6px;
+      color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.3s;
+    }
+    .cs.active { border-color: #fff; color: #fff; box-shadow: 0 0 8px currentColor; transform: scale(1.3); }
+
+    /* NOTE DISPLAY */
+    .note-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 10px;
+      margin: 8px 0;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+    }
+    .note-big { font-size: 36px; font-weight: bold; }
+    .note-info { font-size: 10px; color: #888; line-height: 1.6; }
+
+    /* BOTTOM GRID */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 10px; }
+    th { padding: 6px; text-align: left; color: #888; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 9px; }
+    td { padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔷 UFT 7D HEPTERCUBE × 12:21 COSMIC TRANSLATOR</h1>
+    <p class="subtitle">
+      <span class="inp">INPUT: 7D Geometry (128v, 448e)</span> → 
+      <span class="proc">PROCESS: 12:21 UFT Translation</span> → 
+      <span class="out">OUTPUT: Audiovisual Sync</span>
+    </p>
+
+    <!-- PIPELINE STATUS -->
+    <div class="pipeline">
+      <div class="pipe-stage input">
+        <h3>⬡ INPUT — 7D HEPTERCUBE</h3>
+        <div class="val" id="pipeInput">128 vertices @ 83.4 Hz</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage process">
+        <h3>🌀 12:21 UFT TRANSLATOR</h3>
+        <div class="val" id="pipeProcess">State 0 — Seed | Phase 0.000</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage output">
+        <h3>🔊 AUDIOVISUAL OUTPUT</h3>
+        <div class="val" id="pipeOutput">C @ 210.4 Hz | Coherency —</div>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <div class="ctrl">
+        <label>Input Frequency (Hz)</label>
+        <input type="number" id="inputFreq" value="83.4" step="0.1" min="20" max="500">
+      </div>
+      <div class="ctrl">
+        <label>Time Speed (days/sec)</label>
+        <input type="range" id="timeSpeed" value="30" min="1" max="100">
+        <span style="color:#888;font-size:9px;" id="timeSpeedLbl">30</span>
+      </div>
+      <div class="ctrl">
+        <label>7D Rotation</label>
+        <input type="range" id="rotSpeed" value="40" min="0" max="100">
+      </div>
+      <div class="ctrl">
+        <label>Energy Level</label>
+        <input type="range" id="energyLevel" value="50" min="0" max="100">
+      </div>
+      <div class="ctrl">
+        <label>Gesture</label>
+        <input type="range" id="gesture" value="50" min="0" max="100">
+      </div>
+      <div style="display:flex;gap:6px;align-items:flex-end;">
+        <button class="btn-play" onclick="startSystem()">▶ PLAY</button>
+        <button class="btn-stop" onclick="stopSystem()" id="stopBtn" style="display:none;">⏹ STOP</button>
+      </div>
+    </div>
+
+    <!-- MAIN DISPLAY -->
+    <div class="main-grid">
+      <!-- CANVAS -->
+      <div class="panel">
+        <h2>7D HEPTERCUBE — DRIVEN BY 12:21 TRANSLATION</h2>
+        <canvas id="mainCanvas"></canvas>
+      </div>
+
+      <!-- DATA PANEL -->
+      <div class="panel">
+        <h2>12:21 TRANSLATOR STATE</h2>
+
+        <!-- Current note -->
+        <div class="note-display">
+          <div class="note-big" id="noteDisplay" style="color:#c4a000;">C</div>
+          <div class="note-info">
+            <div>Freq: <span id="noteFreq" style="color:#d4aa20;">210.4 Hz</span></div>
+            <div>State: <span id="noteState" style="color:#d4aa20;">Seed</span></div>
+            <div>Phase: <span id="notePhase" style="color:#d4aa20;">Ascending</span></div>
+            <div>Spiral r: <span id="noteSpiral" style="color:#d4aa20;">1.000</span></div>
+          </div>
+        </div>
+
+        <!-- 21 cosmic states -->
+        <div style="color:#888;font-size:9px;margin-top:8px;">21 COSMIC STATES</div>
+        <div class="cosmic-strip" id="cosmicStrip"></div>
+
+        <!-- 12 notes -->
+        <div style="color:#888;font-size:9px;margin-top:8px;">12 CHROMATIC NOTES</div>
+        <div class="state-row" id="noteStrip"></div>
+
+        <!-- Data readouts -->
+        <div class="data-row">
+          <div class="datum">
+            <div class="lbl">Day</div>
+            <div class="val" id="dayVal" style="color:#4a7c24;">0.0</div>
+          </div>
+          <div class="datum">
+            <div class="lbl">Spiral Mag</div>
+            <div class="val" id="spiralMag" style="color:#c4a000;">1.000</div>
+          </div>
+          <div class="datum">
+            <div class="lbl">Coherency</div>
+            <div class="val" id="coherency" style="color:#a855f7;">—</div>
+          </div>
+        </div>
+        <div class="data-row">
+          <div class="datum">
+            <div class="lbl">Tempo BPM</div>
+            <div class="val" id="tempoVal" style="color:#4a7c24;">72</div>
+          </div>
+          <div class="datum">
+            <div class="lbl">Harmonics</div>
+            <div class="val" id="harmonicsVal" style="color:#c4a000;">3</div>
+          </div>
+          <div class="datum">
+            <div class="lbl">Dynamics</div>
+            <div class="val" id="dynamicsVal" style="color:#a855f7;">0.5</div>
+          </div>
+        </div>
+
+        <!-- Torus mapping -->
+        <div class="info-line" style="border-color:#c4a000;">
+          <div class="lbl">TORUS (13,21) POSITION</div>
+          <div class="val" id="torusPos" style="color:#d4aa20;">u=0.00 v=0.00 r=1.00</div>
+        </div>
+        <div class="info-line" style="border-color:#4a7c24;">
+          <div class="lbl">7D ROTATION PLANES ACTIVE</div>
+          <div class="val" id="activePlanes" style="color:#4a7c24;">XY XZ YW ZV UT</div>
+        </div>
+        <div class="info-line" style="border-color:#8e44ad;">
+          <div class="lbl">AUDIO SYNC</div>
+          <div class="val" id="audioSync" style="color:#a855f7;">Waiting...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: TABLES -->
+    <div class="bottom-grid">
+      <div class="panel">
+        <h2>🎵 21-STATE → 7D PLANE MAPPING</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>State</th><th>Name</th><th>7D Planes</th><th>Rate</th><th>Color</th>
+            </tr>
+          </thead>
+          <tbody id="stateTable"></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h2>🔊 12-NOTE → HARMONIC OUTPUT</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Note</th><th>Frequency</th><th>Proto-Word</th><th>Waveform</th><th>Dimension</th>
+            </tr>
+          </thead>
+          <tbody id="noteTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== UFT 12:21 COSMIC TRANSLATOR (from cosmic-translator-12-21.js) =====
+    const PHI = 1.6180339887;
+    const T_L = 29.5306;           // Moon synodic period
+    const MOON_ROOT_HZ = 210.4186; // Lunar octave root
+    const ZERO_POINT_HZ = 297.5768;
+    const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+    
+    const STATES_21 = [
+      { idx:0,  name:'Seed',       phase:'Ascending', color:'#1abc9c', quality:'Beginning' },
+      { idx:1,  name:'Pulse',      phase:'Ascending', color:'#16a085', quality:'First movement' },
+      { idx:2,  name:'Root',       phase:'Ascending', color:'#117a65', quality:'Establishment' },
+      { idx:3,  name:'Rise',       phase:'Ascending', color:'#0e6251', quality:'Growth' },
+      { idx:4,  name:'Form',       phase:'Ascending', color:'#0b4f3c', quality:'Structure' },
+      { idx:5,  name:'Gather',     phase:'Ascending', color:'#0a3a2a', quality:'Accumulation' },
+      { idx:6,  name:'Open',       phase:'Ascending', color:'#073d26', quality:'Preparation' },
+      { idx:7,  name:'Peak',       phase:'Peak',      color:'#f39c12', quality:'Maximum' },
+      { idx:8,  name:'Signal',     phase:'Peak',      color:'#d68910', quality:'Transmission' },
+      { idx:9,  name:'Resonance',  phase:'Peak',      color:'#b3690e', quality:'Full vibration' },
+      { idx:10, name:'Zero Point', phase:'Peak',      color:'#ffffff', quality:'Still centre' },
+      { idx:11, name:'Reflect',    phase:'Peak',      color:'#e8d4b8', quality:'Looking back' },
+      { idx:12, name:'Descend',    phase:'Peak',      color:'#d4a574', quality:'Return begins' },
+      { idx:13, name:'Harvest',    phase:'Peak',      color:'#c08552', quality:'Gathering' },
+      { idx:14, name:'Release',    phase:'Transform', color:'#8e44ad', quality:'Letting go' },
+      { idx:15, name:'Compost',    phase:'Transform', color:'#7d3c98', quality:'Breaking down' },
+      { idx:16, name:'Dark',       phase:'Transform', color:'#6c3483', quality:'Unknown' },
+      { idx:17, name:'Silence',    phase:'Transform', color:'#4a235a', quality:'Stillness' },
+      { idx:18, name:'Stir',       phase:'Transform', color:'#5b7c99', quality:'First return' },
+      { idx:19, name:'Awaken',     phase:'Transform', color:'#7a9fb5', quality:'Awareness' },
+      { idx:20, name:'Renew',      phase:'Transform', color:'#9fc5dd', quality:'Next spiral' }
+    ];
+
+    // Proto-words mapped to 12 notes
+    const PROTO_MAP = [
+      { note:'C',  word:'AH',  freq:210.42, planet:'Moon' },
+      { note:'C#', word:'SA',  freq:222.93, planet:'Mercury' },
+      { note:'D',  word:'LA',  freq:236.19, planet:'Venus' },
+      { note:'D#', word:'RA',  freq:250.23, planet:'Sun' },
+      { note:'E',  word:'DA',  freq:265.11, planet:'Mars' },
+      { note:'F',  word:'HA',  freq:280.88, planet:'Jupiter' },
+      { note:'F#', word:'NA',  freq:297.58, planet:'Zero Point' },
+      { note:'G',  word:'KA',  freq:315.29, planet:'Saturn' },
+      { note:'G#', word:'OM',  freq:334.02, planet:'Ophiuchus' },
+      { note:'A',  word:'MA',  freq:353.94, planet:'Uranus' },
+      { note:'A#', word:'PA',  freq:374.97, planet:'Neptune' },
+      { note:'B',  word:'TAO', freq:397.23, planet:'Pluto' }
+    ];
+
+    // 21 rotation plane names in 7D
+    const PLANE_NAMES = [
+      'XY','XZ','XW','XV','XU','XT',
+      'YZ','YW','YV','YU','YT',
+      'ZW','ZV','ZU','ZT',
+      'WV','WU','WT',
+      'VU','VT',
+      'UT'
+    ];
+
+    // ===== 12:21 TRANSLATOR FUNCTIONS =====
+    function phaseFunction(t_days) {
+      return (2 * Math.PI * t_days) / T_L;
+    }
+
+    function spiralFunction(t_days) {
+      const theta = phaseFunction(t_days);
+      const exponent = theta / (2 * Math.PI);
+      const magnitude = Math.pow(PHI, exponent);
+      return {
+        magnitude,
+        phase: theta,
+        x: magnitude * Math.cos(theta),
+        y: magnitude * Math.sin(theta),
+        cycles: exponent
+      };
+    }
+
+    function segmentationFunction(t_days) {
+      const theta = phaseFunction(t_days);
+      const normalized = ((theta / (2 * Math.PI)) % 1 + 1) % 1;
+      return Math.min(Math.floor(normalized * 21), 20);
+    }
+
+    function phaseToPitch(phase) {
+      const normalized = (phase / (2 * Math.PI)) * 12;
+      const noteIndex = ((Math.round(normalized) % 12) + 12) % 12;
+      const frequency = MOON_ROOT_HZ * Math.pow(2, noteIndex / 12);
+      return { note: NOTE_NAMES[noteIndex], noteIndex, frequency };
+    }
+
+    function energyToTempo(energyLevel) {
+      return Math.round(60 + energyLevel * 60); // 60-120 BPM
+    }
+
+    function radiusToHarmonics(magnitude) {
+      return Math.min(Math.max(Math.round(magnitude * 2), 1), 12);
+    }
+
+    function stateToDynamics(stateIdx) {
+      // Ascending: 0.3→0.7, Peak: 0.7→1.0→0.7, Transform: 0.7→0.2
+      if (stateIdx <= 6) return 0.3 + (stateIdx / 6) * 0.4;
+      if (stateIdx <= 13) return stateIdx === 10 ? 1.0 : 0.7 + Math.sin((stateIdx - 7) / 6 * Math.PI) * 0.3;
+      return 0.7 - ((stateIdx - 14) / 6) * 0.5;
+    }
+
+    // Full translator (mirrors RealtimeMapping.translate)
+    function translateUFT(t_days, energyLevel, userGesture) {
+      const phase = phaseFunction(t_days);
+      const spiral = spiralFunction(t_days);
+      const stateIdx = segmentationFunction(t_days);
+      const state = STATES_21[stateIdx];
+      const pitch = phaseToPitch(phase);
+      const tempo = energyToTempo(energyLevel);
+      const harmonics = radiusToHarmonics(spiral.magnitude);
+      const dynamics = stateToDynamics(stateIdx);
+
+      return {
+        t_days, phase, stateIdx, state, spiral, pitch, tempo, harmonics, dynamics,
+        torus: { u: phase, v: userGesture * Math.PI, r: spiral.magnitude }
+      };
+    }
+
+    // ===== 7D HEPTERCUBE =====
+    let edges7d = [];
+
+    function generate7DVertices() {
+      const verts = [];
+      for (let i = 0; i < 128; i++) {
+        verts.push({
+          x: (i&1)?1:-1, y: (i&2)?1:-1, z: (i&4)?1:-1,
+          w: (i&8)?1:-1, v: (i&16)?1:-1, u: (i&32)?1:-1, t: (i&64)?1:-1
+        });
+      }
+      return verts;
+    }
+
+    function generate7DEdges() {
+      const e = [];
+      for (let i=0;i<128;i++) for (let j=i+1;j<128;j++) {
+        const xor = i^j;
+        if ((xor & (xor-1)) === 0) e.push([i,j]);
+      }
+      return e;
+    }
+
+    function rotate7D(p, angles) {
+      let r = {...p};
+      // Apply rotations in all 21 planes
+      function rot2D(a, b, theta) {
+        const c = Math.cos(theta), s = Math.sin(theta);
+        const na = r[a]*c - r[b]*s;
+        const nb = r[a]*s + r[b]*c;
+        r[a] = na; r[b] = nb;
+      }
+      rot2D('x','y', angles[0]);
+      rot2D('x','z', angles[1]);
+      rot2D('x','w', angles[2]);
+      rot2D('x','v', angles[3]);
+      rot2D('x','u', angles[4]);
+      rot2D('x','t', angles[5]);
+      rot2D('y','z', angles[6]);
+      rot2D('y','w', angles[7]);
+      rot2D('y','v', angles[8]);
+      rot2D('y','u', angles[9]);
+      rot2D('y','t', angles[10]);
+      rot2D('z','w', angles[11]);
+      rot2D('z','v', angles[12]);
+      rot2D('z','u', angles[13]);
+      rot2D('z','t', angles[14]);
+      rot2D('w','v', angles[15]);
+      rot2D('w','u', angles[16]);
+      rot2D('w','t', angles[17]);
+      rot2D('v','u', angles[18]);
+      rot2D('v','t', angles[19]);
+      rot2D('u','t', angles[20]);
+      return r;
+    }
+
+    function project7DTo2D(p) {
+      const d = 4;
+      const scale = d / (d + p.t*0.4 + p.u*0.25 + p.v*0.15);
+      return { x: (p.x + p.w*0.3 + p.v*0.15) * scale, y: (p.y + p.z*0.2 + p.w*0.1) * scale };
+    }
+
+    // ===== AUDIO ENGINE =====
+    let audioContext, analyser, frequencyData;
+    let oscillators = [];
+    let isPlaying = false;
+    let masterGainNode;
+    let audioEnergy=0, bassEnergy=0, midEnergy=0, highEnergy=0;
+
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 512;
+        analyser.smoothingTimeConstant = 0.82;
+        frequencyData = new Uint8Array(analyser.frequencyBinCount);
+        analyser.connect(audioContext.destination);
+      }
+    }
+
+    // Rebuild oscillators based on current UFT translation state
+    function rebuildAudio(uftState) {
+      // Kill old oscs
+      oscillators.forEach(o => { try { o.stop(); } catch(e) {} });
+      oscillators = [];
+
+      if (!isPlaying || !audioContext) return;
+
+      masterGainNode = audioContext.createGain();
+      masterGainNode.gain.setValueAtTime(0.07 * uftState.dynamics, audioContext.currentTime);
+      masterGainNode.connect(analyser);
+
+      const baseFreq = uftState.pitch.frequency;
+      const numHarm = uftState.harmonics;
+      const waveforms = ['sine','triangle','square','sawtooth'];
+
+      for (let i = 1; i <= numHarm; i++) {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.frequency.setValueAtTime(baseFreq * i, audioContext.currentTime);
+        osc.type = waveforms[i % 4];
+        gain.gain.setValueAtTime(0.08 / (i * i), audioContext.currentTime);
+        osc.connect(gain);
+        gain.connect(masterGainNode);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 2); // short-lived, rebuilt each cycle
+        oscillators.push(osc);
+      }
+    }
+
+    function getAudioData() {
+      if (!analyser || !isPlaying) return { energy:0, bass:0, mid:0, high:0, bands:new Array(21).fill(0) };
+      analyser.getByteFrequencyData(frequencyData);
+      const len = frequencyData.length;
+      let bass=0,mid=0,high=0,total=0;
+      const bE=Math.floor(len*0.12), mE=Math.floor(len*0.45);
+      for (let i=0;i<len;i++){const v=frequencyData[i]/255;total+=v;if(i<bE)bass+=v;else if(i<mE)mid+=v;else high+=v;}
+      bass/=bE||1;mid/=(mE-bE)||1;high/=(len-mE)||1;total/=len;
+      const bS=Math.floor(len/21);
+      const bands=[];
+      for(let b=0;b<21;b++){let s=0;for(let i=b*bS;i<(b+1)*bS&&i<len;i++)s+=frequencyData[i]/255;bands.push(s/bS);}
+      return {energy:total,bass,mid,high,bands};
+    }
+
+    // ===== SYSTEM START/STOP =====
+    function startSystem() {
+      initAudio();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      isPlaying = true;
+      document.getElementById('stopBtn').style.display = 'inline-block';
+    }
+
+    function stopSystem() {
+      oscillators.forEach(o => { try{o.stop();}catch(e){} });
+      oscillators = [];
+      isPlaying = false;
+      document.getElementById('stopBtn').style.display = 'none';
+    }
+
+    // ===== MAIN ANIMATION LOOP =====
+    let animId;
+    let simTime = 0;         // simulated days
+    let lastAudioRebuild = 0;
+    let rotAngles = new Array(21).fill(0); // all 21 rotation planes
+
+    function animate() {
+      const canvas = document.getElementById('mainCanvas');
+      const ctx = canvas.getContext('2d');
+
+      const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+      if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
+      const cx = canvas.width/2, cy = canvas.height/2;
+
+      // Read controls
+      const inputFreq = parseFloat(document.getElementById('inputFreq').value) || 83.4;
+      const timeSpeed = parseInt(document.getElementById('timeSpeed').value) || 30;
+      const rotSpeed = parseInt(document.getElementById('rotSpeed').value) || 40;
+      const energyLevel = parseInt(document.getElementById('energyLevel').value) / 100;
+      const gesture = parseInt(document.getElementById('gesture').value) / 100;
+
+      // Advance simulation time
+      simTime += (timeSpeed / 60) * (1/60); // days per frame at 60fps
+
+      // ===== 12:21 TRANSLATION =====
+      const uft = translateUFT(simTime, energyLevel, gesture);
+      const state = uft.state;
+      const stateIdx = uft.stateIdx;
+      const pitch = uft.pitch;
+
+      // Rebuild audio when state changes
+      if (isPlaying && Math.floor(simTime * 10) !== lastAudioRebuild) {
+        lastAudioRebuild = Math.floor(simTime * 10);
+        rebuildAudio(uft);
+      }
+
+      // Audio data
+      const audio = getAudioData();
+      audioEnergy += (audio.energy - audioEnergy) * 0.15;
+      bassEnergy += (audio.bass - bassEnergy) * 0.12;
+      midEnergy += (audio.mid - midEnergy) * 0.15;
+      highEnergy += (audio.high - highEnergy) * 0.18;
+
+      // ===== 7D ROTATION DRIVEN BY 21 STATES =====
+      // Each state activates certain rotation planes with different intensities
+      const baseRot = rotSpeed / 40;
+      for (let i = 0; i < 21; i++) {
+        // State-driven: active state's planes rotate faster
+        const stateInfluence = (i === stateIdx) ? 2.5 : 
+                               (Math.abs(i - stateIdx) <= 2) ? 1.5 : 0.6;
+        // Phase-driven: ascending/peak/transform affect speed
+        const phaseMultiplier = state.phase === 'Peak' ? 1.4 : 
+                                 state.phase === 'Transform' ? 0.7 : 1.0;
+        // Audio-driven
+        const audioMult = isPlaying ? 1 + (audio.bands[i] || 0) * 2 : 1;
+        // Spiral magnitude affects rotation amplitude
+        const spiralScale = 0.5 + uft.spiral.magnitude * 0.3;
+
+        rotAngles[i] += 0.004 * baseRot * stateInfluence * phaseMultiplier * audioMult * spiralScale;
+      }
+
+      // ===== RENDER 7D HEPTERCUBE =====
+      // Background: color tinted by state phase
+      const stateColor = state.color;
+      const bgR = parseInt(stateColor.slice(1,3),16);
+      const bgG = parseInt(stateColor.slice(3,5),16);
+      const bgB = parseInt(stateColor.slice(5,7),16);
+      const bgAlpha = 0.12 + (isPlaying ? bassEnergy * 0.06 : 0);
+      ctx.fillStyle = `rgba(${Math.floor(bgR*0.1)}, ${Math.floor(bgG*0.1)}, ${Math.floor(bgB*0.1)}, ${bgAlpha})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const vertices = generate7DVertices();
+      if (edges7d.length === 0) edges7d = generate7DEdges();
+
+      // Projection scale: driven by spiral magnitude + bass
+      const projScale = 80 + uft.spiral.magnitude * 20 + (isPlaying ? bassEnergy * 40 : 0);
+
+      const rotated = vertices.map(v => rotate7D(v, rotAngles));
+      const projected = rotated.map(v => {
+        const p = project7DTo2D(v);
+        return { x: cx + p.x * projScale, y: cy + p.y * projScale };
+      });
+
+      // Edge color from state
+      const hue = (stateIdx / 21) * 360;
+      const satBase = 50 + (isPlaying ? midEnergy * 30 : 0);
+      const lightBase = 30 + (isPlaying ? audioEnergy * 20 : 0);
+
+      // Draw edges
+      edges7d.forEach(([s, e]) => {
+        const dAvg = (rotated[s].t + rotated[e].t) / 2;
+        const alpha = 0.12 + Math.abs(dAvg) * 0.35 + (isPlaying ? highEnergy * 0.25 : 0);
+        const lum = lightBase + Math.abs(dAvg) * 15;
+        ctx.strokeStyle = `hsla(${hue}, ${satBase}%, ${lum}%, ${Math.min(alpha, 0.9)})`;
+        ctx.lineWidth = 0.3 + Math.abs(dAvg) * 0.5 + (isPlaying ? bassEnergy * 1 : 0);
+
+        if (isPlaying && audioEnergy > 0.35) {
+          ctx.shadowColor = `hsla(${hue+30}, 80%, 50%, ${audioEnergy*0.5})`;
+          ctx.shadowBlur = audioEnergy * 10;
+        } else { ctx.shadowBlur = 0; }
+
+        ctx.beginPath();
+        ctx.moveTo(projected[s].x, projected[s].y);
+        ctx.lineTo(projected[e].x, projected[e].y);
+        ctx.stroke();
+      });
+      ctx.shadowBlur = 0;
+
+      // Draw vertices
+      projected.forEach((p, i) => {
+        const depth = rotated[i].t;
+        const bandIdx = i % 21;
+        const react = isPlaying ? (audio.bands[bandIdx] || 0) : 0;
+        const sz = 1 + Math.abs(depth) * 1.5 + react * 3;
+        const vHue = hue + depth * 30;
+        const vLight = 35 + react * 30 + Math.abs(depth) * 10;
+        ctx.fillStyle = `hsl(${vHue}, ${satBase+10}%, ${vLight}%)`;
+
+        if (isPlaying && react > 0.4) {
+          ctx.shadowColor = state.color;
+          ctx.shadowBlur = react * 8;
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, sz, 0, Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      // Center label
+      ctx.fillStyle = state.color;
+      ctx.globalAlpha = 0.7;
+      ctx.font = 'bold 11px Monaco, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${state.name.toUpperCase()} — ${pitch.note} @ ${pitch.frequency.toFixed(1)} Hz — Day ${simTime.toFixed(1)}`, cx, canvas.height - 12);
+      ctx.globalAlpha = 1;
+
+      // ===== UPDATE UI =====
+      document.getElementById('pipeInput').textContent = `128 vertices @ ${inputFreq} Hz`;
+      document.getElementById('pipeProcess').textContent = `State ${stateIdx} — ${state.name} | Phase ${uft.phase.toFixed(3)}`;
+      document.getElementById('pipeOutput').textContent = `${pitch.note} @ ${pitch.frequency.toFixed(1)} Hz | Coherency ${coherencyCalc(uft)}%`;
+
+      document.getElementById('noteDisplay').textContent = pitch.note;
+      document.getElementById('noteDisplay').style.color = state.color;
+      document.getElementById('noteFreq').textContent = pitch.frequency.toFixed(1) + ' Hz';
+      document.getElementById('noteState').textContent = `${state.name} (${state.phase})`;
+      document.getElementById('notePhase').textContent = state.phase;
+      document.getElementById('noteSpiral').textContent = uft.spiral.magnitude.toFixed(3);
+
+      document.getElementById('dayVal').textContent = simTime.toFixed(1);
+      document.getElementById('spiralMag').textContent = uft.spiral.magnitude.toFixed(3);
+      document.getElementById('coherency').textContent = coherencyCalc(uft) + '%';
+      document.getElementById('tempoVal').textContent = uft.tempo;
+      document.getElementById('harmonicsVal').textContent = uft.harmonics;
+      document.getElementById('dynamicsVal').textContent = uft.dynamics.toFixed(2);
+
+      document.getElementById('torusPos').textContent = `u=${uft.torus.u.toFixed(2)} v=${uft.torus.v.toFixed(2)} r=${uft.torus.r.toFixed(3)}`;
+
+      // Active planes
+      const activePlanes = PLANE_NAMES.filter((_, i) => {
+        const dist = Math.abs(i - stateIdx);
+        return dist <= 2 || dist >= 19;
+      });
+      document.getElementById('activePlanes').textContent = activePlanes.join(' ') + ` (+${21-activePlanes.length} slow)`;
+
+      document.getElementById('audioSync').textContent = isPlaying ?
+        `${uft.harmonics} harmonics | ${uft.tempo} BPM | Energy ${(audioEnergy*100).toFixed(0)}%` :
+        'Press PLAY for audio sync';
+
+      // Update state strip
+      document.querySelectorAll('#cosmicStrip .cs').forEach((el, i) => {
+        el.classList.toggle('active', i === stateIdx);
+        if (isPlaying) el.style.opacity = 0.3 + (audio.bands[i]||0) * 0.7;
+      });
+
+      // Update note strip
+      document.querySelectorAll('#noteStrip .state-cell').forEach((el, i) => {
+        el.classList.toggle('active', i === pitch.noteIndex);
+      });
+
+      animId = requestAnimationFrame(animate);
+    }
+
+    function coherencyCalc(uft) {
+      const phiRatio = (uft.spiral.magnitude / PHI) % 1;
+      const proximity = 1 - Math.abs(phiRatio - 0.618);
+      const stateBalance = uft.dynamics;
+      return Math.round((proximity * 0.6 + stateBalance * 0.4) * 100);
+    }
+
+    // ===== INIT UI =====
+    function initUI() {
+      // 21 cosmic state dots
+      const strip = document.getElementById('cosmicStrip');
+      STATES_21.forEach((s, i) => {
+        const el = document.createElement('div');
+        el.className = 'cs';
+        el.style.background = s.color;
+        el.style.color = s.color;
+        el.textContent = i;
+        el.title = `${s.name} (${s.phase}) — ${s.quality}`;
+        strip.appendChild(el);
+      });
+
+      // 12 note cells
+      const ns = document.getElementById('noteStrip');
+      NOTE_NAMES.forEach((n, i) => {
+        const el = document.createElement('div');
+        el.className = 'state-cell';
+        el.style.background = `hsl(${(i/12)*360}, 50%, 20%)`;
+        el.textContent = n;
+        ns.appendChild(el);
+      });
+
+      // State → 7D plane mapping table
+      const st = document.getElementById('stateTable');
+      STATES_21.forEach((s, i) => {
+        const planes = PLANE_NAMES.slice(i, i+3).concat(i >= 19 ? PLANE_NAMES.slice(0, i-18) : []);
+        const rate = s.phase === 'Peak' ? 'Fast' : s.phase === 'Transform' ? 'Slow' : 'Medium';
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="color:${s.color};">${i}</td>
+          <td style="color:${s.color};font-weight:bold;">${s.name}</td>
+          <td style="font-size:9px;">${planes.join(', ')}</td>
+          <td>${rate}</td>
+          <td><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${s.color};"></span></td>
+        `;
+        st.appendChild(row);
+      });
+
+      // 12 note → harmonic table
+      const nt = document.getElementById('noteTable');
+      const waves = ['sine','triangle','square','sawtooth'];
+      const dims = ['X','Y','Z','W','V','U','T','X+Y','Z+W','V+U','T+X','Y+Z'];
+      PROTO_MAP.forEach((p, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-weight:bold;color:hsl(${(i/12)*360},60%,60%);">${p.note}</td>
+          <td>${p.freq.toFixed(1)} Hz</td>
+          <td style="color:#c4a000;">${p.word}</td>
+          <td>${waves[i%4]}</td>
+          <td>${dims[i]}</td>
+        `;
+        nt.appendChild(row);
+      });
+
+      document.getElementById('timeSpeed').addEventListener('input', function() {
+        document.getElementById('timeSpeedLbl').textContent = this.value;
+      });
+    }
+
+    // ===== BOOT =====
+    initUI();
+    animate();
+  </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UFT Music Toys</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Monaco', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%);
+      color: #e8f4f8;
+      padding: 60px 20px;
+      min-height: 100vh;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    
+    h1 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #1abc9c, #f39c12, #8e44ad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 40px;
+    }
+    
+    .toys-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    
+    .toy-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      transition: all 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .toy-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .toy-emoji {
+      font-size: 48px;
+    }
+    
+    .toy-name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .toy-description {
+      font-size: 12px;
+      color: #aaa;
+      flex: 1;
+    }
+    
+    .toy-link {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .toy-card:hover .toy-link {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .info-section {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 25px;
+      margin-top: 30px;
+    }
+    
+    .info-section h2 {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .info-content {
+      font-size: 12px;
+      line-height: 1.8;
+      color: #aaa;
+    }
+    
+    .proto-words {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .proto-word-badge {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 8px;
+      text-align: center;
+      font-size: 11px;
+    }
+    
+    .proto-word-badge .word { font-weight: bold; font-size: 16px; }
+    .proto-word-badge .freq { color: #888; font-size: 9px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎵 UFT Music Toys</h1>
+    <p class="subtitle">Simple, shareable cosmic frequency demonstrations</p>
+    
+    <div class="toys-grid">
+      <a href="1-proto-word-sound-gallery.html" class="toy-card">
+        <div class="toy-emoji">🎵</div>
+        <div class="toy-name">Proto-Word Sound Gallery</div>
+        <div class="toy-description">
+          Click any proto-word to hear its cosmic frequency in real-time
+        </div>
+        <div class="toy-link">→ Open</div>
+      </a>
+      
+      <a href="2-frequency-converter.html" class="toy-card">
+        <div class="toy-emoji">🎼</div>
+        <div class="toy-name">Frequency Converter</div>
+        <div class="toy-description">
+          Input any Hz → find the closest proto-word and cosmic association
+        </div>
+        <div class="toy-link">→ Open</div>
+      </a>
+      
+      <a href="3-cymatic-geometry-player.html" class="toy-card">
+        <div class="toy-emoji">🌊</div>
+        <div class="toy-name">Cymatic Geometry Player</div>
+        <div class="toy-description">
+          Visualize the animated cosmic geometry of each proto-word
+        </div>
+        <div class="toy-link">→ Open</div>
+      </a>
+      
+      <a href="4-medical-biometric-demo.html" class="toy-card">
+        <div class="toy-emoji">🫀</div>
+        <div class="toy-name">Medical Biometric Demo</div>
+        <div class="toy-description">
+          Input vital signs → UFT v4.1 analysis → therapeutic frequency recommendation with cosmic visualization
+        </div>
+        <div class="toy-link">→ Open</div>
+      </a>
+    </div>
+    
+    <div class="info-section">
+      <h2>Proto-Words Reference</h2>
+      <div class="info-content">
+        9 frequencies that resonate with cosmic cycles. Each has a unique geometric pattern (cymatic geometry) and planetary association.
+      </div>
+      <div class="proto-words">
+        <div class="proto-word-badge"><div class="word">AH</div><div class="freq">210.42 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">SA</div><div class="freq">222.93 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">LA</div><div class="freq">236.19 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">RA</div><div class="freq">250.23 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">DA</div><div class="freq">265.11 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">HA</div><div class="freq">280.88 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">NA</div><div class="freq">297.58 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">OM</div><div class="freq">334.02 Hz</div></div>
+        <div class="proto-word-badge"><div class="word">TAO</div><div class="freq">420.84 Hz</div></div>
+      </div>
+    </div>
+    
+    <div class="info-section">
+      <h2>How to Use</h2>
+      <div class="info-content">
+        <strong>No installation needed.</strong> All toys are standalone HTML files that run in any modern web browser.
+        <br><br>
+        <strong>Features:</strong> Real-time Web Audio synthesis, interactive visualizations, instant frequency mapping.
+        <br><br>
+        <strong>No dependencies:</strong> Pure vanilla JavaScript. No frameworks, no build tools, no external data.
+        <br><br>
+        <strong>Shareable:</strong> All code and data are public. No sensitive keys or private information.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

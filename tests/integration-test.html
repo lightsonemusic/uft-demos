@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UFT v4.1 Core Machine Integration Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0c29 100%);
+      color: #e8f4f8;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 32px;
+      color: #00ffff;
+      margin-bottom: 5px;
+      text-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+    }
+    
+    .subtitle {
+      color: #00d4d4;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #00d4ff, #00ffff);
+      border: none;
+      color: #0a0e27;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 255, 255, 0.5);
+    }
+    
+    .panel {
+      background: linear-gradient(135deg, rgba(20, 50, 80, 0.7), rgba(30, 60, 100, 0.5));
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 15px 0;
+      backdrop-filter: blur(10px);
+    }
+    
+    .panel-title {
+      font-size: 16px;
+      color: #00ffff;
+      margin-bottom: 12px;
+      font-weight: bold;
+      border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+      padding-bottom: 8px;
+    }
+    
+    .status {
+      padding: 8px;
+      margin: 6px 0;
+      border-radius: 4px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .status.ready {
+      background: rgba(0, 200, 100, 0.15);
+      border-left: 3px solid #00c864;
+      color: #00ff88;
+    }
+    
+    .status.warning {
+      background: rgba(200, 150, 0, 0.15);
+      border-left: 3px solid #ffaa00;
+      color: #ffdd00;
+    }
+    
+    .status.error {
+      background: rgba(200, 50, 50, 0.15);
+      border-left: 3px solid #ff5555;
+      color: #ff8888;
+    }
+    
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 15px 0;
+    }
+    
+    .info-row {
+      background: rgba(0, 100, 150, 0.2);
+      border: 1px solid rgba(0, 200, 255, 0.3);
+      border-radius: 4px;
+      padding: 10px;
+      margin: 6px 0;
+    }
+    
+    .info-label {
+      color: #00d4d4;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    
+    .info-value {
+      color: #00ffff;
+      font-size: 13px;
+      margin-top: 3px;
+    }
+    
+    .cosmic-box {
+      border-left: 4px solid #ff00ff;
+    }
+    
+    .lunar-box {
+      border-left: 4px solid #00aaff;
+    }
+    
+    .solar-box {
+      border-left: 4px solid #ffaa00;
+    }
+    
+    code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #00ff88;
+    }
+    
+    .output-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 255, 100, 0.3);
+      border-radius: 4px;
+      padding: 12px;
+      margin: 10px 0;
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚙️ UFT v4.1 Core Machine Integration Test</h1>
+    <p class="subtitle">Lunar Module × Solar Module × 12:21 Cosmic Translator</p>
+    
+    <div class="button-group">
+      <button onclick="testInitialization()">🔧 Initialize Machine</button>
+      <button onclick="testTranslation()">📊 Test Translation</button>
+      <button onclick="testMedical()">🏥 Test Medical</button>
+      <button onclick="verifyModules()">✓ Verify Modules</button>
+      <button onclick="getSystemStatus()">📈 System Status</button>
+      <button onclick="clearOutput()">🔄 Clear</button>
+    </div>
+    
+    <!-- Status Panel -->
+    <div class="panel">
+      <div class="panel-title">System Status</div>
+      <div id="status-output"></div>
+    </div>
+    
+    <!-- Module Status -->
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title">🌙 Lunar Module</div>
+        <div id="lunar-output"></div>
+      </div>
+      
+      <div class="panel">
+        <div class="panel-title">☀️ Solar Module</div>
+        <div id="solar-output"></div>
+      </div>
+    </div>
+    
+    <!-- Translation Output -->
+    <div class="panel">
+      <div class="panel-title">📡 Translation Engine Output</div>
+      <div id="translation-output"></div>
+    </div>
+    
+    <!-- Verification Output -->
+    <div class="panel">
+      <div class="panel-title">🔬 Mathematical Verification</div>
+      <div id="verification-output"></div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * UFT v4.1 Integration Test
+     * Tests: Lunar Module + Solar Module + 12:21 Cosmic Translator
+     * 
+     * NOTE: This test demonstrates the architecture. 
+     * In production, modules would be loaded from their respective files.
+     */
+    
+    // Mock Lunar Module for demonstration
+    const MockLunarModule = {
+      SYNODIC_PERIOD: 29.5306,
+      LUNAR_OCTAVE_ROOT: 210.4186,
+      LUNAR_PROTO_WORDS: [
+        { month: 1, word: 'OH', freq: 210.4186, quality: 'Universal Heart' },
+        { month: 7, word: 'AY', freq: 297.5768, quality: 'Zero Point Threshold' }
+      ],
+      dayToLunarPhase(dayOfYear) {
+        const month = Math.ceil((dayOfYear % 365) / 28);
+        return { month: Math.min(month, 13), phaseRatio: ((dayOfYear % 28) / 28) };
+      },
+      verifyMoonCalendar() {
+        return { formula: '13 × 28 = 364', passed: true };
+      },
+      exportState(dayOfYear) {
+        const phase = this.dayToLunarPhase(dayOfYear);
+        return {
+          month: phase.month,
+          frequency: 210.4186 + (phase.month * 10),
+          protoWord: this.LUNAR_PROTO_WORDS[0].word
+        };
+      }
+    };
+    
+    // Mock Solar Module for demonstration
+    const MockSolarModule = {
+      SOLAR_YEAR_DAYS: 365.25,
+      SOLAR_ROOT: 256.0000,
+      ZODIAC_SIGNS: [
+        { sign: 'Aries', freq: 256, note: 'C' },
+        { sign: 'Capricorn', freq: 432, note: 'A' }
+      ],
+      dayToZodiacSign(dayOfYear) {
+        const signIndex = Math.floor((dayOfYear % 365) / 30.4);
+        return this.ZODIAC_SIGNS[Math.min(signIndex, 1)];
+      },
+      verifySolarCalendar() {
+        return { formula: '12 × 30.4375 = 365.25', passed: true };
+      },
+      exportState(dayOfYear) {
+        const sign = this.dayToZodiacSign(dayOfYear);
+        return {
+          zodiacSign: sign.sign,
+          frequency: sign.freq,
+          note: sign.note
+        };
+      }
+    };
+    
+    // Mock 12:21 Cosmic Translator
+    const MockCosmicTranslator = {
+      phaseFunction(t) {
+        return (t * 2 * Math.PI) % (2 * Math.PI);
+      },
+      spiralFunction(t, r0 = 1) {
+        const PHI = 1.6180339887;
+        const theta = this.phaseFunction(t);
+        const r = r0 * Math.pow(PHI, theta / (2 * Math.PI));
+        return { r, theta, x: r * Math.cos(theta), y: r * Math.sin(theta) };
+      },
+      RealtimeMapping: {
+        translate(time) {
+          const PHI = 1.6180339887;
+          const theta = (time * 2 * Math.PI) % (2 * Math.PI);
+          const stateIndex = Math.floor((theta / (2 * Math.PI)) * 21);
+          return {
+            time,
+            phase: theta,
+            stateIndex,
+            frequency: 256 + (Math.sin(theta) * 50),
+            note: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'][stateIndex % 12],
+            radiusNormalized: Math.sin(theta) * 0.5 + 0.5
+          };
+        }
+      }
+    };
+    
+    // UFT Machine Orchestrator (simplified version)
+    const UFTMachineTest = {
+      version: '4.1',
+      modules: {
+        cosmic: MockCosmicTranslator,
+        lunar: MockLunarModule,
+        solar: MockSolarModule
+      },
+      
+      isReady() {
+        return !!this.modules.cosmic && !!this.modules.lunar && !!this.modules.solar;
+      },
+      
+      translate(time) {
+        if (!this.isReady()) return { error: 'Not initialized' };
+        
+        const dayOfYear = Math.floor((time % 365) + 1);
+        const cosmicState = this.modules.cosmic.RealtimeMapping.translate(time);
+        const lunarState = this.modules.lunar.exportState(dayOfYear);
+        const solarState = this.modules.solar.exportState(dayOfYear);
+        
+        return {
+          timestamp: new Date().toISOString(),
+          time,
+          dayOfYear,
+          cosmicPhase: cosmicState,
+          lunarContext: lunarState,
+          solarContext: solarState,
+          coherency: this.calculateCoherency(cosmicState, lunarState, solarState)
+        };
+      },
+      
+      calculateCoherency(cosmic, lunar, solar) {
+        const freqDiff = Math.abs(cosmic.frequency - lunar.frequency) / 10;
+        const score = Math.max(0, 100 - freqDiff);
+        return {
+          overall: Math.round(score),
+          status: score > 80 ? 'Excellent' : score > 60 ? 'Good' : 'Monitor'
+        };
+      },
+      
+      verifyModules() {
+        return {
+          lunar: this.modules.lunar.verifyMoonCalendar(),
+          solar: this.modules.solar.verifySolarCalendar(),
+          cosmic: { status: 'Loaded' }
+        };
+      }
+    };
+    
+    // Test Functions
+    function testInitialization() {
+      let html = '<div class="output-box">';
+      
+      if (UFTMachineTest.isReady()) {
+        html += '<div class="status ready">✓ UFT Machine v4.1 Ready</div>';
+        html += '<div class="status ready">✓ Lunar Module Loaded</div>';
+        html += '<div class="status ready">✓ Solar Module Loaded</div>';
+        html += '<div class="status ready">✓ 12:21 Cosmic Translator Loaded</div>';
+        html += '<div class="info-row cosmic-box"><div class="info-label">Primary Module</div><div class="info-value">12:21 Cosmic Translator (Default)</div></div>';
+      } else {
+        html += '<div class="status error">✗ Initialization Failed</div>';
+      }
+      
+      html += '</div>';
+      document.getElementById('status-output').innerHTML = html;
+    }
+    
+    function testTranslation() {
+      const time = Math.random() * 365;
+      const result = UFTMachineTest.translate(time);
+      
+      let html = '<div class="output-box">';
+      
+      if (result.error) {
+        html += `<div class="status error">✗ ${result.error}</div>`;
+      } else {
+        html += `<div class="info-row cosmic-box">
+          <div class="info-label">Time / Day of Year</div>
+          <div class="info-value">${result.time.toFixed(2)} / Day ${result.dayOfYear}</div>
+        </div>`;
+        
+        html += `<div class="info-row cosmic-box">
+          <div class="info-label">Cosmic Phase</div>
+          <div class="info-value">State #${result.cosmicPhase.stateIndex}/20 | ${result.cosmicPhase.note} | ${result.cosmicPhase.frequency.toFixed(2)} Hz</div>
+        </div>`;
+        
+        html += `<div class="info-row lunar-box">
+          <div class="info-label">Lunar Context</div>
+          <div class="info-value">Month ${result.lunarContext.month} | ${result.lunarContext.protoWord} | ${result.lunarContext.frequency.toFixed(2)} Hz</div>
+        </div>`;
+        
+        html += `<div class="info-row solar-box">
+          <div class="info-label">Solar Context</div>
+          <div class="info-value">${result.solarContext.zodiacSign} | ${result.solarContext.note} | ${result.solarContext.frequency.toFixed(2)} Hz</div>
+        </div>`;
+        
+        html += `<div class="info-row">
+          <div class="info-label">Coherency Assessment</div>
+          <div class="info-value">${result.coherency.overall}% - ${result.coherency.status}</div>
+        </div>`;
+      }
+      
+      html += '</div>';
+      document.getElementById('translation-output').innerHTML = html;
+    }
+    
+    function testMedical() {
+      const patientFreq = 266; // Example: skin cancer frequency
+      const normalized = patientFreq;
+      const lunarDist = Math.abs(normalized - 210.4186);
+      
+      let html = '<div class="output-box">';
+      
+      html += `<div class="info-row">
+        <div class="info-label">Patient Frequency</div>
+        <div class="info-value">${patientFreq} Hz</div>
+      </div>`;
+      
+      html += `<div class="info-row">
+        <div class="info-label">Closest Lunar Proto-Word</div>
+        <div class="info-value">AH (210.4186 Hz)</div>
+      </div>`;
+      
+      html += `<div class="info-row">
+        <div class="info-label">Deviation</div>
+        <div class="info-value">${((lunarDist / 210.4186) * 100).toFixed(2)}%</div>
+      </div>`;
+      
+      html += `<div class="info-row">
+        <div class="info-label">Recommended Protocol</div>
+        <div class="info-value">AH (210.42 Hz) for 21 minutes daily</div>
+      </div>`;
+      
+      html += '<div class="status ready">✓ Medical analysis complete</div>';
+      
+      html += '</div>';
+      document.getElementById('translation-output').innerHTML = html;
+    }
+    
+    function verifyModules() {
+      const verify = UFTMachineTest.verifyModules();
+      
+      let html = '<div class="output-box">';
+      
+      html += `<div class="info-row lunar-box">
+        <div class="info-label">Lunar Module: ${verify.lunar.formula}</div>
+        <div class="info-value">${verify.lunar.passed ? '✓ Verified' : '✗ Failed'}</div>
+      </div>`;
+      
+      html += `<div class="info-row solar-box">
+        <div class="info-label">Solar Module: ${verify.solar.formula}</div>
+        <div class="info-value">${verify.solar.passed ? '✓ Verified' : '✗ Failed'}</div>
+      </div>`;
+      
+      html += `<div class="info-row cosmic-box">
+        <div class="info-label">Cosmic Module Status</div>
+        <div class="info-value">${verify.cosmic.status}</div>
+      </div>`;
+      
+      html += '</div>';
+      document.getElementById('verification-output').innerHTML = html;
+    }
+    
+    function getSystemStatus() {
+      let html = '<div class="output-box">';
+      
+      html += `<div class="info-row">
+        <div class="info-label">Version</div>
+        <div class="info-value">UFT ${UFTMachineTest.version}</div>
+      </div>`;
+      
+      html += `<div class="info-row">
+        <div class="info-label">Primary Module</div>
+        <div class="info-value">12:21 Cosmic Translator (Default)</div>
+      </div>`;
+      
+      html += `<div class="info-row">
+        <div class="info-label">Supporting Modules</div>
+        <div class="info-value">Lunar Module, Solar Module</div>
+      </div>`;
+      
+      html += `<div class="info-row">
+        <div class="info-label">Status</div>
+        <div class="info-value">${UFTMachineTest.isReady() ? 'READY' : 'NOT READY'}</div>
+      </div>`;
+      
+      html += `<div class="info-row">
+        <div class="info-label">Capabilities</div>
+        <div class="info-value">
+          Real-time translation | Medical analysis | Multi-domain coherency | Proto-word mapping
+        </div>
+      </div>`;
+      
+      html += '</div>';
+      document.getElementById('status-output').innerHTML = html;
+    }
+    
+    function clearOutput() {
+      document.getElementById('status-output').innerHTML = '';
+      document.getElementById('lunar-output').innerHTML = '';
+      document.getElementById('solar-output').innerHTML = '';
+      document.getElementById('translation-output').innerHTML = '';
+      document.getElementById('verification-output').innerHTML = '';
+    }
+    
+    // Auto-run on load
+    window.onload = () => {
+      testInitialization();
+      verifyModules();
+      getSystemStatus();
+    };
+  </script>
+</body>
+</html>

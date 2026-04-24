@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UFT Test 3 — Guitar Bm Chord → UFT Core Engine → Ogham Proto-Words</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0c29 100%);
+      color: #e8f4f8;
+      padding: 15px;
+      min-height: 100vh;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 {
+      font-size: 26px;
+      text-align: center;
+      margin-bottom: 4px;
+      background: linear-gradient(90deg, #4a7c24, #c4a000, #8e44ad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle { text-align: center; color: #888; font-size: 11px; margin-bottom: 15px; }
+    .subtitle span { font-weight: bold; }
+    .subtitle .inp { color: #4a7c24; }
+    .subtitle .proc { color: #c4a000; }
+    .subtitle .out { color: #8e44ad; }
+
+    /* Pipeline */
+    .pipeline {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 0; align-items: center; margin: 10px 0;
+    }
+    .pipe-stage { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px 14px; text-align: center; }
+    .pipe-stage.input { border: 2px solid #2d5016; }
+    .pipe-stage.process { border: 2px solid #c4a000; }
+    .pipe-stage.output { border: 2px solid #8e44ad; }
+    .pipe-stage h3 { font-size: 11px; margin-bottom: 4px; }
+    .pipe-stage.input h3 { color: #4a7c24; }
+    .pipe-stage.process h3 { color: #c4a000; }
+    .pipe-stage.output h3 { color: #8e44ad; }
+    .pipe-stage p { font-size: 10px; color: #aaa; }
+    .pipe-arrow { font-size: 22px; color: #555; text-align: center; }
+
+    /* Main grid */
+    .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+    .panel {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .panel h2 { font-size: 12px; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Guitar strings */
+    .string-row { display: flex; gap: 6px; margin: 4px 0; align-items: center; }
+    .string-label { width: 28px; font-size: 10px; color: #888; text-align: right; }
+    .string-bar { flex: 1; height: 22px; border-radius: 4px; position: relative; display: flex; align-items: center; padding: 0 8px; }
+    .string-bar .note { font-size: 11px; font-weight: bold; }
+    .string-bar .hz { font-size: 9px; color: rgba(255,255,255,0.6); margin-left: auto; }
+    .string-muted { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); }
+    .string-muted .note { color: #444; }
+
+    /* Ogham output cards */
+    .ogham-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .ogham-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .ogham-card .ogham-name { font-size: 22px; font-weight: bold; margin-bottom: 2px; }
+    .ogham-card .tree-name { font-size: 13px; color: #aaa; margin-bottom: 6px; }
+    .ogham-card .proto-word { font-size: 28px; font-weight: bold; margin: 6px 0; letter-spacing: 2px; }
+    .ogham-card .details { font-size: 9px; color: #777; line-height: 1.6; }
+    .ogham-card .details span { display: block; }
+
+    /* Canvas */
+    canvas { width: 100%; height: 350px; border-radius: 8px; background: #050510; }
+
+    /* Data table */
+    table { width: 100%; border-collapse: collapse; font-size: 10px; }
+    th { color: #888; text-align: left; padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    td { padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+
+    /* Chord summary */
+    .chord-summary {
+      text-align: center; padding: 10px;
+      background: rgba(142, 68, 173, 0.08);
+      border: 1px solid rgba(142, 68, 173, 0.2);
+      border-radius: 8px; margin-top: 12px;
+    }
+    .chord-summary .phrase { font-size: 32px; font-weight: bold; letter-spacing: 6px; margin: 8px 0; }
+    .chord-summary .meaning { font-size: 12px; color: #aaa; }
+
+    /* Play button */
+    .play-btn {
+      display: inline-block; padding: 8px 20px; margin: 8px 4px;
+      border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;
+      border: 1px solid; background: rgba(255,255,255,0.05);
+    }
+    .play-btn:hover { background: rgba(255,255,255,0.1); }
+    .controls { text-align: center; margin: 8px 0; }
+
+    /* Full width */
+    .full-width { grid-column: 1 / -1; }
+
+    /* Status */
+    .status-bar {
+      display: flex; gap: 15px; justify-content: center;
+      font-size: 10px; color: #666; margin: 6px 0;
+    }
+    .status-bar .ok { color: #4a7c24; }
+    .status-bar .module { color: #c4a000; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎸 UFT TEST 3 — Guitar Bm Chord → Ogham Proto-Words</h1>
+    <p class="subtitle">
+      <span class="inp">INPUT: Guitar Bm chord (B, D, F#)</span> →
+      <span class="proc">PROCESS: UFT Core Engine v4.1</span> →
+      <span class="out">OUTPUT: Ogham Tree Alphabet + Proto-Words</span>
+    </p>
+
+    <div class="status-bar">
+      <span class="ok">✓ CosmicTranslator</span>
+      <span class="ok">✓ MusicEngine</span>
+      <span class="ok">✓ ProtoWords</span>
+      <span class="ok">✓ States21</span>
+      <span class="module">UFT v4.1</span>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="pipeline">
+      <div class="pipe-stage input">
+        <h3>🎸 INPUT</h3>
+        <p id="pipeInput">Bm chord: B2 F#3 B3 D4 F#4</p>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage process">
+        <h3>⚙ UFT CORE ENGINE</h3>
+        <p id="pipeProcess">phaseFunction → spiralFunction → segmentationFunction → phaseToPitch</p>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage output">
+        <h3>🌳 OGHAM OUTPUT</h3>
+        <p id="pipeOutput">Ruis (UH) + Nion (LA) + Duir (NA)</p>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <!-- Guitar Input -->
+      <div class="panel">
+        <h2>🎸 Input: Guitar Bm Chord (x24432)</h2>
+        <div id="guitarStrings"></div>
+        <div class="controls">
+          <button class="play-btn" id="playBtn" onclick="playChord()" style="color:#4a7c24;border-color:#4a7c24;">▶ PLAY Bm CHORD</button>
+          <button class="play-btn" id="stopBtn" onclick="stopChord()" style="color:#e74c3c;border-color:#e74c3c;display:none;">■ STOP</button>
+        </div>
+      </div>
+
+      <!-- Ogham Output -->
+      <div class="panel">
+        <h2>🌳 Output: Ogham Proto-Words</h2>
+        <div class="ogham-cards" id="oghamCards"></div>
+      </div>
+
+      <!-- Cymatic Canvas -->
+      <div class="panel full-width">
+        <h2>🔊 Cymatic Geometry — UFT Visual Engine</h2>
+        <canvas id="mainCanvas"></canvas>
+      </div>
+
+      <!-- UFT Translation Table -->
+      <div class="panel">
+        <h2>⚙ UFT Translation Pipeline (per note)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Guitar</th><th>Hz (std)</th><th>UFT Hz</th><th>Note</th>
+              <th>Phase θ</th><th>Spiral r</th><th>State</th>
+              <th>Ogham</th><th>Tree</th><th>Proto</th><th>Body</th><th>Sap</th>
+            </tr>
+          </thead>
+          <tbody id="translationTable"></tbody>
+        </table>
+      </div>
+
+      <!-- Fibonacci / Phi -->
+      <div class="panel">
+        <h2>φ Fibonacci · Phi Ratios · Harmonic Analysis</h2>
+        <table>
+          <thead>
+            <tr><th>Note</th><th>Fib#</th><th>Phi Ratio</th><th>Consonance</th><th>Interval from Root</th><th>Quality</th></tr>
+          </thead>
+          <tbody id="fibTable"></tbody>
+        </table>
+      </div>
+
+      <!-- Proto-Word Phrase -->
+      <div class="chord-summary full-width">
+        <div style="font-size:11px;color:#888;">THE CHORD SPEAKS:</div>
+        <div class="phrase" id="chordPhrase"></div>
+        <div class="meaning" id="chordMeaning"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { CosmicTranslator, States21, MusicEngine, ProtoWords } from '../modules/12-21/cosmic-translator-12-21.js';
+
+    // ===========================================================================
+    // UFT CORE ENGINE IMPORTS — RUNNING ACTUAL MODULE CODE
+    // Imports: modules/12-21/cosmic-translator-12-21.js
+    // ===========================================================================
+    // UFT CORE ENGINE IMPORTS — RUNNING ACTUAL MODULE CODE
+    // Imports: modules/12-21/cosmic-translator-12-21.js
+    // ===========================================================================
+
+    // Reference data (from docs/REFERENCE.md Section IV)
+    const NIKKAL_DICTIONARY = [
+      { p:1,  note:'C',  hz:210.42, fib:1,   tree:'Birch',    ogham:'Beith', sap:'Rising',     proto:'AH',  body:'Root' },
+      { p:2,  note:'C#', hz:222.93, fib:2,   tree:'Rowan',    ogham:'Luis',  sap:'Rising',     proto:'SA',  body:'Throat' },
+      { p:3,  note:'D',  hz:236.19, fib:3,   tree:'Ash',      ogham:'Nion',  sap:'Rising',     proto:'LA',  body:'Hands & lungs' },
+      { p:4,  note:'D#', hz:250.23, fib:5,   tree:'Alder',    ogham:'Fearn', sap:'Peak',       proto:'RA',  body:'Stomach' },
+      { p:5,  note:'E',  hz:265.11, fib:8,   tree:'Willow',   ogham:'Sail',  sap:'Peak',       proto:'DA',  body:'Solar plexus' },
+      { p:6,  note:'F',  hz:280.88, fib:13,  tree:'Hawthorn', ogham:'Huath', sap:'Peak',       proto:'HA',  body:'Diaphragm' },
+      { p:7,  note:'F#', hz:297.58, fib:21,  tree:'Oak',      ogham:'Duir',  sap:'Zero Point', proto:'NA',  body:'Heart' },
+      { p:8,  note:'G',  hz:315.27, fib:34,  tree:'Holly',    ogham:'Tinne', sap:'Descending', proto:'KA',  body:'Spine' },
+      { p:9,  note:'G#', hz:334.02, fib:55,  tree:'Hazel',    ogham:'Coll',  sap:'Descending', proto:'OM',  body:'The wound as portal' },
+      { p:10, note:'A',  hz:353.88, fib:89,  tree:'Vine',     ogham:'Muin',  sap:'Descending', proto:'AH',  body:'The blood' },
+      { p:11, note:'A#', hz:374.92, fib:144, tree:'Ivy',      ogham:'Gort',  sap:'Dormant',    proto:'EE',  body:'Deep interior' },
+      { p:12, note:'B',  hz:397.22, fib:233, tree:'Elder',    ogham:'Ruis',  sap:'Dormant',    proto:'UH',  body:'The compost' },
+      { p:13, note:"C'", hz:420.84, fib:377, tree:'Yew',      ogham:'Ioho',  sap:'Awakening',  proto:'TAO', body:'The full system' }
+    ];
+
+    // Lookup by note name
+    function getNikkalByNote(noteName) {
+      return NIKKAL_DICTIONARY.find(n => n.note === noteName) || null;
+    }
+
+    // --- E: REALTIME MAPPING (from RealtimeMapping.translate) ---
+    function translateFrequency(inputHz) {
+      // Normalize to UFT lunar octave range [210.42 — 420.84]
+      let normalized = inputHz;
+      while (normalized > 420.84) normalized /= 2;
+      while (normalized < 210.42) normalized *= 2;
+
+      // Find which note this maps to (closest in 12-tone Moon tuning)
+      let closestNote = NIKKAL_DICTIONARY[0], minDist = Infinity;
+      for (const n of NIKKAL_DICTIONARY) {
+        const dist = Math.abs(normalized - n.hz);
+        if (dist < minDist) { minDist = dist; closestNote = n; }
+      }
+
+      // Use UFT phase math: derive the time_days that produces this note
+      // noteIndex maps to phase = (noteIndex / 12) × 2π
+      const noteIndex = closestNote.p - 1; // 0-based
+      const phase = (noteIndex / 12) * 2 * Math.PI;
+
+      // Equivalent time in days
+      const t_days = (phase * CosmicTranslator.T_L) / (2 * Math.PI);
+
+      // Run through actual UFT pipeline
+      const spiral = CosmicTranslator.spiralFunction(t_days);
+      const stateIdx = CosmicTranslator.segmentationFunction(t_days);
+      const state = States21.getState(stateIdx);
+      const pitch = MusicEngine.phaseToPitch(phase);
+      const harmonics = MusicEngine.radiusToHarmonics(spiral.magnitude);
+      const dynamics = MusicEngine.stateToEnergy(stateIdx);
+      const protoWord = ProtoWords.getWordByFrequency(closestNote.hz);
+
+      return {
+        inputHz,
+        normalized,
+        nikkal: closestNote,
+        phase,
+        t_days,
+        spiral,
+        stateIdx,
+        state,
+        pitch,
+        harmonics,
+        dynamics,
+        protoWord
+      };
+    }
+
+    // ===========================================================================
+    // Bm CHORD DEFINITION — Standard guitar tuning (x24432)
+    // ===========================================================================
+    const BM_CHORD = {
+      name: 'Bm',
+      strings: [
+        { string: 6, name: 'E2', fret: 'x', hz: null,   note: null, muted: true },
+        { string: 5, name: 'A2', fret: 2,   hz: 246.94, note: 'B'  },
+        { string: 4, name: 'D3', fret: 4,   hz: 369.99, note: 'F#' },
+        { string: 3, name: 'G3', fret: 4,   hz: 246.94, note: 'B'  },
+        { string: 2, name: 'B3', fret: 3,   hz: 293.66, note: 'D'  },
+        { string: 1, name: 'E4', fret: 2,   hz: 369.99, note: 'F#' }
+      ],
+      // Unique pitch classes in the chord
+      uniqueNotes: ['B', 'D', 'F#']
+    };
+
+    // ===========================================================================
+    // AUDIO ENGINE
+    // ===========================================================================
+    let audioContext, oscillators = [], isPlaying = false;
+
+    function playChord() {
+      if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      stopChord();
+      isPlaying = true;
+      document.getElementById('stopBtn').style.display = 'inline-block';
+
+      const masterGain = audioContext.createGain();
+      masterGain.gain.setValueAtTime(0.15, audioContext.currentTime);
+      masterGain.connect(audioContext.destination);
+
+      // Play each string through UFT-derived parameters
+      BM_CHORD.strings.forEach(s => {
+        if (s.muted) return;
+        const uft = translateFrequency(s.hz);
+        const dynamics = uft.dynamics;
+
+        // Oscillator 1: sine at UFT lunar frequency
+        const osc1 = audioContext.createOscillator();
+        const gain1 = audioContext.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(uft.nikkal.hz, audioContext.currentTime);
+        gain1.gain.setValueAtTime(0, audioContext.currentTime);
+        gain1.gain.linearRampToValueAtTime(dynamics.volume * 0.5, audioContext.currentTime + dynamics.attack_ms / 1000);
+        gain1.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 3);
+        osc1.connect(gain1);
+        gain1.connect(masterGain);
+        osc1.start();
+        osc1.stop(audioContext.currentTime + 3);
+        oscillators.push(osc1);
+
+        // Oscillator 2: triangle at 2.01x (per UFT audio engine spec)
+        const osc2 = audioContext.createOscillator();
+        const gain2 = audioContext.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(uft.nikkal.hz * 2.01, audioContext.currentTime);
+        gain2.gain.setValueAtTime(0, audioContext.currentTime);
+        gain2.gain.linearRampToValueAtTime(dynamics.volume * 0.15, audioContext.currentTime + dynamics.attack_ms / 1000);
+        gain2.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 3);
+        osc2.connect(gain2);
+        gain2.connect(masterGain);
+        osc2.start();
+        osc2.stop(audioContext.currentTime + 3);
+        oscillators.push(osc2);
+      });
+    }
+
+    function stopChord() {
+      oscillators.forEach(o => { try { o.stop(); } catch(e) {} });
+      oscillators = [];
+      isPlaying = false;
+      document.getElementById('stopBtn').style.display = 'none';
+    }
+
+    // ===========================================================================
+    // CYMATIC VISUALIZATION
+    // ===========================================================================
+    let animId;
+
+    function drawCymatics() {
+      const canvas = document.getElementById('mainCanvas');
+      const ctx = canvas.getContext('2d');
+      const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+      if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
+
+      ctx.fillStyle = 'rgba(5, 5, 16, 0.08)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const t = Date.now() / 1000;
+      const cx = canvas.width / 2, cy = canvas.height / 2;
+      const translations = BM_CHORD.uniqueNotes.map(n => translateFrequency(getNikkalByNote(n).hz));
+
+      // Draw each note's cymatic geometry
+      translations.forEach((uft, idx) => {
+        const offsetX = (idx - 1) * (canvas.width / 3.5);
+        const nikkal = uft.nikkal;
+        const pcx = cx + offsetX, pcy = cy;
+        const complexity = ProtoWords.frequencyToComplexity(nikkal.hz);
+        const spiral = uft.spiral;
+        const color = uft.protoWord.color;
+        const isZP = uft.protoWord.isZeroPoint;
+
+        // Cymatic pattern based on geometry type
+        const geom = uft.protoWord.geometry;
+
+        // Outer ring — spiral magnitude
+        const ringR = 50 + spiral.magnitude * 25;
+        ctx.strokeStyle = color;
+        ctx.globalAlpha = 0.15;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.arc(pcx, pcy, ringR, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Draw geometry
+        ctx.globalAlpha = 0.5 + Math.sin(t * 2 + idx) * 0.2;
+        ctx.lineWidth = 1;
+
+        if (geom === 'twelve_fold_mandala') {
+          // B / Ruis — 12-fold mandala
+          for (let i = 0; i < 12; i++) {
+            const a1 = (i / 12) * Math.PI * 2 + t * 0.3;
+            const a2 = ((i + 1) / 12) * Math.PI * 2 + t * 0.3;
+            const r = ringR * 0.8;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(pcx, pcy);
+            ctx.lineTo(pcx + Math.cos(a1) * r, pcy + Math.sin(a1) * r);
+            ctx.stroke();
+            // Petal arcs
+            ctx.beginPath();
+            ctx.arc(pcx + Math.cos(a1) * r * 0.5, pcy + Math.sin(a1) * r * 0.5,
+                    r * 0.35, a1, a2);
+            ctx.stroke();
+          }
+        } else if (geom === 'three_petal_triangle') {
+          // D / Nion — 3-petal triangle (Venus / proportion / φ)
+          for (let i = 0; i < 3; i++) {
+            const a = (i / 3) * Math.PI * 2 + t * 0.5;
+            const r = ringR * 0.75;
+            const px = pcx + Math.cos(a) * r;
+            const py = pcy + Math.sin(a) * r;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(pcx + Math.cos(a) * r, pcy + Math.sin(a) * r);
+            ctx.lineTo(pcx + Math.cos(a + Math.PI*2/3) * r, pcy + Math.sin(a + Math.PI*2/3) * r);
+            ctx.stroke();
+            // Petal
+            ctx.beginPath();
+            ctx.arc(px, py, r * 0.5, a + Math.PI * 0.5, a + Math.PI * 1.5);
+            ctx.stroke();
+          }
+        } else if (geom === 'standing_wave_null') {
+          // F# / Duir — standing wave null (Zero Point)
+          const r = ringR * 0.8;
+          // Double helix approaching stillness
+          for (let i = 0; i < 60; i++) {
+            const a = (i / 60) * Math.PI * 2;
+            const wave1 = Math.sin(a * 21 + t * 1.5) * r * 0.4 * Math.cos(a);
+            const wave2 = -Math.sin(a * 21 + t * 1.5) * r * 0.4 * Math.cos(a);
+            const wx = pcx + Math.cos(a) * r * 0.6;
+            const wy1 = pcy + Math.sin(a) * r * 0.3 + wave1;
+            const wy2 = pcy + Math.sin(a) * r * 0.3 + wave2;
+            ctx.fillStyle = '#fff';
+            ctx.globalAlpha = 0.3 + Math.abs(Math.sin(a * 21)) * 0.5;
+            ctx.beginPath(); ctx.arc(wx, wy1, 1, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(wx, wy2, 1, 0, Math.PI * 2); ctx.fill();
+          }
+          // Zero point cross
+          if (isZP) {
+            ctx.strokeStyle = '#fff';
+            ctx.globalAlpha = 0.3 + Math.sin(t * 3) * 0.2;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(pcx - r*0.3, pcy); ctx.lineTo(pcx + r*0.3, pcy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(pcx, pcy - r*0.3); ctx.lineTo(pcx, pcy + r*0.3); ctx.stroke();
+          }
+        }
+
+        // Label
+        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = color;
+        ctx.font = 'bold 14px Monaco, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(uft.protoWord.word, pcx, pcy + ringR + 18);
+        ctx.font = '10px Monaco, monospace';
+        ctx.fillStyle = '#888';
+        ctx.fillText(`${nikkal.note} · ${nikkal.ogham} · ${nikkal.tree}`, pcx, pcy + ringR + 32);
+        ctx.fillText(`${nikkal.hz} Hz`, pcx, pcy + ringR + 44);
+      });
+
+      // PHI spiral connecting all three
+      ctx.globalAlpha = 0.06;
+      ctx.strokeStyle = '#c4a000';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      for (let i = 0; i < 200; i++) {
+        const a = (i / 200) * Math.PI * 6 + t * 0.2;
+        const r = Math.pow(CosmicTranslator.PHI, a / (2 * Math.PI)) * 8;
+        const x = cx + Math.cos(a) * r;
+        const y = cy + Math.sin(a) * r;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      animId = requestAnimationFrame(drawCymatics);
+    }
+
+    // ===========================================================================
+    // BUILD UI
+    // ===========================================================================
+    function buildUI() {
+      // Guitar strings
+      const strDiv = document.getElementById('guitarStrings');
+      const stringColors = ['#e74c3c','#f39c12','#c4a000','#4a7c24','#3498db','#8e44ad'];
+      BM_CHORD.strings.forEach((s, i) => {
+        const uft = s.muted ? null : translateFrequency(s.hz);
+        const row = document.createElement('div');
+        row.className = 'string-row';
+        const col = stringColors[i];
+        if (s.muted) {
+          row.innerHTML = `
+            <div class="string-label">${s.name}</div>
+            <div class="string-bar string-muted">
+              <span class="note">✕ muted</span>
+            </div>`;
+        } else {
+          const nikkal = uft.nikkal;
+          row.innerHTML = `
+            <div class="string-label">${s.name}</div>
+            <div class="string-bar" style="background:${col}22;border:1px solid ${col};">
+              <span class="note" style="color:${col};">${s.note} (fret ${s.fret})</span>
+              <span class="hz">${s.hz} Hz → ${nikkal.hz} Hz (${nikkal.ogham})</span>
+            </div>`;
+        }
+        strDiv.appendChild(row);
+      });
+
+      // Ogham cards
+      const cardsDiv = document.getElementById('oghamCards');
+      BM_CHORD.uniqueNotes.forEach(noteName => {
+        const nikkal = getNikkalByNote(noteName);
+        const uft = translateFrequency(nikkal.hz);
+        const pw = uft.protoWord;
+        const card = document.createElement('div');
+        card.className = 'ogham-card';
+        card.style.borderColor = pw.color;
+        card.innerHTML = `
+          <div class="ogham-name" style="color:${pw.color};">${nikkal.ogham}</div>
+          <div class="tree-name">🌳 ${nikkal.tree}</div>
+          <div class="proto-word" style="color:${pw.color};">${nikkal.proto}</div>
+          <div class="details">
+            <span><strong>${nikkal.note}</strong> · ${nikkal.hz} Hz · Fib ${nikkal.fib}</span>
+            <span>Sap: ${nikkal.sap} · Body: ${nikkal.body}</span>
+            <span>State: ${uft.state.name} (${uft.state.phase})</span>
+            <span>Spiral r = ${uft.spiral.magnitude.toFixed(4)}</span>
+            <span>Geometry: ${pw.geometry.replace(/_/g, ' ')}</span>
+            <span style="font-style:italic;color:${pw.color};">${pw.significance}</span>
+          </div>`;
+        cardsDiv.appendChild(card);
+      });
+
+      // Translation table
+      const tbody = document.getElementById('translationTable');
+      BM_CHORD.strings.forEach(s => {
+        if (s.muted) return;
+        const uft = translateFrequency(s.hz);
+        const n = uft.nikkal;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-weight:bold;color:${uft.protoWord.color};">${s.note}${s.string}</td>
+          <td>${s.hz}</td>
+          <td style="color:${uft.protoWord.color};">${n.hz}</td>
+          <td style="font-weight:bold;">${n.note}</td>
+          <td>${uft.phase.toFixed(4)}</td>
+          <td>${uft.spiral.magnitude.toFixed(4)}</td>
+          <td style="color:${uft.state.color};">${uft.state.name}</td>
+          <td style="font-weight:bold;color:${uft.protoWord.color};">${n.ogham}</td>
+          <td>🌳 ${n.tree}</td>
+          <td style="font-size:12px;font-weight:bold;color:${uft.protoWord.color};">${n.proto}</td>
+          <td>${n.body}</td>
+          <td>${n.sap}</td>`;
+        tbody.appendChild(row);
+      });
+
+      // Fibonacci table
+      const ftbody = document.getElementById('fibTable');
+      const INT_NAMES = ['Unison','Minor 2nd','Major 2nd','Minor 3rd','Major 3rd','Perfect 4th',
+                         'Tritone','Perfect 5th','Minor 6th','Major 6th','Minor 7th','Major 7th'];
+      const INT_CONS = ['pure','dissonant','dissonant','consonant','consonant','consonant',
+                        'dissonant','consonant','consonant','consonant','dissonant','dissonant'];
+      // Root of chord = B
+      const rootNikkal = getNikkalByNote('B');
+      BM_CHORD.uniqueNotes.forEach(noteName => {
+        const nikkal = getNikkalByNote(noteName);
+        const uft = translateFrequency(nikkal.hz);
+        const semi = ((nikkal.p - rootNikkal.p) + 13) % 13;
+        // Phi ratio with adjacent Fibonacci
+        const fibIdx = NIKKAL_DICTIONARY.indexOf(nikkal);
+        const nextFib = fibIdx < 12 ? NIKKAL_DICTIONARY[fibIdx + 1].fib : nikkal.fib * CosmicTranslator.PHI;
+        const phiRatio = (nikkal.fib / nextFib).toFixed(6);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-weight:bold;color:${uft.protoWord.color};">${nikkal.note} (${nikkal.ogham})</td>
+          <td>${nikkal.fib}</td>
+          <td>${phiRatio}</td>
+          <td>${semi < 12 ? INT_CONS[semi] : '—'}</td>
+          <td>${semi < 12 ? INT_NAMES[semi] : '—'} (${semi} semitones from B)</td>
+          <td style="color:${uft.state.color};">${uft.state.quality}</td>`;
+        ftbody.appendChild(row);
+      });
+
+      // Chord phrase
+      const phrase = BM_CHORD.uniqueNotes.map(n => getNikkalByNote(n).proto).join(' · ');
+      document.getElementById('chordPhrase').textContent = phrase;
+      document.getElementById('chordPhrase').style.color = '#8e44ad';
+
+      // Meaning
+      const trees = BM_CHORD.uniqueNotes.map(n => getNikkalByNote(n).tree).join(', ');
+      const bodies = BM_CHORD.uniqueNotes.map(n => getNikkalByNote(n).body).join(' → ');
+      const oghams = BM_CHORD.uniqueNotes.map(n => getNikkalByNote(n).ogham).join(' · ');
+      document.getElementById('chordMeaning').innerHTML =
+        `Ogham: <strong>${oghams}</strong> · Trees: ${trees} · Body path: ${bodies}<br>` +
+        `F# (Duir/Oak) = Zero Point at the Heart — the chord resolves into silence`;
+    }
+
+    // ===========================================================================
+    // BOOT — Initialize after modules loaded
+    // ===========================================================================
+    (async () => {
+      buildUI();
+      drawCymatics();
+    })();
+  </script>
+</body>
+</html>
