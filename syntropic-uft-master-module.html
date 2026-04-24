@@ -319,6 +319,299 @@
       height: 100%;
       border-radius: 4px;
     }
+
+    /* ===== MOBILE RESPONSIVENESS ===== */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      .container {
+        max-width: 100%;
+      }
+
+      header {
+        padding: 20px 15px;
+        margin-bottom: 0;
+      }
+
+      h1 {
+        font-size: 1.8em;
+        margin-bottom: 8px;
+      }
+
+      .subtitle {
+        font-size: 0.9em;
+      }
+
+      .page-nav {
+        padding: 10px;
+        gap: 6px;
+      }
+
+      .page-btn {
+        padding: 8px 10px;
+        font-size: 0.75em;
+        flex: 1 1 calc(50% - 3px);
+      }
+
+      .pages-container {
+        padding: 15px;
+        border-radius: 0 0 8px 8px;
+      }
+
+      .card {
+        padding: 12px;
+      }
+
+      .card h3 {
+        font-size: 1.1em;
+      }
+
+      .section-title {
+        font-size: 1.3em;
+      }
+
+      .legend-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .legend-item {
+        padding: 10px;
+      }
+
+      .sensor-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .sensor-input {
+        padding: 12px;
+      }
+
+      select, input {
+        padding: 8px;
+        font-size: 0.95em;
+        margin-bottom: 12px;
+      }
+
+      .btn-primary {
+        padding: 10px 15px;
+        font-size: 0.9em;
+        margin: 8px 0;
+      }
+
+      .companion-item {
+        padding: 10px;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .info-row {
+        padding: 8px;
+        font-size: 0.9em;
+        flex-wrap: wrap;
+      }
+
+      .harmony-score {
+        font-size: 1.5em;
+        margin: 15px 0;
+      }
+
+      svg {
+        width: 100% !important;
+        height: auto !important;
+      }
+
+      svg text {
+        font-size: 8px !important;
+      }
+
+      footer {
+        padding: 15px;
+        font-size: 0.75em;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 8px;
+      }
+
+      header {
+        padding: 15px 10px;
+        border-radius: 8px 8px 0 0;
+      }
+
+      h1 {
+        font-size: 1.4em;
+        margin-bottom: 5px;
+      }
+
+      .subtitle {
+        font-size: 0.8em;
+        display: none;
+      }
+
+      .page-nav {
+        padding: 8px;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+
+      .page-btn {
+        padding: 6px 8px;
+        font-size: 0.65em;
+        flex: 0 1 auto;
+        border-width: 1px;
+      }
+
+      .pages-container {
+        padding: 10px;
+        border-width: 1px;
+      }
+
+      .card {
+        padding: 10px;
+        border-width: 1px;
+      }
+
+      .card h3 {
+        font-size: 0.95em;
+        margin-bottom: 10px;
+      }
+
+      .section-title {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+      }
+
+      .legend-section {
+        padding: 10px;
+        margin: 10px 0;
+      }
+
+      .legend-section h3 {
+        font-size: 1em;
+        margin-bottom: 8px;
+      }
+
+      .legend-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .legend-item {
+        padding: 8px;
+        font-size: 0.85em;
+      }
+
+      .sensor-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .sensor-input {
+        padding: 10px;
+      }
+
+      .sensor-input h4 {
+        font-size: 0.9em;
+      }
+
+      .slider-value {
+        font-size: 0.8em;
+        margin-top: 5px;
+      }
+
+      select, input {
+        padding: 6px;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+        width: 100%;
+      }
+
+      .btn-primary {
+        padding: 8px 12px;
+        font-size: 0.8em;
+        margin: 5px 0;
+        width: 100%;
+      }
+
+      .companion-item {
+        padding: 8px;
+        flex-direction: column;
+        gap: 6px;
+        border-left-width: 2px;
+      }
+
+      .companion-list {
+        gap: 8px;
+      }
+
+      .info-row {
+        padding: 6px;
+        font-size: 0.8em;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .info-label {
+        font-size: 0.85em;
+      }
+
+      .info-value {
+        font-size: 0.8em;
+      }
+
+      .harmony-score {
+        font-size: 1.2em;
+        margin: 10px 0;
+      }
+
+      .diagnosis-box {
+        padding: 10px;
+        margin: 8px 0;
+        border-left-width: 3px;
+      }
+
+      .diagnosis-item {
+        padding: 6px;
+        font-size: 0.85em;
+        margin: 4px 0;
+      }
+
+      svg {
+        width: 100% !important;
+        height: auto !important;
+        margin: 10px 0 !important;
+      }
+
+      svg circle {
+        r: 12 !important;
+      }
+
+      svg text {
+        font-size: 7px !important;
+      }
+
+      svg line {
+        stroke-width: 1px !important;
+      }
+
+      footer {
+        padding: 10px;
+        margin-top: 20px;
+        font-size: 0.7em;
+        border-top-width: 1px;
+      }
+
+      .empty-message {
+        padding: 15px;
+        font-size: 0.85em;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1205,7 +1498,7 @@
       };
 
       const svg = `
-        <svg width="100%" viewBox="0 0 800 280" style="background: rgba(74, 157, 125, 0.05); border-radius: 6px; margin: 20px 0;">
+        <svg width="100%" viewBox="0 0 800 320" preserveAspectRatio="xMidYMid meet" style="background: rgba(74, 157, 125, 0.05); border-radius: 6px; margin: 20px 0; max-width: 100%; height: auto;">
           <!-- Musical Staff (5 lines) -->
           <line x1="40" y1="40" x2="760" y2="40" stroke="#4a9d7d" stroke-width="2"/>
           <line x1="40" y1="80" x2="760" y2="80" stroke="#4a9d7d" stroke-width="2"/>
@@ -1214,11 +1507,11 @@
           <line x1="40" y1="200" x2="760" y2="200" stroke="#4a9d7d" stroke-width="2"/>
           
           <!-- Strata Labels on left -->
-          <text x="5" y="45" font-size="10" fill="#999">Emergent</text>
-          <text x="5" y="85" font-size="10" fill="#999">Alto</text>
-          <text x="5" y="125" font-size="10" fill="#999">Medio</text>
-          <text x="5" y="165" font-size="10" fill="#999">Bajo</text>
-          <text x="5" y="205" font-size="10" fill="#999">Ground</text>
+          <text x="5" y="45" font-size="12" fill="#999">Emergent</text>
+          <text x="5" y="85" font-size="12" fill="#999">Alto</text>
+          <text x="5" y="125" font-size="12" fill="#999">Medio</text>
+          <text x="5" y="165" font-size="12" fill="#999">Bajo</text>
+          <text x="5" y="205" font-size="12" fill="#999">Ground</text>
           
           <!-- Treble Clef symbol (simplified) -->
           <circle cx="50" cy="120" r="8" fill="none" stroke="#4affb1" stroke-width="1"/>
@@ -1226,9 +1519,9 @@
           <!-- Plant 1: Pioneer (Placenta) - left position -->
           <circle cx="150" cy="${getYCoord(getStaffPosition(p1))}" r="18" fill="#90EE90" stroke="#4affb1" stroke-width="2"/>
           <line x1="168" y1="${getYCoord(getStaffPosition(p1)) - 18}" x2="168" y2="${getYCoord(getStaffPosition(p1)) - 50}" stroke="#4affb1" stroke-width="2"/>
-          <text x="110" y="245" font-size="11" fill="#4affb1" font-weight="bold" text-anchor="middle">🌱 1-4 yrs</text>
-          <text x="110" y="260" font-size="9" fill="#999" text-anchor="middle">${p1.common_name_pt}</text>
-          <text x="110" y="275" font-size="8" fill="#666" text-anchor="middle">${p1.freq.toFixed(0)} Hz</text>
+          <text x="110" y="260" font-size="11" fill="#4affb1" font-weight="bold" text-anchor="middle">🌱 1-4 yrs</text>
+          <text x="110" y="276" font-size="10" fill="#999" text-anchor="middle">${p1.common_name_pt}</text>
+          <text x="110" y="290" font-size="9" fill="#666" text-anchor="middle">${p1.freq.toFixed(0)} Hz</text>
           
           <!-- Arrow between p1 and p2 -->
           <path d="M 200 120 L 260 120" stroke="#4affb1" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
@@ -1237,9 +1530,9 @@
           <!-- Plant 2: Secondary - middle position -->
           <circle cx="320" cy="${getYCoord(getStaffPosition(p2))}" r="18" fill="#FFD700" stroke="#4affb1" stroke-width="2"/>
           <line x1="338" y1="${getYCoord(getStaffPosition(p2)) - 18}" x2="338" y2="${getYCoord(getStaffPosition(p2)) - 50}" stroke="#4affb1" stroke-width="2"/>
-          <text x="320" y="245" font-size="11" fill="#4affb1" font-weight="bold" text-anchor="middle">🌿 Secundária</text>
-          <text x="320" y="260" font-size="9" fill="#999" text-anchor="middle">${p2.common_name_pt}</text>
-          <text x="320" y="275" font-size="8" fill="#666" text-anchor="middle">${p2.freq.toFixed(0)} Hz</text>
+          <text x="320" y="260" font-size="11" fill="#4affb1" font-weight="bold" text-anchor="middle">🌿 Secundária</text>
+          <text x="320" y="276" font-size="10" fill="#999" text-anchor="middle">${p2.common_name_pt}</text>
+          <text x="320" y="290" font-size="9" fill="#666" text-anchor="middle">${p2.freq.toFixed(0)} Hz</text>
           
           <!-- Arrow between p2 and p3 -->
           <path d="M 370 120 L 430 120" stroke="#4affb1" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
@@ -1248,9 +1541,9 @@
           <!-- Plant 3: Climax - right position -->
           <circle cx="490" cy="${getYCoord(getStaffPosition(p3))}" r="18" fill="#8B4513" stroke="#4affb1" stroke-width="2"/>
           <line x1="508" y1="${getYCoord(getStaffPosition(p3)) - 18}" x2="508" y2="${getYCoord(getStaffPosition(p3)) - 50}" stroke="#4affb1" stroke-width="2"/>
-          <text x="490" y="245" font-size="11" fill="#4affb1" font-weight="bold" text-anchor="middle">🌲 15+ yrs</text>
-          <text x="490" y="260" font-size="9" fill="#999" text-anchor="middle">${p3.common_name_pt}</text>
-          <text x="490" y="275" font-size="8" fill="#666" text-anchor="middle">${p3.freq.toFixed(0)} Hz</text>
+          <text x="490" y="260" font-size="11" fill="#4affb1" font-weight="bold" text-anchor="middle">🌲 15+ yrs</text>
+          <text x="490" y="276" font-size="10" fill="#999" text-anchor="middle">${p3.common_name_pt}</text>
+          <text x="490" y="290" font-size="9" fill="#666" text-anchor="middle">${p3.freq.toFixed(0)} Hz</text>
           
           <!-- Arrow marker definition -->
           <defs>
@@ -1260,7 +1553,7 @@
           </defs>
           
           <!-- Harmony Intervals Label -->
-          <text x="40" y="20" font-size="12" fill="#4affb1" font-weight="bold">🎵 Syntropic Succession as Musical Progression</text>
+          <text x="40" y="20" font-size="13" fill="#4affb1" font-weight="bold">🎵 Syntropic Succession as Musical Progression</text>
         </svg>
       `;
       
