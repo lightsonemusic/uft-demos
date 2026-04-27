@@ -2060,11 +2060,11 @@ function drawEggShape(coh) {
   ctx.fillStyle = `rgba(0, 255, 136, ${0.05 + coh/500})`;
   ctx.beginPath();
   
-  // True egg parametric equation: narrow & pointed at top, wide & round at bottom
+  // True egg parametric equation: EXTREME narrow & pointed at top, WIDE & round at bottom
   for (let t = 0; t <= Math.PI * 2; t += Math.PI / 90) {
-    // More aggressive egg shape formula
-    const topTaper = Math.pow(Math.abs(Math.sin(t/2)), 0.6);  // Very narrow at top
-    const verticalAsym = Math.sin(t) > 0 ? 0.7 : 1.3;        // Bottom wider than top
+    // EXTREME egg shape formula - much sharper
+    const topTaper = Math.pow(Math.abs(Math.sin(t/2)), 0.3);  // VERY sharp point at top
+    const verticalAsym = Math.sin(t) > 0 ? 0.4 : 1.6;        // Extreme: narrow top, very wide bottom
     
     const x = cx + eggWidth * Math.cos(t) * topTaper;
     const y = cy + eggHeight * Math.sin(t) * verticalAsym * 0.5;
@@ -2083,8 +2083,8 @@ function drawEggShape(coh) {
   ctx.beginPath();
   
   for (let t = 0; t <= Math.PI * 2; t += Math.PI / 90) {
-    const topTaper = Math.pow(Math.abs(Math.sin(t/2)), 0.6);
-    const verticalAsym = Math.sin(t) > 0 ? 0.7 : 1.3;
+    const topTaper = Math.pow(Math.abs(Math.sin(t/2)), 0.3);
+    const verticalAsym = Math.sin(t) > 0 ? 0.4 : 1.6;
     
     const x = cx + eggWidth * 0.7 * Math.cos(t) * topTaper * breathingFactor;
     const y = cy + eggHeight * 0.7 * Math.sin(t) * verticalAsym * 0.5 * breathingFactor;
