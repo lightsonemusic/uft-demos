@@ -812,10 +812,13 @@ button.secondary:hover {
 
 </div>
 
+<!-- DEVICE SENSOR BRIDGE SCRIPT - LOAD FIRST -->
+<script src="../modules/device-sensor-bridge.js"></script>
+
 <script>
 // ============================================================================
 // UFT PLANT DISCOVERY MODEL BUILDER
-// ============================================================================
+// ==============================================================================
 
 const PHI = 1.6180339887;
 const STORAGE_KEY = 'uft_plant_models';
@@ -2456,9 +2459,6 @@ if (document.readyState === 'loading') {
   initializeApp();
 }
 </script>
-
-<!-- DEVICE SENSOR BRIDGE SCRIPT -->
-<script src="../modules/device-sensor-bridge.js"></script>
 
 <!-- DISCLAIMER -->
 <div style="text-align: center; font-size: 11px; color: #5a7080; padding: 24px 20px; margin-top: 32px; border-top: 1px solid #182840;">
