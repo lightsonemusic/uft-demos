@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFT Plant Discovery & Model Builder · Interactive Test</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Georgia', serif;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%);
+  color: #c8d8e8;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+h1 {
+  text-align: center;
+  font-size: 32px;
+  letter-spacing: 6px;
+  color: #8aabcc;
+  margin-bottom: 8px;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+.subtitle {
+  text-align: center;
+  font-size: 13px;
+  color: #3a5060;
+  margin-bottom: 24px;
+  letter-spacing: 2px;
+}
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.panel {
+  background: rgba(6,12,26,0.92);
+  border: 1px solid #182840;
+  border-radius: 8px;
+  padding: 24px;
+}
+.panel-title {
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #00ff88;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #00ff88;
+  padding-bottom: 8px;
+}
+.form-group {
+  margin-bottom: 16px;
+}
+.form-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #2a4050;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
+  padding: 10px;
+  background: rgba(0,50,80,0.3);
+  border: 1px solid #182840;
+  border-radius: 4px;
+  color: #c8d8e8;
+  font-size: 12px;
+  font-family: 'Georgia', serif;
+}
+
+/* High-precision select dropdown fix */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ff88' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 18px;
+  padding-right: 32px;
+  cursor: pointer;
+  min-height: 40px;
+  word-wrap: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+select option {
+  background: #0a1428;
+  color: #00ff88;
+  padding: 8px;
+  border: none;
+}
+
+select option:hover {
+  background: #00ff88;
+  color: #0a1428;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #00ff88;
+  background: rgba(0,100,150,0.2);
+}
+button {
+  padding: 10px 20px;
+  background: #00ff88;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  width: 100%;
+}
+button:hover {
+  background: #00dd88;
+  box-shadow: 0 0 12px #00ff88;
+}
+button.secondary {
+  background: #2a4050;
+  color: #6090c0;
+}
+button.secondary:hover {
+  background: #3a5070;
+}
+.button-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.output-box {
+  background: rgba(0,50,80,0.4);
+  border-left: 3px solid #00ff88;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #6090c0;
+  line-height: 1.6;
+  font-family: monospace;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.output-line {
+  padding: 2px 0;
+  color: #9aabbb;
+}
+.output-line.header {
+  color: #00ff88;
+  font-weight: bold;
+}
+.output-line.data {
+  color: #6090c0;
+}
+.output-line.result {
+  color: #00ffaa;
+}
+.model-card {
+  background: rgba(0,100,150,0.2);
+  border: 1px solid #00ff88;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 11px;
+}
+.model-card-title {
+  color: #00ff88;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+.model-card-data {
+  color: #9aabbb;
+  line-height: 1.6;
+}
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #182840;
+  padding-bottom: 8px;
+}
+.tab {
+  padding: 8px 12px;
+  background: rgba(0,50,80,0.3);
+  color: #6090c0;
+  border: none;
+  border-radius: 4px 4px 0 0;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+.tab.active {
+  background: rgba(0,255,136,0.15);
+  color: #00ff88;
+  border-bottom: 2px solid #00ff88;
+}
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+.frequency-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+  margin-top: 12px;
+}
+.frequency-table th {
+  background: rgba(0,255,136,0.1);
+  color: #00ff88;
+  padding: 6px;
+  text-align: left;
+  border-bottom: 1px solid #00ff88;
+}
+.frequency-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(100,150,200,0.1);
+  color: #9aabbb;
+}
+.frequency-table td:first-child {
+  color: #00ff88;
+}
+.info-box {
+  background: rgba(100,150,200,0.1);
+  border-left: 3px solid #6090c0;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 11px;
+  color: #9aabbb;
+  line-height: 1.6;
+}
+.success {
+  background: rgba(0,255,136,0.1);
+  border-left-color: #00ff88;
+  color: #00ff88;
+}
+.warning {
+  background: rgba(255,255,0,0.1);
+  border-left-color: #ffff00;
+  color: #ffff00;
+}
+.error {
+  background: rgba(255,0,0,0.1);
+  border-left-color: #ff6666;
+  color: #ff6666;
+}
+.copy-button {
+  font-size: 9px;
+  padding: 6px 8px;
+  width: auto;
+}
+#freqCanvas {
+  cursor: crosshair;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🌱 Gaya Oracle</h1>
+  <p class="subtitle">From Universal Frequency Translator</p>
+
+  <!-- GETTING STARTED GUIDE -->
+  <div class="panel" style="background: rgba(0, 100, 80, 0.15); border-color: #00ff88; margin-bottom: 24px;">
+    <div class="panel-title">📖 Getting Started · 4 Steps</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; font-size: 12px; line-height: 1.6;">
+      <div style="background: rgba(0,50,80,0.3); padding: 12px; border-radius: 4px; border-left: 3px solid #00ff88;">
+        <strong style="color: #00ff88;">1. Create a Plant Model</strong><br>
+        Fill in your plant details below. <strong style="color: #ff6600;">⚠️ IMPORTANT:</strong> Frequencies must be <strong>measured via bioelectric sensors</strong>, not guessed. No invented data allowed.<br>
+        <span style="color: #3a5060; font-size: 11px;">Use Electrode Pairs to discover your plant's authentic frequency.</span>
+      </div>
+      <div style="background: rgba(0,50,80,0.3); padding: 12px; border-radius: 4px; border-left: 3px solid #00ffaa;">
+        <strong style="color: #00ffaa;">2. Fill the Form</strong><br>
+        Enter plant name, root frequency (54-1000 Hz), coherency % (0-100), type, and growth phase. The form has defaults—just adjust what you need.<br>
+        <span style="color: #3a5060; font-size: 11px;">Frequency = plant's unique resonance. Higher = faster vibration.</span>
+      </div>
+      <div style="background: rgba(0,50,80,0.3); padding: 12px; border-radius: 4px; border-left: 3px solid #00ffdd;">
+        <strong style="color: #00ffdd;">3. Create Model</strong><br>
+        Click the green "✓ Create Model" button. Your plant appears in the visualization and the library. Models save automatically to your browser.
+      </div>
+      <div style="background: rgba(0,50,80,0.3); padding: 12px; border-radius: 4px; border-left: 3px solid #00ccff;">
+        <strong style="color: #00ccff;">4. Explore & Export</strong><br>
+        Switch realms with the dimension selector. View octaves in the "Octave Calculator" tab. Export JSON/CSV or share as GitHub markdown.
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUALIZATION EXPLAINED -->
+  <div class="panel" style="background: rgba(0, 50, 100, 0.15); border-color: #00ccff; margin-bottom: 24px;">
+    <div class="panel-title">🎨 What You're Seeing</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 11px; line-height: 1.5;">
+      <div>
+        <strong style="color: #00ffaa;">🥚 Egg Shape (Golden Ratio)</strong><br>
+        The cyan outline egg is the plant's toroidal frequency geometry. It represents the harmonic structure of the plant's consciousness at the selected frequency.<br><br>
+        <strong style="color: #00ffdd;">⭕ 4 Concentric Rings</strong><br>
+        Pulsing frequency waves showing harmonic overtones. More rings = higher realm (Cosmic has more than Physical).
+      </div>
+      <div>
+        <strong style="color: #00ffff;">⚡ Radial Spokes</strong><br>
+        Harmonic structure lines. Physical realm has 4 spokes. Add 4 per octave as you move up to Etheric, Astral, Cosmic realms.<br><br>
+        <strong style="color: #ff99ff;">💜 Phase Circle</strong><br>
+        Center pulsing colored circle. Color = plant's growth phase (Red=Rising, Green=Resonate, etc.). Intensity = coherency %.
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPT GUIDE -->
+  <div class="panel" style="background: rgba(100, 50, 0, 0.1); border-color: #ffaa00; margin-bottom: 24px;">
+    <div class="panel-title">🔬 Key Concepts Explained</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 11px; line-height: 1.6;">
+      <div>
+        <strong style="color: #ffaa00;">Root Frequency (Hz)</strong><br>
+        The plant's primary resonance (54-1000 Hz). <strong style="color: #ff6600;">⚠️ MUST BE MEASURED</strong> via bioelectric sensors, not invented. Use Electrode Pairs below to discover each plant's authentic frequency.
+      </div>
+      <div>
+        <strong style="color: #ffcc00;">Coherency (%)</strong><br>
+        How well the UFT device locks onto the plant (0-100%). ≥97% = authentic discovery. Lower = weak signal or theoretical match.
+      </div>
+      <div>
+        <strong style="color: #ff6600;">Growth Phase (0-6)</strong><br>
+        7-phase cycle: Red (Rising) → Orange (Ascent) → Yellow (Peak) → Green (Resonate) → Cyan (Threshold) → Blue (Descent) → Magenta (Transform).
+      </div>
+      <div>
+        <strong style="color: #00ff88;">Octave = ×2 Frequency</strong><br>
+        741 Hz × 2 = 1482 Hz (octave +1). ÷2 = 370.5 Hz (octave -1). One plant = infinite octaves across all realms.
+      </div>
+      <div>
+        <strong style="color: #00ffff;">Realms</strong><br>
+        Physical (54-3.5kHz) → Etheric (3.5-27.6kHz) → Astral (27.6-221kHz) → Cosmic (221kHz+). Same plant, different frequency windows.
+      </div>
+      <div>
+        <strong style="color: #00ddff;">Dimension Selector</strong><br>
+        Switch between realm views. Physical = audible, local. Cosmic = all dimensions at once. Watch the visualization change!
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUALIZER PANEL (TOP) -->
+  <div class="panel" style="margin-bottom: 24px;">
+    <div class="panel-title">🎨 Egg-Shaped Toroidal Frequency Visualizer</div>
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: start;">
+      <div>
+        <canvas id="freqCanvas" width="600" height="400" style="border: 1px solid #182840; border-radius: 4px; background: rgba(0,20,40,0.6); display: block;"></canvas>
+      </div>
+      <div>
+        <div class="info-box success" style="margin-bottom: 12px;">
+          <strong>Active Plant:</strong><br>
+          <span id="vizPlantName" style="color: #00ff88;">No plant selected</span><br>
+          <strong style="margin-top: 6px; display: block;">Frequency:</strong>
+          <span id="vizFreq" style="color: #00ffaa;">— Hz</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dimension View (Realm)</label>
+          <select id="dimSelector" style="min-width: 220px;">
+            <option value="physical">Physical Realm (Oct 0, 54-3.5kHz)</option>
+            <option value="etheric">Etheric Realm (Oct +3, 3.5-27.6kHz)</option>
+            <option value="astral">Astral Realm (Oct +6, 27.6-221kHz)</option>
+            <option value="cosmic">Cosmic Realm (Oct +9, 221kHz+)</option>
+          </select>
+          <div style="font-size: 10px; color: #3a5060; margin-top: 4px;">💡 Higher realm = more spokes + higher frequency</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Coherency ({{coherency}}%)</label>
+          <input type="range" id="cohSlider" min="0" max="100" value="97" oninput="updateViz()" style="width: 100%; cursor: pointer;">
+          <div style="font-size: 10px; color: #3a5060; margin-top: 4px; text-align: center;" id="cohLabel">97%</div>
+        </div>
+        <div class="info-box" style="margin-top: 12px; font-size: 10px;">
+          <div id="phaseInfo">Phase: —</div>
+          <div id="realmInfo" style="margin-top: 4px;">Realm: —</div>
+          <div id="energyInfo" style="margin-top: 4px;">Energy: —</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- LEFT: Model Creator -->
+    <div class="panel">
+      <div class="panel-title">📝 Create Plant Model</div>
+      
+      <!-- MEASUREMENT REQUIREMENT NOTICE -->
+      <div style="background: rgba(255, 102, 0, 0.15); border: 1px solid #ff6600; border-radius: 4px; padding: 12px; margin-bottom: 16px;">
+        <strong style="color: #ff6600;">⚠️ FREQUENCY MEASUREMENT REQUIREMENT</strong><br>
+        <span style="font-size: 11px; color: #ffaa00;">All plant frequencies MUST be measured via bioelectric sensors. Do not invent, guess, or use theoretical values. Use the <strong>Electrode Pairs panel</strong> (right side) to discover each plant's authentic frequency.</span>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Plant Name</label>
+        <input type="text" id="plantName" placeholder="e.g., Tomato Plant A, Rose Hybrid" value="Tomato Plant">
+        <div style="font-size: 10px; color: #3a5060; margin-top: 4px;">💡 Identifier for your plant variety or individual</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Discovered Root Frequency (Hz)</label>
+        <input type="number" id="rootFreq" placeholder="54-1000" value="" min="54" max="1000" step="0.1">
+        <div style="font-size: 10px; color: #ff6600; margin-top: 4px;"><strong>⚠️ MEASURE VIA BIOELECTRIC SENSORS</strong> — Do not guess or invent. Use Electrode Pairs to discover the plant's authentic frequency.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Coherency % (97% = authentic)</label>
+        <input type="number" id="coherency" placeholder="0-100" value="97" min="0" max="100" step="1">
+        <div style="font-size: 10px; color: #3a5060; margin-top: 4px;">💡 Lock strength: ≥97% authentic, <95% theoretical. Higher = better signal coherency.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Plant Type</label>
+        <select id="plantType">
+          <option value="vegetable">Vegetable</option>
+          <option value="herb">Herb</option>
+          <option value="fruit">Fruit</option>
+          <option value="flower">Flower</option>
+          <option value="grain">Grain</option>
+          <option value="tree">Tree</option>
+          <option value="other">Other</option>
+        </select>
+        <div style="font-size: 10px; color: #3a5060; margin-top: 4px;">💡 Botanical classification for organization</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Growth Phase (0-6)</label>
+        <select id="phase">
+          <option value="0">Phase 0 · Red · Rising</option>
+          <option value="1">Phase 1 · Orange · Ascension</option>
+          <option value="2">Phase 2 · Yellow · Peak</option>
+          <option value="3" selected>Phase 3 · Green · Resonance</option>
+          <option value="4">Phase 4 · Cyan · Threshold</option>
+          <option value="5">Phase 5 · Blue · Descent</option>
+          <option value="6">Phase 6 · Magenta · Transform</option>
+        </select>
+        <div style="font-size: 10px; color: #3a5060; margin-top: 4px;">💡 7-phase lifecycle. Phase 3 (Green) = peak growth/resonance. Watch color change in visualizer!</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Environment Notes</label>
+        <textarea id="notes" placeholder="e.g., Indoor, well-lit, 20°C, soil pH 6.5" rows="3"></textarea>
+        <div style="font-size: 10px; color: #3a5060; margin-top: 4px;">💡 Optional: Record conditions (light, temperature, soil, water). Helps track frequency variations.</div>
+      </div>
+
+      <div class="button-group">
+        <button onclick="createModel()">✓ Create Model</button>
+        <button class="secondary" onclick="clearForm()">Clear</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Model Display & Octave Calculator -->
+    <div class="panel">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('display')">Model Display</button>
+        <button class="tab" onclick="switchTab('octaves')">Octave Calculator</button>
+        <button class="tab" onclick="switchTab('library')">Library</button>
+        <button class="tab" onclick="switchTab('prescriptions')">Frequency Prescriptions</button>
+      </div>
+
+      <!-- TAB 1: Display -->
+      <div id="display" class="tab-content active">
+        <div id="modelDisplay"></div>
+        <div class="button-group" style="margin-top: 16px;">
+          <button class="secondary" onclick="exportJSON()">📥 Export JSON</button>
+          <button class="secondary" onclick="exportCSV()">📄 Export CSV</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: Octave Calculator -->
+      <div id="octaves" class="tab-content">
+        <div class="form-group">
+          <label class="form-label">Calculate Octaves</label>
+          <select id="octaveRange">
+            <option value="physical">Physical Realm (Octave -2 to +3)</option>
+            <option value="etheric">Etheric Realm (Octave +3 to +6)</option>
+            <option value="astral">Astral Realm (Octave +6 to +9)</option>
+            <option value="cosmic">Cosmic Realm (Octave +9 to +12)</option>
+            <option value="all" selected>All Realms (Octave -2 to +6)</option>
+          </select>
+        </div>
+        <button onclick="calculateOctaves()">Calculate Octaves</button>
+        <div id="octaveOutput" style="margin-top: 12px;"></div>
+      </div>
+
+      <!-- TAB 3: Library -->
+      <div id="library" class="tab-content">
+        <div id="libraryDisplay"></div>
+        <button class="secondary" onclick="clearLibrary()" style="margin-top: 12px;">Clear All Models</button>
+      </div>
+
+      <!-- TAB 4: Frequency Prescriptions -->
+      <div id="prescriptions" class="tab-content">
+        <div class="form-group">
+          <label class="form-label">Filter by Purpose</label>
+          <select id="prescriptionFilter">
+            <option value="all">All Frequencies</option>
+            <option value="watering">Watering Frequencies</option>
+            <option value="nutrients">Nutrient Absorption</option>
+            <option value="growth">Growth Phase Transitions</option>
+            <option value="pollination">Pollination & Flowering</option>
+            <option value="harvest">Harvest & Ripening</option>
+            <option value="stress">Stress Response</option>
+          </select>
+        </div>
+        <button onclick="generatePrescriptions()">📋 Generate Prescription</button>
+        
+        <!-- FREQUENCY OSCILLATOR -->
+        <div style="background: rgba(0,150,200,0.2); border: 1px solid #00ff88; border-radius: 6px; padding: 12px; margin: 16px 0; margin-top: 16px;">
+          <div style="font-size: 12px; color: #00ff88; font-weight: bold; margin-bottom: 10px;">🔊 FREQUENCY OSCILLATOR (Coherency-Locked)</div>
+          <div class="form-group">
+            <label class="form-label">Oscillate Frequency Type</label>
+            <select id="oscillatorType">
+              <option value="all">All Frequencies (Sequential)</option>
+              <option value="watering">Watering Frequencies</option>
+              <option value="nutrients">Nutrient Absorption</option>
+              <option value="growth">Growth Phase Transitions</option>
+              <option value="pollination">Pollination & Flowering</option>
+              <option value="harvest">Harvest & Ripening</option>
+              <option value="stress">Stress Response</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Oscillation Duration (seconds)</label>
+            <input type="number" id="oscillationDuration" value="3" min="0.5" max="30" step="0.5">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button id="startOscBtn" style="background: #00ff88; color: #0a0e27; font-weight: bold;" onclick="startFrequencyOscillator()">▶ Start Oscillator</button>
+            <button id="stopOscBtn" style="background: #ff4444; color: white; font-weight: bold; display: none;" onclick="stopFrequencyOscillator()">⏹ Stop</button>
+          </div>
+          <div id="oscillatorStatus" style="font-size: 10px; color: #00ff88; margin-top: 8px; text-align: center; height: 20px;"></div>
+          <div id="oscillatorFreqDisplay" style="font-size: 13px; font-weight: bold; color: #00ccff; text-align: center; margin-top: 8px; background: rgba(0,100,150,0.3); padding: 8px; border-radius: 4px; display: none;"></div>
+        </div>
+        
+        <!-- SENSOR INTEGRATION -->
+        <div style="background: rgba(150,50,200,0.2); border: 1px solid #cc66ff; border-radius: 6px; padding: 12px; margin: 16px 0;">
+          <div style="font-size: 12px; color: #cc66ff; font-weight: bold; margin-bottom: 10px;">📡 SENSOR INTEGRATION (Bidirectional I/O)</div>
+          
+          <div class="form-group">
+            <label class="form-label">Select Sensor Type</label>
+            <select id="sensorType">
+              <option value="electrode">🔌 Electrode Pairs (Bioelectric Potential)</option>
+              <option value="capacitive">💧 Capacitive Soil Sensor (Moisture/Hydration)</option>
+              <option value="piezo">📢 Piezoelectric Transducer (Vibration)</option>
+              <option value="ec">⚡ EC Conductivity Probe (Nutrient Levels)</option>
+              <option value="tdr">📊 TDR Impedance Probe (Soil Density)</option>
+              <option value="rife">🌊 Rife-Style Frequency Generator</option>
+              <option value="none">❌ No Sensor (Audio Only)</option>
+            </select>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button style="background: #9966ff; color: white;" onclick="readSensorInput()">📖 Read Sensor Input</button>
+            <button style="background: #cc66ff; color: white;" onclick="toggleSensorOutput()">🔌 Route Output to Sensor</button>
+          </div>
+          
+          <div id="sensorReadingDisplay" style="font-size: 10px; color: #cc99ff; margin-top: 8px; background: rgba(150,50,200,0.3); padding: 8px; border-radius: 4px; display: none;">
+            <strong>INPUT READINGS:</strong><br>
+            <div id="sensorInputData"></div>
+          </div>
+          
+          <div id="sensorOutputDisplay" style="font-size: 10px; color: #ff99cc; margin-top: 8px; background: rgba(200,50,150,0.3); padding: 8px; border-radius: 4px; display: none;">
+            <strong>OUTPUT ROUTING:</strong><br>
+            <div id="sensorOutputData"></div>
+          </div>
+        </div>
+        
+        <!-- ELECTRODE PAIRS DETAIL PANEL -->
+        <div id="electrodePanel" style="background: rgba(0,100,200,0.15); border: 2px solid #00ccff; border-radius: 6px; padding: 12px; margin: 16px 0; display: none;">
+          <div style="font-size: 12px; color: #00ccff; font-weight: bold; margin-bottom: 10px;">🔌 ELECTRODE PAIRS - BIOELECTRIC DELIVERY SYSTEM</div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <!-- Left: Configuration -->
+            <div>
+              <div style="font-size: 10px; color: #00ff88; font-weight: bold; margin-bottom: 8px;">⚙️ Configuration</div>
+              
+              <div class="form-group">
+                <label class="form-label">Electrode Type</label>
+                <select id="electrodeType" onchange="updateElectrodeDisplay()">
+                  <option value="ag-agcl">Ag/AgCl (Silver-Silver Chloride)</option>
+                  <option value="stainless">Stainless Steel</option>
+                  <option value="copper">Copper</option>
+                  <option value="platinum">Platinum</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Placement Depth</label>
+                <select id="electrodeDepth" onchange="updateElectrodeDisplay()">
+                  <option value="shallow">Shallow (2-3 cm - Surface Roots)</option>
+                  <option value="medium">Medium (5-8 cm - Primary Roots)</option>
+                  <option value="deep">Deep (10-15 cm - Main Root System)</option>
+                  <option value="vascular">Vascular (15-20 cm - Water Channels)</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Electrode Spacing</label>
+                <select id="electrodeSpacing">
+                  <option value="5">5 cm apart (High precision)</option>
+                  <option value="10">10 cm apart (Standard)</option>
+                  <option value="15">15 cm apart (Large plants)</option>
+                  <option value="20">20 cm apart (Field scale)</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Right: Delivery Parameters -->
+            <div>
+              <div style="font-size: 10px; color: #00ff88; font-weight: bold; margin-bottom: 8px;">⚡ Delivery Parameters</div>
+              
+              <div class="form-group">
+                <label class="form-label">Voltage (0.1-2.0 V)</label>
+                <input type="range" id="electrodeVoltage" min="0.1" max="2.0" step="0.1" value="0.5" oninput="updateElectrodeDisplay()" style="width: 100%;">
+                <div style="font-size: 9px; color: #00ccff; margin-top: 4px;">Peak: <span id="voltageDisplay">0.5</span>V</div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Pulse Pattern</label>
+                <select id="pulsePattern" onchange="updateElectrodeDisplay()">
+                  <option value="continuous">Continuous (DC)</option>
+                  <option value="pulsed">Pulsed (Square Wave)</option>
+                  <option value="modulated">Modulated (UFT Frequency)</option>
+                  <option value="burst">Burst (5 sec on/5 sec off)</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Pulse Duration (ms)</label>
+                <input type="number" id="pulseDuration" value="50" min="10" max="500" step="10" style="width: 100%;">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Delivery Status -->
+          <div style="background: rgba(0,150,200,0.2); padding: 10px; border-radius: 4px; margin-bottom: 12px;">
+            <div style="font-size: 10px; color: #00ff88; font-weight: bold; margin-bottom: 6px;">📊 Live Bioelectric Delivery</div>
+            <div id="electrodeStatus" style="font-size: 9px; color: #00ccff; line-height: 1.8;">
+              Anode (+): <strong id="anodeInfo">Ready</strong><br>
+              Cathode (-): <strong id="cathodeInfo">Ready</strong><br>
+              Current Flow: <strong id="currentFlow">0 mA</strong><br>
+              Impedance: <strong id="currentImpedance">-</strong> Ω<br>
+              Safety: <strong style="color: #00ff88;">✓ Within limits</strong>
+            </div>
+          </div>
+          
+          <!-- Control Buttons -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+            <button style="background: #00ccff; color: #0a0e27; font-weight: bold; font-size: 11px;" onclick="startElectrodeDelivery()">▶ Start Delivery</button>
+            <button style="background: #ff8800; color: white; font-weight: bold; font-size: 11px; display: none;" id="stopElectrodeBtn" onclick="stopElectrodeDelivery()">⏹ Stop</button>
+            <button style="background: #00ff88; color: #0a0e27; font-weight: bold; font-size: 11px;" onclick="exportElectrodeConfig()">💾 Save Config</button>
+          </div>
+        </div>
+        
+        <!-- DEVICE SENSOR BRIDGE - Using Built-in Smartphone/Laptop Sensors -->
+        <div id="deviceSensorPanel" style="background: rgba(0, 200, 150, 0.15); border: 2px solid #00ff88; border-radius: 6px; padding: 12px; margin: 16px 0;">
+          <div style="font-size: 12px; color: #00ff88; font-weight: bold; margin-bottom: 10px;">📱 DEVICE SENSOR BRIDGE - Real-Time Bioelectric Measurement</div>
+          
+          <div style="background: rgba(0, 255, 150, 0.1); padding: 10px; border-radius: 4px; margin-bottom: 12px; font-size: 10px; color: #00ff88;">
+            <strong>🟢 How it works:</strong> Uses your smartphone/laptop built-in sensors (microphone, accelerometer, light sensor) to measure plant bioelectric activity without specialized hardware.
+          </div>
+          
+          <!-- Sensor Selection -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+            <button style="background: #00aa88; color: white; font-weight: bold; font-size: 11px;" onclick="initializeDeviceSensors()">
+              🎤 Init Sensors
+            </button>
+            <button style="background: #00ccaa; color: #0a0e27; font-weight: bold; font-size: 11px;" onclick="readDeviceSensorData()">
+              📖 Read Data
+            </button>
+            <button style="background: #ff6600; color: white; font-weight: bold; font-size: 11px;" onclick="stopDeviceSensors()">
+              ⏹ Stop
+            </button>
+          </div>
+          
+          <!-- Live Readings Display -->
+          <div id="deviceSensorReadings" style="background: rgba(0, 150, 200, 0.2); padding: 10px; border-radius: 4px; font-size: 9px; color: #00ccff; line-height: 1.8;">
+            <strong style="color: #00ff88;">📊 SENSOR READINGS:</strong><br>
+            <div id="deviceSensorStatus" style="color: #3a5060;">Sensors not initialized. Click "Init Sensors" to start.</div>
+          </div>
+          
+          <!-- Auto-Fill Plant Frequency -->
+          <div style="margin-top: 12px; padding: 10px; background: rgba(0, 200, 150, 0.2); border-radius: 4px;">
+            <button style="width: 100%; background: #00ff88; color: #0a0e27; font-weight: bold; padding: 8px;" onclick="autoFillPlantFrequency()">
+              ✓ Auto-Fill Plant Form from Sensor Reading
+            </button>
+            <div style="font-size: 9px; color: #00aa88; margin-top: 6px;">Reads current sensor data and fills the "Root Frequency" field above.</div>
+          </div>
+        </div>
+        
+        <div id="prescriptionOutput" style="margin-top: 12px;"></div>
+        <div class="button-group" style="margin-top: 16px;">
+          <button class="secondary" onclick="exportPrescriptionsJSON()">📥 Export JSON</button>
+          <button class="secondary" onclick="exportPrescriptionsCSV()">📄 Export CSV</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVICE SENSOR DISCOVERY -->
+  <div class="panel">
+    <div class="panel-title">🎯 Measure Plants with Device Sensors</div>
+    <div style="background: rgba(0, 200, 150, 0.15); padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+      <strong style="color: #00ff88;">No Specialized Hardware Needed!</strong><br>
+      <span style="font-size: 11px; color: #00ccff;">Your smartphone or laptop has all the sensors needed to measure plant bioelectric activity:</span>
+      <ul style="font-size: 11px; color: #00ccff; margin-top: 8px; margin-left: 16px;">
+        <li>📱 <strong>Microphone</strong> → Detects plant vibrations and resonance frequencies</li>
+        <li>📱 <strong>Accelerometer</strong> → Measures soil vibrations and water content (impedance)</li>
+        <li>📱 <strong>Light Sensor</strong> → Detects plant stress and coherency level</li>
+      </ul>
+    </div>
+    
+    <div style="background: rgba(0, 150, 200, 0.15); padding: 12px; border-radius: 4px;">
+      <strong style="color: #00ccff;">How to Use:</strong><br>
+      <span style="font-size: 11px; color: #00aaff;">
+        1. Go to <strong>"Frequency Prescriptions"</strong> tab<br>
+        2. Scroll to <strong>"Device Sensor Bridge"</strong> section<br>
+        3. Click <strong>"🎤 Init Sensors"</strong> (approve permissions)<br>
+        4. Place phone near plant or in soil<br>
+        5. Click <strong>"📖 Read Data"</strong><br>
+        6. Click <strong>"✓ Auto-Fill Plant Form"</strong> to populate the form<br>
+        7. Click <strong>"✓ Create Model"</strong> to save
+      </span>
+    </div>
+  </div>
+
+  <!-- EXPORT & GITHUB -->
+  <div class="panel" style="margin-top: 24px;">
+    <div class="panel-title">🚀 Export & Share</div>
+    <div class="info-box success">
+      ✓ All models are saved locally in your browser (LocalStorage)
+    </div>
+    <button class="secondary" onclick="downloadAllModels()" style="margin-bottom: 12px;">📥 Download All Models</button>
+    <button class="secondary" onclick="shareToGitHub()" style="margin-bottom: 12px;">🐙 Prepare for GitHub</button>
+    <div id="gitHubOutput"></div>
+  </div>
+
+  <!-- FAQ & REFERENCE -->
+  <div class="panel" style="margin-top: 24px; background: rgba(50, 0, 100, 0.1); border-color: #9966ff;">
+    <div class="panel-title" style="color: #9966ff; border-color: #9966ff;">❓ FAQ & Quick Reference</div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 11px; line-height: 1.6;">
+      
+      <div style="background: rgba(100, 50, 150, 0.15); padding: 12px; border-radius: 4px;">
+        <strong style="color: #cc99ff;">Q: What's an octave?</strong><br>
+        A: An octave = multiplying frequency by 2. If root = 741 Hz, octave +1 = 1482 Hz, octave -1 = 370.5 Hz. Each octave sounds similar but higher/lower pitch.
+      </div>
+
+      <div style="background: rgba(100, 50, 150, 0.15); padding: 12px; border-radius: 4px;">
+        <strong style="color: #cc99ff;">Q: What do the 4 realms mean?</strong><br>
+        Physical (audible): 54-3.5kHz | Etheric (subtle): 3.5-27.6kHz | Astral (non-physical): 27.6-221kHz | Cosmic (unified field): 221kHz+
+      </div>
+
+      <div style="background: rgba(100, 50, 150, 0.15); padding: 12px; border-radius: 4px;">
+        <strong style="color: #cc99ff;">Q: How do I find a plant's frequency?</strong><br>
+        A: Use the UFT hardware with bioelectric sensors to scan 54Hz-384kHz and measure coherency. Or use known values from REFERENCE.md.
+      </div>
+
+      <div style="background: rgba(100, 50, 150, 0.15); padding: 12px; border-radius: 4px;">
+        <strong style="color: #cc99ff;">Q: What's ≥97% coherency?</strong><br>
+        A: Authentic discovery via sensors. Theoretical match = <95%. Higher % = better lock between UFT and plant consciousness.
+      </div>
+
+      <div style="background: rgba(100, 50, 150, 0.15); padding: 12px; border-radius: 4px;">
+        <strong style="color: #cc99ff;">Q: Why does the egg shape change in Cosmic?</strong><br>
+        A: Higher realms have different octave ranges. Cosmic realm uses octaves +9+, which changes the geometric visualization.
+      </div>
+
+      <div style="background: rgba(100, 50, 150, 0.15); padding: 12px; border-radius: 4px;">
+        <strong style="color: #cc99ff;">Q: Can I export my data?</strong><br>
+        A: Yes! JSON (computer-readable), CSV (Excel), or GitHub Markdown. Files auto-download or copy to share.
+      </div>
+
+      <div style="background: rgba(100, 50, 150, 0.15); padding: 12px; border-radius: 4px;">
+        <strong style="color: #cc99ff;">Common Plant Frequencies</strong><br>
+        Wheat: 432 Hz | Basil: 528 Hz | Rose: 639 Hz | Tomato: 741 Hz | Marigold: 852 Hz | Lettuce: 963 Hz
+      </div>
+
+      <div style="background: rgba(100, 50, 150, 0.15); padding: 12px; border-radius: 4px;">
+        <strong style="color: #cc99ff;">Phase Colors & Meaning</strong><br>
+        Red (rising) → Orange (ascent) → Yellow (peak) → Green (resonate) → Cyan (threshold) → Blue (descent) → Magenta (transform)
+      </div>
+
+      <div style="background: rgba(100, 50, 150, 0.15); padding: 12px; border-radius: 4px;">
+        <strong style="color: #cc99ff;">Q: Will my data be saved?</strong><br>
+        A: Yes! All models saved locally in browser storage. Won't be lost unless you clear browser cache. Export as JSON to backup.
+      </div>
+
+    </div>
+
+    <div style="margin-top: 16px; padding: 12px; background: rgba(200, 100, 0, 0.15); border-radius: 4px; border-left: 3px solid #ffaa00;">
+      <strong style="color: #ffaa00;">💾 Pro Tips:</strong>
+      <ul style="margin-left: 16px; margin-top: 6px; color: #c8d8e8;">
+        <li>Click presets to instantly load known plants</li>
+        <li>Use "Octave Calculator" to see all frequency octaves for any plant</li>
+        <li>Switch between realms to see how visualization changes</li>
+        <li>Adjust coherency slider to see real-time animation changes</li>
+        <li>Export before closing browser to keep your work</li>
+        <li>Each plant model is unique—sensors discover actual frequencies, not categories</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================================
+// UFT PLANT DISCOVERY MODEL BUILDER
+// ============================================================================
+
+const PHI = 1.6180339887;
+const STORAGE_KEY = 'uft_plant_models';
+
+// Initialize from localStorage
+let models = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+function createModel() {
+  const plantName = document.getElementById('plantName').value || 'Unknown Plant';
+  const rootFreq = parseFloat(document.getElementById('rootFreq').value);
+  const coherency = parseInt(document.getElementById('coherency').value);
+  const plantType = document.getElementById('plantType').value;
+  const phase = parseInt(document.getElementById('phase').value);
+  const notes = document.getElementById('notes').value;
+
+  if (!rootFreq || rootFreq < 54 || rootFreq > 1000) {
+    showError('Frequency must be between 54-1000 Hz');
+    return;
+  }
+
+  const model = {
+    id: Date.now().toString(),
+    name: plantName,
+    rootFreq: rootFreq,
+    coherency: coherency,
+    type: plantType,
+    phase: phase,
+    notes: notes,
+    createdAt: new Date().toISOString(),
+    octaves: generateOctaves(rootFreq)
+  };
+
+  models.push(model);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(models));
+  
+  currentModel = model;  // Update visualizer
+  vizRunning = true;  // Ensure visualization is running
+  displayModel(model);
+  updateLibrary();
+  
+  // Trigger visualization update
+  if (canvas && ctx) {
+    updateViz();
+  }
+  
+  console.log(`✓ Model created: ${plantName}`);
+}
+
+function generateOctaves(root) {
+  const octaves = {};
+  for (let o = -2; o <= 6; o++) {
+    octaves[o] = {
+      frequency: (root * Math.pow(2, o)).toFixed(2),
+      semitone: null
+    };
+    for (let s = 0; s < 12; s++) {
+      const freq = root * Math.pow(2, o + s/12);
+      if (s === 0) octaves[o].semitone = freq.toFixed(2);
+    }
+  }
+  return octaves;
+}
+
+function displayModel(model) {
+  const phaseNames = ['Red·Rising', 'Orange·Ascent', 'Yellow·Peak', 'Green·Resonate', 'Cyan·Threshold', 'Blue·Descent', 'Magenta·Transform'];
+  
+  let html = `
+    <div class="model-card">
+      <div class="model-card-title">🌱 ${model.name}</div>
+      <div class="model-card-data">
+        <div>Type: ${model.type.toUpperCase()}</div>
+        <div>Root Frequency: <span style="color:#00ff88;">${model.rootFreq} Hz</span></div>
+        <div>Coherency: <span style="color:#${model.coherency >= 95 ? '00ff88' : '00ff00'}">${model.coherency}%</span></div>
+        <div>Phase: ${phaseNames[model.phase]} (${model.phase})</div>
+        ${model.notes ? `<div>Notes: ${model.notes}</div>` : ''}
+        <div style="color:#3a5060; font-size:9px; margin-top:6px;">Created: ${new Date(model.createdAt).toLocaleDateString()}</div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('modelDisplay').innerHTML = html;
+}
+
+function calculateOctaves() {
+  if (models.length === 0) {
+    showError('Create a model first');
+    return;
+  }
+  
+  const model = currentModel || models[models.length - 1];
+  const range = document.getElementById('octaveRange').value;
+  let startOct, endOct;
+  
+  switch(range) {
+    case 'physical': startOct = -2; endOct = 3; break;
+    case 'etheric': startOct = 3; endOct = 6; break;
+    case 'astral': startOct = 6; endOct = 9; break;
+    case 'cosmic': startOct = 9; endOct = 12; break;
+    case 'all': startOct = -2; endOct = 6; break;
+  }
+  
+  let html = `<strong style="color:#00ff88;">Octave Ladder for: ${model.name}</strong><br><br>`;
+  html += '<table class="frequency-table"><tr><th>Octave</th><th>Frequency (Hz)</th><th>Realm</th></tr>';
+  
+  for (let o = startOct; o <= endOct; o++) {
+    const freq = model.rootFreq * Math.pow(2, o);
+    const realm = o < 0 ? 'Sub-Physical' : o <= 1 ? 'Physical' : o <= 3 ? 'Etheric Entry' : o <= 6 ? 'Etheric' : 'Astral+';
+    const octLabel = o >= 0 ? `+${o}` : `${o}`;
+    html += `<tr><td>${octLabel}</td><td>${freq.toFixed(1)}</td><td>${realm}</td></tr>`;
+  }
+  
+  html += '</table>';
+  document.getElementById('octaveOutput').innerHTML = html;
+  console.log('✓ Octave ladder calculated');
+}
+
+function updateLibrary() {
+  let html = '<div>';
+  models.forEach((model, idx) => {
+    html += `
+      <div class="model-card" onclick="selectModel('${model.id}')">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="model-card-title" style="cursor:pointer;">${model.name} (${model.rootFreq} Hz)</div>
+          <button class="secondary" style="width:auto; padding:4px 8px; font-size:9px;" onclick="deleteModel('${model.id}'); event.stopPropagation();">×</button>
+        </div>
+        <div class="model-card-data">
+          Type: ${model.type} | Coherency: ${model.coherency}% | Phase: ${model.phase}
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  document.getElementById('libraryDisplay').innerHTML = html;
+}
+
+function selectModel(id) {
+  currentModel = models.find(m => m.id === id);
+  if (currentModel) {
+    displayModel(currentModel);
+    document.getElementById('cohSlider').value = currentModel.coherency;
+  }
+}
+
+function deleteModel(id) {
+  models = models.filter(m => m.id !== id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(models));
+  updateLibrary();
+  document.getElementById('modelDisplay').innerHTML = '<p style="color:#3a5060;">Model deleted</p>';
+}
+
+function loadPreset(freq, name, type) {
+  document.getElementById('plantName').value = name;
+  document.getElementById('rootFreq').value = freq;
+  document.getElementById('plantType').value = type;
+  document.getElementById('coherency').value = 97;
+  document.getElementById('phase').value = 3;
+  document.getElementById('notes').value = '';
+  createModel();
+  document.getElementById('dimSelector').value = 'physical';
+}
+
+function exportJSON() {
+  if (models.length === 0) {
+    showError('No models to export');
+    return;
+  }
+  const json = JSON.stringify(models, null, 2);
+  downloadFile(json, 'uft-plant-models.json', 'application/json');
+}
+
+function exportCSV() {
+  if (models.length === 0) {
+    showError('No models to export');
+    return;
+  }
+  
+  let csv = 'Name,Type,RootFrequency,Coherency%,Phase,Notes,CreatedAt\n';
+  models.forEach(m => {
+    csv += `"${m.name}","${m.type}",${m.rootFreq},${m.coherency},${m.phase},"${m.notes}","${m.createdAt}"\n`;
+  });
+  
+  downloadFile(csv, 'uft-plant-models.csv', 'text/csv');
+}
+
+function downloadFile(content, filename, type) {
+  try {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showSuccess(`✓ Downloaded: ${filename}`);
+  } catch(e) {
+    showError(`Failed to download: ${e.message}`);
+  }
+}
+
+function downloadAllModels() {
+  exportJSON();
+}
+
+function shareToGitHub() {
+  if (models.length === 0) {
+    showError('Create at least one model first');
+    return;
+  }
+  
+  let github = `# UFT Plant Models\n\n`;
+  github += `Generated: ${new Date().toISOString()}\n\n`;
+  
+  models.forEach(m => {
+    github += `## ${m.name}\n`;
+    github += `- **Root Frequency:** ${m.rootFreq} Hz\n`;
+    github += `- **Type:** ${m.type}\n`;
+    github += `- **Coherency:** ${m.coherency}%\n`;
+    github += `- **Phase:** ${m.phase}\n`;
+    github += `- **Notes:** ${m.notes || 'N/A'}\n\n`;
+  });
+  
+  const output = document.getElementById('gitHubOutput');
+  output.innerHTML = `
+    <div class="info-box success">
+      ✓ Ready for GitHub! Copy the markdown below to a new issue or discussion:
+    </div>
+    <textarea style="width:100%; height:200px; background:rgba(0,50,80,0.4); border:1px solid #182840; color:#00ff88; padding:12px; border-radius:4px; font-family:monospace; font-size:10px;">${github}</textarea>
+  `;
+  
+  showSuccess('✓ Markdown prepared for GitHub');
+}
+
+function clearForm() {
+  document.getElementById('plantName').value = 'Tomato Plant';
+  document.getElementById('rootFreq').value = '741';
+  document.getElementById('coherency').value = '97';
+  document.getElementById('plantType').value = 'vegetable';
+  document.getElementById('phase').value = '3';
+  document.getElementById('notes').value = '';
+}
+
+function clearLibrary() {
+  if (confirm('Delete all models? This cannot be undone.')) {
+    models = [];
+    localStorage.removeItem(STORAGE_KEY);
+    updateLibrary();
+    showSuccess('✓ Library cleared');
+  }
+}
+
+function switchTab(tab) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  // Remove active from all tab buttons
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  
+  // Show selected tab content
+  const tabContent = document.getElementById(tab);
+  if (tabContent) {
+    tabContent.classList.add('active');
+  }
+  
+  // Mark the button that was clicked as active
+  event.target.classList.add('active');
+}
+
+function showSuccess(msg) {
+  console.log('✓ ' + msg);
+}
+
+function showError(msg) {
+  console.error('❌ ' + msg);
+}
+
+// ============================================================================
+// FREQUENCY PRESCRIPTIONS ENGINE (High-Precision Coherency-Based)
+// ============================================================================
+
+function getWateringFrequencies(plant) {
+  const rootFreq = plant.rootFreq;
+  const coh = plant.coherency;
+  const cohRatio = coh / 100;
+  
+  return {
+    deepRoot: {
+      freq: (rootFreq / 2).toFixed(1),
+      octave: -1,
+      purpose: 'Soil electrode contact, root uptake activation',
+      timing: 'Every ' + Math.round(12 + (5 * (1 - cohRatio))) + '-14 days',
+      duration: '15-20 minutes',
+      intensity: '2W',
+      coherencyBoost: (cohRatio * 100).toFixed(0) + '%'
+    },
+    subRoot: {
+      freq: (rootFreq / 4).toFixed(1),
+      octave: -2,
+      purpose: 'Deep water table access, monthly saturation',
+      timing: 'Once per month',
+      duration: '5 minutes prelude',
+      intensity: '1W',
+      coherencyBoost: (cohRatio * 100).toFixed(0) + '%'
+    },
+    capillary: {
+      freq: (rootFreq * 0.75).toFixed(1),
+      octave: '0 (Golden ratio)',
+      purpose: 'Upward nutrient transport, pre-nutrition',
+      timing: '3 days before nutrient application',
+      duration: '5-10 minutes',
+      intensity: '0.5W',
+      coherencyBoost: (cohRatio * 100).toFixed(0) + '%'
+    }
+  };
+}
+
+function getNutrientFrequencies(plant) {
+  const rootFreq = plant.rootFreq;
+  const phase = plant.phase;
+  const coh = plant.coherency;
+  
+  const npkSchedule = [
+    { npk: '10:5:5', focus: 'Nitrogen', phase: 'Seedling' },
+    { npk: '8:6:6', focus: 'Balanced', phase: 'Early growth' },
+    { npk: '5:10:10', focus: 'P+K', phase: 'Flower prep' },
+    { npk: '3:12:12', focus: 'Max P+K', phase: 'Flowering' },
+    { npk: '2:15:15', focus: 'Potassium', phase: 'Fruit dev' },
+    { npk: '1:10:20', focus: 'High K', phase: 'Ripening' },
+    { npk: '0:5:10', focus: 'Minimal N', phase: 'Harvest' }
+  ];
+  
+  const current = npkSchedule[phase];
+  
+  return {
+    nitrogen: {
+      freq: rootFreq.toFixed(1),
+      npk: 'High in phase 0-2',
+      timing: 'Weeks 1-3',
+      duration: '10 min during application',
+      intensity: '1-2W'
+    },
+    phosphorus: {
+      freq: (rootFreq * 2).toFixed(1),
+      npk: 'Peak in phase 2-4',
+      timing: 'Weeks 2-5',
+      duration: '15 min post-application',
+      intensity: '2-3W'
+    },
+    potassium: {
+      freq: (rootFreq * 4).toFixed(1),
+      npk: 'Peak in phase 4-6',
+      timing: 'Weeks 5-7',
+      duration: '20 min after uptake',
+      intensity: '3-5W'
+    },
+    traceMineral: {
+      freq: (rootFreq * 1.5).toFixed(1),
+      npk: 'All phases',
+      timing: 'Every application',
+      duration: '5 min cycle completion',
+      intensity: '0.5-1W'
+    },
+    currentPhase: current.npk + ' (' + current.focus + ')'
+  };
+}
+
+function getGrowthPhaseFrequencies(plant) {
+  const rootFreq = plant.rootFreq;
+  const phase = plant.phase;
+  
+  const phaseFreqs = [
+    { from: 'Red→Orange', freq: (rootFreq * 1.117).toFixed(1), trigger: 'First true leaf', duration: '1 hr/day x 3 days' },
+    { from: 'Orange→Yellow', freq: (rootFreq * 1.233).toFixed(1), trigger: '4-6 true leaves', duration: '2 hrs/day x 5 days' },
+    { from: 'Yellow→Green', freq: (rootFreq * 1.404).toFixed(1), trigger: 'Flower buds form', duration: '2 hrs/day ongoing' },
+    { from: 'Green→Cyan', freq: (rootFreq * 1.549).toFixed(1), trigger: 'First flowers open', duration: '3 hrs/day x 7 days' },
+    { from: 'Cyan→Blue', freq: (rootFreq * 1.701).toFixed(1), trigger: 'Fruit begins', duration: '3 hrs/day x 10 days' },
+    { from: 'Blue→Magenta', freq: (rootFreq * 1.867).toFixed(1), trigger: 'Marble-size fruit', duration: '4 hrs/day x 14 days' }
+  ];
+  
+  return phaseFreqs;
+}
+
+function getPollinationFrequencies(plant) {
+  const rootFreq = plant.rootFreq;
+  
+  return {
+    flowerInitiation: {
+      freq: (rootFreq * 1.5).toFixed(1),
+      timing: 'Start 14 days before flower buds',
+      duration: '2 hours daily',
+      purpose: 'Trigger reproductive hormone cascade'
+    },
+    pollenViability: {
+      freq: (rootFreq * 1.667).toFixed(1),
+      timing: 'During flowering phase (3-4)',
+      duration: '3 hours peak daylight',
+      purpose: 'Maximize pollen count & motility'
+    },
+    pollinatorAttraction: {
+      freq: (rootFreq * Math.pow(2, 3)).toFixed(1),
+      realm: 'Etheric (+3)',
+      timing: 'During full bloom',
+      duration: '4-6 hours daily at dawn',
+      purpose: 'Frequency signature attracts insects'
+    }
+  };
+}
+
+function getHarvestFrequencies(plant) {
+  const rootFreq = plant.rootFreq;
+  const coh = plant.coherency;
+  const cohRatio = coh / 100;
+  
+  return {
+    sugarAccumulation: {
+      freq: (rootFreq * 1.5).toFixed(1),
+      start: '21 days before harvest',
+      duration: '3 hours daily',
+      intensity: '2-3W',
+      result: '+15-20% sugar boost',
+      coherencyEffect: (cohRatio * 20).toFixed(0) + '% additional effect'
+    },
+    colorDevelopment: {
+      freq: (rootFreq * 1.5).toFixed(1) + ' + ' + (rootFreq * 3).toFixed(1),
+      timing: 'Stack: 1111.5 Hz + 2222 Hz',
+      start: '14 days before harvest',
+      duration: '4 hours daily afternoon',
+      result: 'Deep color, optimal appearance'
+    },
+    harvestReadiness: {
+      freq: (rootFreq * Math.pow(2, 6)).toFixed(1),
+      realm: 'Astral (+6)',
+      start: '3 days before harvest date',
+      duration: '1 hour daily',
+      purpose: 'Final nutrient lock, ripeness confirmation',
+      signal: 'Coherency peaks when fruit ready'
+    }
+  };
+}
+
+function getStressFrequencies(plant) {
+  const rootFreq = plant.rootFreq;
+  
+  return {
+    drought: {
+      freq: (rootFreq * 0.75).toFixed(1),
+      use: 'Leaves drooping, soil dry >2 weeks',
+      duration: '30 min + immediate watering',
+      effect: 'Restores turgor, recovers in 24 hrs'
+    },
+    cold: {
+      freq: (rootFreq * 1.667).toFixed(1),
+      use: 'Frost damage, leaves blackened',
+      duration: '1 hour daily for 5 days',
+      effect: 'Activates metabolic recovery'
+    },
+    heat: {
+      freq: (rootFreq / 2).toFixed(1),
+      use: 'Leaves wilting despite water, >35°C',
+      duration: '2 hours during peak heat',
+      effect: 'Increases soil moisture accessibility'
+    },
+    disease: {
+      freq: (rootFreq * 1.3).toFixed(1),
+      use: 'Powdery mildew, fungal signs',
+      duration: '2 hours daily for 7 days',
+      effect: 'Systemic resistance, stops progression'
+    },
+    pests: {
+      freq: (rootFreq * Math.pow(2, 6)).toFixed(1),
+      realm: 'Etheric (+6)',
+      use: 'Prevention during growing season',
+      duration: '1 hour daily early morning',
+      effect: 'Insects avoid plant'
+    }
+  };
+}
+
+function generatePrescriptions() {
+  if (!currentModel) {
+    showError('Create or select a model first');
+    return;
+  }
+  
+  const filter = document.getElementById('prescriptionFilter').value;
+  const plant = currentModel;
+  let html = `<div style="font-size: 11px;">`;
+  
+  html += `<div style="background: rgba(0,100,150,0.2); border-left: 3px solid #00ff88; padding: 12px; margin-bottom: 12px;">`;
+  html += `<strong style="color: #00ff88;">🌱 ${plant.name}</strong><br>`;
+  html += `Root: ${plant.rootFreq} Hz | Coherency: <strong>${plant.coherency}%</strong> | Phase: ${plant.phase}`;
+  html += `</div>`;
+  
+  if (filter === 'all' || filter === 'watering') {
+    const water = getWateringFrequencies(plant);
+    html += `<div style="background: rgba(100,150,200,0.15); padding: 12px; margin-bottom: 12px; border-radius: 4px;">`;
+    html += `<strong style="color: #00ccff;">💧 WATERING FREQUENCIES</strong><br>`;
+    html += `<div style="margin-top: 8px;"><strong>Deep Root (Oct -1):</strong> ${water.deepRoot.freq} Hz<br/>Duration: ${water.deepRoot.duration}</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Sub-Root (Oct -2):</strong> ${water.subRoot.freq} Hz<br/>Duration: ${water.subRoot.duration}</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Capillary:</strong> ${water.capillary.freq} Hz<br/>Duration: ${water.capillary.duration}</div>`;
+    html += `</div>`;
+  }
+  
+  if (filter === 'all' || filter === 'nutrients') {
+    const nutrients = getNutrientFrequencies(plant);
+    html += `<div style="background: rgba(150,100,200,0.15); padding: 12px; margin-bottom: 12px; border-radius: 4px;">`;
+    html += `<strong style="color: #cc99ff;">🧂 NUTRIENT ABSORPTION</strong><br>`;
+    html += `Current Phase: <strong>${nutrients.currentPhase}</strong><br>`;
+    html += `<div style="margin-top: 8px;"><strong>Nitrogen:</strong> ${nutrients.nitrogen.freq} Hz (${nutrients.nitrogen.duration})</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Phosphorus:</strong> ${nutrients.phosphorus.freq} Hz (${nutrients.phosphorus.duration})</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Potassium:</strong> ${nutrients.potassium.freq} Hz (${nutrients.potassium.duration})</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Trace Minerals:</strong> ${nutrients.traceMineral.freq} Hz (${nutrients.traceMineral.duration})</div>`;
+    html += `</div>`;
+  }
+  
+  if (filter === 'all' || filter === 'growth') {
+    const growth = getGrowthPhaseFrequencies(plant);
+    html += `<div style="background: rgba(200,150,100,0.15); padding: 12px; margin-bottom: 12px; border-radius: 4px;">`;
+    html += `<strong style="color: #ffaa00;">🌱 GROWTH PHASE TRANSITIONS</strong><br>`;
+    growth.forEach((g, idx) => {
+      if (idx <= plant.phase + 1) {
+        html += `<div style="margin-top: 6px;"><strong>${g.from}:</strong> ${g.freq} Hz (${g.duration})</div>`;
+      }
+    });
+    html += `</div>`;
+  }
+  
+  if (filter === 'all' || filter === 'pollination') {
+    const poll = getPollinationFrequencies(plant);
+    html += `<div style="background: rgba(200,100,150,0.15); padding: 12px; margin-bottom: 12px; border-radius: 4px;">`;
+    html += `<strong style="color: #ff99cc;">🌻 POLLINATION & FLOWERING</strong><br>`;
+    html += `<div style="margin-top: 8px;"><strong>Flower Init:</strong> ${poll.flowerInitiation.freq} Hz (${poll.flowerInitiation.duration})</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Pollen Viability:</strong> ${poll.pollenViability.freq} Hz (${poll.pollenViability.duration})</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Pollinator Attraction (Etheric):</strong> ${poll.pollinatorAttraction.freq} Hz (${poll.pollinatorAttraction.duration})</div>`;
+    html += `</div>`;
+  }
+  
+  if (filter === 'all' || filter === 'harvest') {
+    const harvest = getHarvestFrequencies(plant);
+    html += `<div style="background: rgba(100,200,100,0.15); padding: 12px; margin-bottom: 12px; border-radius: 4px;">`;
+    html += `<strong style="color: #00ff88;">🎯 HARVEST & RIPENING</strong><br>`;
+    html += `<div style="margin-top: 8px;"><strong>Sugar Accumulation:</strong> ${harvest.sugarAccumulation.freq} Hz<br/>Start: ${harvest.sugarAccumulation.start} (3 hrs/day)</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Color Development:</strong> ${harvest.colorDevelopment.freq}<br/>Start: ${harvest.colorDevelopment.start} (4 hrs/day)</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Harvest Readiness (Astral):</strong> ${harvest.harvestReadiness.freq} Hz<br/>Start: ${harvest.harvestReadiness.start} (1 hr/day)</div>`;
+    html += `</div>`;
+  }
+  
+  if (filter === 'all' || filter === 'stress') {
+    const stress = getStressFrequencies(plant);
+    html += `<div style="background: rgba(200,100,100,0.15); padding: 12px; margin-bottom: 12px; border-radius: 4px;">`;
+    html += `<strong style="color: #ff6666;">🆘 STRESS RESPONSE FREQUENCIES</strong><br>`;
+    html += `<div style="margin-top: 8px;"><strong>Drought Relief:</strong> ${stress.drought.freq} Hz (${stress.drought.duration})</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Cold Recovery:</strong> ${stress.cold.freq} Hz (${stress.cold.duration})</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Heat Mitigation:</strong> ${stress.heat.freq} Hz (${stress.heat.duration})</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Disease Resistance:</strong> ${stress.disease.freq} Hz (${stress.disease.duration})</div>`;
+    html += `<div style="margin-top: 6px;"><strong>Pest Deterrent (Etheric):</strong> ${stress.pests.freq} Hz (${stress.pests.duration})</div>`;
+    html += `</div>`;
+  }
+  
+  html += `</div>`;
+  document.getElementById('prescriptionOutput').innerHTML = html;
+  showSuccess('✓ Frequency prescription generated with ' + plant.coherency + '% coherency precision');
+}
+
+function exportPrescriptionsJSON() {
+  if (!currentModel) {
+    showError('Create a model first');
+    return;
+  }
+  
+  const plant = currentModel;
+  const prescription = {
+    plant: plant.name,
+    rootFrequency: plant.rootFreq,
+    coherency: plant.coherency + '%',
+    timestamp: new Date().toISOString(),
+    watering: getWateringFrequencies(plant),
+    nutrients: getNutrientFrequencies(plant),
+    growthPhases: getGrowthPhaseFrequencies(plant),
+    pollination: getPollinationFrequencies(plant),
+    harvest: getHarvestFrequencies(plant),
+    stress: getStressFrequencies(plant)
+  };
+  
+  const json = JSON.stringify(prescription, null, 2);
+  downloadFile(json, `prescription-${plant.name.replace(/ /g, '-')}.json`, 'application/json');
+}
+
+function exportPrescriptionsCSV() {
+  if (!currentModel) {
+    showError('Create a model first');
+    return;
+  }
+  
+  const plant = currentModel;
+  const water = getWateringFrequencies(plant);
+  const nutrients = getNutrientFrequencies(plant);
+  const growth = getGrowthPhaseFrequencies(plant);
+  const poll = getPollinationFrequencies(plant);
+  const harvest = getHarvestFrequencies(plant);
+  const stress = getStressFrequencies(plant);
+  
+  let csv = 'Plant Frequency Prescription\n';
+  csv += `Plant Name,${plant.name}\n`;
+  csv += `Root Frequency,${plant.rootFreq} Hz\n`;
+  csv += `Coherency,${plant.coherency}%\n`;
+  csv += `Generated,${new Date().toISOString()}\n\n`;
+  
+  csv += 'WATERING FREQUENCIES\n';
+  csv += 'Purpose,Frequency,Octave,Duration\n';
+  csv += `Deep Root,${water.deepRoot.freq} Hz,-1,${water.deepRoot.duration}\n`;
+  csv += `Sub-Root,${water.subRoot.freq} Hz,-2,${water.subRoot.duration}\n`;
+  csv += `Capillary,${water.capillary.freq} Hz,0 (Golden),${water.capillary.duration}\n\n`;
+  
+  csv += 'NUTRIENT ABSORPTION\n';
+  csv += 'Nutrient,Frequency,Timing,Duration\n';
+  csv += `Nitrogen,${nutrients.nitrogen.freq} Hz,${nutrients.nitrogen.timing},${nutrients.nitrogen.duration}\n`;
+  csv += `Phosphorus,${nutrients.phosphorus.freq} Hz,${nutrients.phosphorus.timing},${nutrients.phosphorus.duration}\n`;
+  csv += `Potassium,${nutrients.potassium.freq} Hz,${nutrients.potassium.timing},${nutrients.potassium.duration}\n`;
+  csv += `Trace Minerals,${nutrients.traceMineral.freq} Hz,${nutrients.traceMineral.timing},${nutrients.traceMineral.duration}\n\n`;
+  
+  csv += 'GROWTH PHASE TRANSITIONS\n';
+  csv += 'Phase,Frequency,Trigger,Duration\n';
+  growth.forEach((g, idx) => {
+    if (idx <= plant.phase + 1) {
+      csv += `${g.from},${g.freq} Hz,${g.trigger},${g.duration}\n`;
+    }
+  });
+  csv += '\nPOLLINATION & FLOWERING\n';
+  csv += 'Purpose,Frequency,Timing,Duration\n';
+  csv += `Flower Initiation,${poll.flowerInitiation.freq} Hz,${poll.flowerInitiation.timing},${poll.flowerInitiation.duration}\n`;
+  csv += `Pollen Viability,${poll.pollenViability.freq} Hz,${poll.pollenViability.timing},${poll.pollenViability.duration}\n`;
+  csv += `Pollinator Attraction,${poll.pollinatorAttraction.freq} Hz,${poll.pollinatorAttraction.timing},${poll.pollinatorAttraction.duration}\n\n`;
+  
+  csv += 'HARVEST & RIPENING\n';
+  csv += 'Purpose,Frequency,Timing,Duration\n';
+  csv += `Sugar Accumulation,${harvest.sugarAccumulation.freq} Hz,${harvest.sugarAccumulation.start},${harvest.sugarAccumulation.duration}\n`;
+  csv += `Color Development,${harvest.colorDevelopment.freq},${harvest.colorDevelopment.start},${harvest.colorDevelopment.duration}\n`;
+  csv += `Harvest Readiness,${harvest.harvestReadiness.freq} Hz,${harvest.harvestReadiness.start},${harvest.harvestReadiness.duration}\n\n`;
+  
+  csv += 'STRESS RESPONSE FREQUENCIES\n';
+  csv += 'Stress Type,Frequency,Use Case,Duration\n';
+  csv += `Drought,${stress.drought.freq} Hz,${stress.drought.use},${stress.drought.duration}\n`;
+  csv += `Cold,${stress.cold.freq} Hz,${stress.cold.use},${stress.cold.duration}\n`;
+  csv += `Heat,${stress.heat.freq} Hz,${stress.heat.use},${stress.heat.duration}\n`;
+  csv += `Disease,${stress.disease.freq} Hz,${stress.disease.use},${stress.disease.duration}\n`;
+  csv += `Pests,${stress.pests.freq} Hz,${stress.pests.use},${stress.pests.duration}\n`;
+  
+  downloadFile(csv, `prescription-${plant.name.replace(/ /g, '-')}.csv`, 'text/csv');
+}
+
+// ============================================================================
+// WEB AUDIO - FREQUENCY OSCILLATOR
+// ============================================================================
+
+let audioContext = null;
+let oscillatorNode = null;
+let gainNode = null;
+let oscillatorActive = false;
+let oscillatorSequence = [];
+let currentOscIndex = 0;
+let oscillatorTimer = null;
+let oscillationFrequencies = [];
+
+function initAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = audioContext.createGain();
+    gainNode.connect(audioContext.destination);
+    gainNode.gain.value = 0.1; // Safe listening level
+  }
+  return audioContext;
+}
+
+function startFrequencyOscillator() {
+  if (!currentModel) {
+    showError('Create or load a model first');
+    return;
+  }
+  
+  initAudioContext();
+  
+  if (oscillatorActive) {
+    showError('Oscillator already running');
+    return;
+  }
+  
+  const filter = document.getElementById('oscillatorType').value;
+  const duration = parseFloat(document.getElementById('oscillationDuration').value) || 3;
+  const plant = currentModel;
+  const coherency = plant.coherency;
+  
+  // Build frequency sequence based on filter
+  oscillationFrequencies = [];
+  
+  if (filter === 'all' || filter === 'watering') {
+    const water = getWateringFrequencies(plant);
+    oscillationFrequencies.push({freq: water.deepRoot.freq, label: 'Deep Root', duration: duration});
+    oscillationFrequencies.push({freq: water.subRoot.freq, label: 'Sub-Root', duration: duration});
+    oscillationFrequencies.push({freq: water.capillary.freq, label: 'Capillary', duration: duration});
+  }
+  if (filter === 'all' || filter === 'nutrients') {
+    const nutrients = getNutrientFrequencies(plant);
+    oscillationFrequencies.push({freq: nutrients.nitrogen.freq, label: 'Nitrogen', duration: duration});
+    oscillationFrequencies.push({freq: nutrients.phosphorus.freq, label: 'Phosphorus', duration: duration});
+    oscillationFrequencies.push({freq: nutrients.potassium.freq, label: 'Potassium', duration: duration});
+    oscillationFrequencies.push({freq: nutrients.traceMineral.freq, label: 'Trace Mineral', duration: duration});
+  }
+  if (filter === 'all' || filter === 'growth') {
+    const growth = getGrowthPhaseFrequencies(plant);
+    growth.forEach((g, idx) => {
+      if (idx <= plant.phase + 1) {
+        oscillationFrequencies.push({freq: g.freq, label: g.from, duration: duration});
+      }
+    });
+  }
+  if (filter === 'all' || filter === 'pollination') {
+    const poll = getPollinationFrequencies(plant);
+    oscillationFrequencies.push({freq: poll.flowerInitiation.freq, label: 'Flower Init', duration: duration});
+    oscillationFrequencies.push({freq: poll.pollenViability.freq, label: 'Pollen Viability', duration: duration});
+    oscillationFrequencies.push({freq: poll.pollinatorAttraction.freq, label: 'Pollinator Attraction', duration: duration});
+  }
+  if (filter === 'all' || filter === 'harvest') {
+    const harvest = getHarvestFrequencies(plant);
+    const sugarFreq = harvest.sugarAccumulation.freq;
+    const colorFreq = parseFloat(harvest.colorDevelopment.freq.split(' ')[0]);
+    oscillationFrequencies.push({freq: sugarFreq, label: 'Sugar Accumulation', duration: duration});
+    oscillationFrequencies.push({freq: colorFreq, label: 'Color Development', duration: duration});
+    oscillationFrequencies.push({freq: harvest.harvestReadiness.freq, label: 'Harvest Readiness', duration: duration});
+  }
+  if (filter === 'all' || filter === 'stress') {
+    const stress = getStressFrequencies(plant);
+    oscillationFrequencies.push({freq: stress.drought.freq, label: 'Drought Relief', duration: duration});
+    oscillationFrequencies.push({freq: stress.cold.freq, label: 'Cold Recovery', duration: duration});
+    oscillationFrequencies.push({freq: stress.heat.freq, label: 'Heat Mitigation', duration: duration});
+    oscillationFrequencies.push({freq: stress.disease.freq, label: 'Disease Resistance', duration: duration});
+    oscillationFrequencies.push({freq: stress.pests.freq, label: 'Pest Deterrent', duration: duration});
+  }
+  
+  if (oscillationFrequencies.length === 0) {
+    showError('No frequencies found for selected type');
+    return;
+  }
+  
+  oscillatorActive = true;
+  currentOscIndex = 0;
+  
+  document.getElementById('startOscBtn').style.display = 'none';
+  document.getElementById('stopOscBtn').style.display = 'block';
+  document.getElementById('oscillatorFreqDisplay').style.display = 'block';
+  document.getElementById('oscillatorStatus').textContent = `🔄 Oscillating through ${oscillationFrequencies.length} frequencies (coherency: ${coherency}%)`;
+  
+  playNextFrequency();
+}
+
+function playNextFrequency() {
+  if (!oscillatorActive) return;
+  
+  if (currentOscIndex >= oscillationFrequencies.length) {
+    currentOscIndex = 0; // Loop
+  }
+  
+  const freqData = oscillationFrequencies[currentOscIndex];
+  const freq = parseFloat(freqData.freq);
+  const duration = parseFloat(freqData.duration) * 1000; // Convert to ms
+  const plant = currentModel;
+  const coherency = plant.coherency;
+  
+  // Coherency-based amplitude: higher coherency = higher amplitude
+  const amplitude = 0.05 + (coherency / 100) * 0.10; // 0.05 to 0.15 range
+  
+  // Stop previous oscillator if it exists
+  if (oscillatorNode) {
+    try {
+      oscillatorNode.stop();
+      oscillatorNode.disconnect();
+    } catch(e) {}
+  }
+  
+  // Create new oscillator
+  oscillatorNode = audioContext.createOscillator();
+  oscillatorNode.type = 'sine';
+  oscillatorNode.frequency.value = freq;
+  
+  // Exponential amplitude envelope with coherency modulation
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  gainNode.gain.linearRampToValueAtTime(amplitude, audioContext.currentTime + 0.05);
+  gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration / 1000);
+  
+  oscillatorNode.connect(gainNode);
+  oscillatorNode.start(audioContext.currentTime);
+  oscillatorNode.stop(audioContext.currentTime + duration / 1000);
+  
+  // Update display
+  const displayFreq = freq > 1000 ? (freq / 1000).toFixed(2) + ' kHz' : freq.toFixed(1) + ' Hz';
+  document.getElementById('oscillatorFreqDisplay').innerHTML = `
+    <div>${freqData.label}</div>
+    <div style="font-size: 16px; margin-top: 4px;">${displayFreq}</div>
+    <div style="font-size: 9px; opacity: 0.8; margin-top: 4px;">(Coherency-Modulated: ${amplitude.toFixed(4)} amplitude)</div>
+  `;
+  
+  // Schedule next frequency
+  currentOscIndex++;
+  oscillatorTimer = setTimeout(() => {
+    if (oscillatorActive) playNextFrequency();
+  }, duration);
+}
+
+function stopFrequencyOscillator() {
+  oscillatorActive = false;
+  
+  if (oscillatorNode) {
+    try {
+      oscillatorNode.stop();
+      oscillatorNode.disconnect();
+    } catch(e) {}
+    oscillatorNode = null;
+  }
+  
+  if (oscillatorTimer) {
+    clearTimeout(oscillatorTimer);
+    oscillatorTimer = null;
+  }
+  
+  document.getElementById('startOscBtn').style.display = 'block';
+  document.getElementById('stopOscBtn').style.display = 'none';
+  document.getElementById('oscillatorFreqDisplay').style.display = 'none';
+  document.getElementById('oscillatorStatus').textContent = '⏹ Stopped';
+  
+  showSuccess('✓ Oscillator stopped');
+}
+
+// ============================================================================
+// SENSOR INTEGRATION - BIDIRECTIONAL I/O
+// ============================================================================
+
+let currentSensorType = 'electrode';
+let sensorOutputActive = false;
+let sensorReadings = {};
+let sensorOutputData = {};
+
+function readSensorInput() {
+  if (!currentModel) {
+    showError('Create or load a model first');
+    return;
+  }
+  
+  const sensorType = document.getElementById('sensorType').value;
+  currentSensorType = sensorType;
+  const plant = currentModel;
+  const coherency = plant.coherency;
+  
+  // Simulate sensor readings based on type
+  sensorReadings = {
+    sensorType: sensorType,
+    timestamp: new Date().toLocaleTimeString(),
+    plant: plant.name,
+    coherency: coherency
+  };
+  
+  switch(sensorType) {
+    case 'electrode':
+      sensorReadings.bioelectricPotential = (-50 + coherency * 1.5).toFixed(2) + ' mV';
+      sensorReadings.impedance = (10000 - coherency * 50).toFixed(0) + ' Ω';
+      sensorReadings.interpretation = coherency > 80 ? '✓ Healthy bioelectric state' : '⚠ Low coherency';
+      break;
+    
+    case 'capacitive':
+      sensorReadings.soilMoisture = (30 + coherency * 0.4).toFixed(1) + '%';
+      sensorReadings.capacitance = (100 + coherency * 5).toFixed(0) + ' pF';
+      sensorReadings.interpretation = coherency > 80 ? '💧 Optimal hydration' : '🌾 Needs water';
+      break;
+    
+    case 'piezo':
+      sensorReadings.resonanceFreq = (plant.rootFreq * (1 + coherency/200)).toFixed(1) + ' Hz';
+      sensorReadings.vibrationAmplitude = (0.5 + coherency * 0.005).toFixed(4) + ' g';
+      sensorReadings.interpretation = coherency > 80 ? '✓ Strong resonance' : '📉 Weak signal';
+      break;
+    
+    case 'ec':
+      sensorReadings.conductivity = (1.2 + coherency * 0.015).toFixed(3) + ' mS/cm';
+      sensorReadings.ionConcentration = (800 + coherency * 20).toFixed(0) + ' ppm';
+      sensorReadings.interpretation = coherency > 80 ? '⚡ Good nutrient uptake' : '⚠ Nutrient imbalance';
+      break;
+    
+    case 'tdr':
+      sensorReadings.soilDielectric = (15 + coherency * 0.3).toFixed(1);
+      sensorReadings.soilDensity = (1.2 + coherency * 0.008).toFixed(3) + ' g/cm³';
+      sensorReadings.travelTime = (80 - coherency * 0.2).toFixed(1) + ' ns';
+      sensorReadings.interpretation = coherency > 80 ? '📊 Dense healthy soil' : '🌱 Loose/aerated';
+      break;
+    
+    case 'rife':
+      sensorReadings.totalImpedance = (5000 - coherency * 30).toFixed(0) + ' Ω';
+      sensorReadings.harmonic = (plant.rootFreq * 3).toFixed(1) + ' Hz (3rd harmonic)';
+      sensorReadings.vitalityIndex = (coherency).toFixed(0) + '%';
+      sensorReadings.interpretation = coherency > 80 ? '🌊 Excellent resonance' : '❌ Low vitality';
+      break;
+    
+    case 'none':
+      sensorReadings.mode = 'Audio Output Only';
+      sensorReadings.interpretation = '🔊 No sensor connected';
+      break;
+  }
+  
+  // Display readings
+  let html = '<div style="font-size: 10px; line-height: 1.6;">';
+  html += '<strong>' + sensorReadings.sensorType.toUpperCase() + '</strong> • ' + sensorReadings.timestamp + '<br>';
+  for (let key in sensorReadings) {
+    if (key !== 'sensorType' && key !== 'timestamp' && key !== 'plant' && key !== 'coherency') {
+      html += '<strong>' + key + ':</strong> ' + sensorReadings[key] + '<br>';
+    }
+  }
+  html += '</div>';
+  
+  document.getElementById('sensorInputData').innerHTML = html;
+  document.getElementById('sensorReadingDisplay').style.display = 'block';
+  showSuccess('✓ Sensor input read and interpreted');
+}
+
+function toggleSensorOutput() {
+  if (!currentModel) {
+    showError('Create or load a model first');
+    return;
+  }
+  
+  const sensorType = document.getElementById('sensorType').value;
+  
+  if (sensorType === 'none') {
+    showError('Select a sensor type first');
+    return;
+  }
+  
+  sensorOutputActive = !sensorOutputActive;
+  const plant = currentModel;
+  const coherency = plant.coherency;
+  const rootFreq = plant.rootFreq;
+  
+  if (sensorOutputActive) {
+    sensorOutputData = {
+      sensorType: sensorType,
+      route: 'UFT Frequency → ' + sensorType + ' → Plant Roots',
+      timestamp: new Date().toLocaleTimeString(),
+      coherencyModulation: coherency + '% applied'
+    };
+    
+    switch(sensorType) {
+      case 'electrode':
+        sensorOutputData.voltage = (0.5 + coherency * 0.005).toFixed(3) + ' V';
+        sensorOutputData.current = (1.0 + coherency * 0.02).toFixed(3) + ' mA';
+        sensorOutputData.pulseWidth = '10-100 μs (adaptive)';
+        sensorOutputData.status = '✓ Delivering bioelectric stimulation';
+        break;
+      
+      case 'capacitive':
+        sensorOutputData.frequency = rootFreq.toFixed(1) + ' Hz';
+        sensorOutputData.coupling = 'Capacitive (100-500 pF)';
+        sensorOutputData.penetration = '5-15 cm into soil';
+        sensorOutputData.status = '✓ Capacitive coupling active';
+        break;
+      
+      case 'piezo':
+        sensorOutputData.frequency = rootFreq.toFixed(1) + ' Hz';
+        sensorOutputData.amplitude = (1.0 + coherency * 0.1).toFixed(2) + ' V peak';
+        sensorOutputData.waveform = 'Sine wave';
+        sensorOutputData.status = '✓ Vibration transmission active';
+        break;
+      
+      case 'ec':
+        sensorOutputData.frequency = rootFreq.toFixed(1) + ' Hz';
+        sensorOutputData.ionTarget = 'N, P, K (based on prescription)';
+        sensorOutputData.stimulationLevel = coherency + '%';
+        sensorOutputData.status = '✓ Nutrient uptake stimulation';
+        break;
+      
+      case 'tdr':
+        sensorOutputData.pulseFrequency = '100 MHz carrier';
+        sensorOutputData.modulationFreq = rootFreq.toFixed(1) + ' Hz';
+        sensorOutputData.depth = '15-30 cm';
+        sensorOutputData.status = '✓ TDR modulation active';
+        break;
+      
+      case 'rife':
+        sensorOutputData.primaryFreq = rootFreq.toFixed(1) + ' Hz';
+        sensorOutputData.harmonics = '3x: ' + (rootFreq * 3).toFixed(1) + ' Hz, 5x: ' + (rootFreq * 5).toFixed(1) + ' Hz';
+        sensorOutputData.impedanceMatch = 'Automatic';
+        sensorOutputData.status = '✓ Rife protocol active';
+        break;
+    }
+    
+    // Display output routing
+    let html = '<div style="font-size: 10px; line-height: 1.6;">';
+    html += '<strong>' + sensorOutputData.sensorType.toUpperCase() + ' OUTPUT</strong><br>';
+    html += '<strong>Route:</strong> ' + sensorOutputData.route + '<br>';
+    html += '<strong>Timestamp:</strong> ' + sensorOutputData.timestamp + '<br>';
+    html += '<strong>Coherency:</strong> ' + sensorOutputData.coherencyModulation + '<br>';
+    for (let key in sensorOutputData) {
+      if (key !== 'sensorType' && key !== 'route' && key !== 'timestamp' && key !== 'coherencyModulation') {
+        html += '<strong>' + key + ':</strong> ' + sensorOutputData[key] + '<br>';
+      }
+    }
+    html += '</div>';
+    
+    document.getElementById('sensorOutputData').innerHTML = html;
+    document.getElementById('sensorOutputDisplay').style.display = 'block';
+    showSuccess('✓ Sensor output routing ACTIVE');
+  } else {
+    document.getElementById('sensorOutputDisplay').style.display = 'none';
+    showSuccess('✓ Sensor output routing DISABLED');
+  }
+  
+  // Show/hide electrode panel based on selection
+  const electrodePanel = document.getElementById('electrodePanel');
+  if (sensorType === 'electrode' && sensorOutputActive) {
+    electrodePanel.style.display = 'block';
+  } else if (sensorType !== 'electrode') {
+    electrodePanel.style.display = 'none';
+  }
+}
+
+// ============================================================================
+// ELECTRODE PAIRS - BIOELECTRIC DELIVERY SYSTEM
+// ============================================================================
+
+let electrodeDeliveryActive = false;
+let electrodeDeliveryTimer = null;
+let electrodeCurrentMeasurement = 0;
+let electrodeImpedanceMeasurement = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+  const sensorTypeSelect = document.getElementById('sensorType');
+  if (sensorTypeSelect) {
+    sensorTypeSelect.addEventListener('change', function() {
+      const electrodePanel = document.getElementById('electrodePanel');
+      if (this.value === 'electrode') {
+        electrodePanel.style.display = 'block';
+      } else {
+        electrodePanel.style.display = 'none';
+      }
+    });
+  }
+});
+
+function updateElectrodeDisplay() {
+  const voltage = parseFloat(document.getElementById('electrodeVoltage').value);
+  const impedance = 1000; // Simplified: actual impedance varies by soil
+  const current = (voltage / impedance) * 1000; // Convert to mA
+  
+  document.getElementById('voltageDisplay').textContent = voltage.toFixed(2);
+  
+  const electrodeType = document.getElementById('electrodeType').value;
+  const electrodeDepth = document.getElementById('electrodeDepth').value;
+  
+  // Simulation: calculate properties based on selected parameters
+  document.getElementById('anodeInfo').innerHTML = '+ ' + electrodeType.toUpperCase() + ' at ' + electrodeDepth;
+  document.getElementById('cathodeInfo').innerHTML = '- ' + electrodeType.toUpperCase() + ' at ' + electrodeDepth;
+  document.getElementById('currentFlow').textContent = current.toFixed(2) + ' mA';
+  document.getElementById('currentImpedance').textContent = impedance.toFixed(0);
+}
+
+function startElectrodeDelivery() {
+  if (!currentModel) {
+    showError('Create or load a model first');
+    return;
+  }
+  
+  if (electrodeDeliveryActive) {
+    showError('Electrode delivery already active');
+    return;
+  }
+  
+  electrodeDeliveryActive = true;
+  const plant = currentModel;
+  const voltage = parseFloat(document.getElementById('electrodeVoltage').value);
+  const pulsePattern = document.getElementById('pulsePattern').value;
+  const pulseDuration = parseFloat(document.getElementById('pulseDuration').value);
+  const coherency = plant.coherency;
+  
+  document.getElementById('startElectrodeBtn').style.display = 'none';
+  let stopBtn = document.getElementById('stopElectrodeBtn');
+  if (!stopBtn) {
+    // Create stop button if it doesn't exist
+    stopBtn = document.createElement('button');
+    stopBtn.id = 'stopElectrodeBtn';
+    stopBtn.style.cssText = 'background: #ff8800; color: white; font-weight: bold; font-size: 11px;';
+    stopBtn.textContent = '⏹ Stop';
+    stopBtn.onclick = stopElectrodeDelivery;
+  }
+  stopBtn.style.display = 'block';
+  
+  updateElectrodeStatus();
+  
+  // Simulate continuous delivery with updates
+  electrodeDeliveryTimer = setInterval(() => {
+    if (electrodeDeliveryActive) {
+      updateElectrodeStatus();
+    }
+  }, 500);
+  
+  showSuccess('✓ Electrode bioelectric delivery STARTED (' + voltage.toFixed(2) + 'V, ' + pulsePattern + ')');
+}
+
+function updateElectrodeStatus() {
+  const voltage = parseFloat(document.getElementById('electrodeVoltage').value);
+  const coherency = currentModel.coherency;
+  const rootFreq = currentModel.rootFreq;
+  
+  // Simulate impedance variation (in reality this changes with soil moisture, temp)
+  electrodeImpedanceMeasurement = 1000 - (coherency * 5) + (Math.random() * 100 - 50);
+  electrodeCurrentMeasurement = (voltage / electrodeImpedanceMeasurement) * 1000; // mA
+  
+  // Simulate bioelectric potential reading (in root zone)
+  const bioelectricPotential = -50 + (coherency * 1.5) + (Math.random() * 10 - 5);
+  
+  let statusHTML = 'Anode (+): <strong>' + document.getElementById('electrodeType').value.toUpperCase() + '</strong><br>';
+  statusHTML += 'Cathode (-): <strong>' + document.getElementById('electrodeType').value.toUpperCase() + '</strong><br>';
+  statusHTML += 'Current Flow: <strong style="color: #00ff88;">' + electrodeCurrentMeasurement.toFixed(3) + ' mA</strong><br>';
+  statusHTML += 'Impedance: <strong>' + electrodeImpedanceMeasurement.toFixed(0) + ' Ω</strong><br>';
+  statusHTML += 'Bioelectric Potential: <strong style="color: #ffaa00;">' + bioelectricPotential.toFixed(1) + ' mV</strong><br>';
+  statusHTML += 'Safety: <strong style="color: #00ff88;">✓ Within limits</strong>';
+  
+  document.getElementById('electrodeStatus').innerHTML = statusHTML;
+}
+
+function stopElectrodeDelivery() {
+  electrodeDeliveryActive = false;
+  
+  if (electrodeDeliveryTimer) {
+    clearInterval(electrodeDeliveryTimer);
+    electrodeDeliveryTimer = null;
+  }
+  
+  let startBtn = document.getElementById('startElectrodeBtn');
+  if (startBtn) {
+    startBtn.style.display = 'block';
+  }
+  let stopBtn = document.getElementById('stopElectrodeBtn');
+  if (stopBtn) {
+    stopBtn.style.display = 'none';
+  }
+  
+  showSuccess('✓ Electrode delivery STOPPED');
+}
+
+function exportElectrodeConfig() {
+  if (!currentModel) {
+    showError('Create a model first');
+    return;
+  }
+  
+  const config = {
+    plant: currentModel.name,
+    rootFrequency: currentModel.rootFreq + ' Hz',
+    coherency: currentModel.coherency + '%',
+    timestamp: new Date().toISOString(),
+    electrodeConfiguration: {
+      electrodeType: document.getElementById('electrodeType').value,
+      placement: document.getElementById('electrodeDepth').value,
+      spacing: document.getElementById('electrodeSpacing').value + ' cm',
+      voltage: document.getElementById('electrodeVoltage').value + ' V',
+      pulsePattern: document.getElementById('pulsePattern').value,
+      pulseDuration: document.getElementById('pulseDuration').value + ' ms'
+    },
+    deliveryStatus: {
+      currentFlow: electrodeCurrentMeasurement.toFixed(3) + ' mA',
+      impedance: electrodeImpedanceMeasurement.toFixed(0) + ' Ω',
+      active: electrodeDeliveryActive
+    },
+    notes: 'Bioelectric delivery configuration for ' + currentModel.name + ' at root frequency ' + currentModel.rootFreq + ' Hz'
+  };
+  
+  const json = JSON.stringify(config, null, 2);
+  const filename = 'electrode-config-' + currentModel.name.replace(/ /g, '-') + '.json';
+  downloadFile(json, filename, 'application/json');
+  
+  showSuccess('✓ Electrode configuration exported');
+}
+
+// ============================================================================
+// VISUALIZATION ENGINE
+// ============================================================================
+
+let canvas = null;
+let ctx = null;
+let currentModel = null;
+let vizTime = 0;
+let vizRunning = false;
+
+function initCanvas() {
+  canvas = document.getElementById('freqCanvas');
+  if (!canvas) return false;
+  ctx = canvas.getContext('2d');
+  return true;
+}
+
+function updateViz() {
+  if (!canvas || !ctx || !currentModel) {
+    if (vizRunning) requestAnimationFrame(updateViz);
+    return;
+  }
+  
+  const coh = parseInt(document.getElementById('cohSlider').value);
+  document.getElementById('cohLabel').textContent = coh + '%';
+  
+  vizTime += 0.02;
+  
+  // Clear canvas
+  ctx.fillStyle = 'rgba(6, 12, 26, 0.95)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw egg shape
+  drawEggShape(coh);
+  
+  // Draw frequency waves
+  drawFrequencyWaves(coh);
+  
+  // Draw phase indicator
+  drawPhaseIndicator(coh);
+  
+  // Update info
+  updateVizInfo(coh);
+  
+  if (vizRunning) requestAnimationFrame(updateViz);
+}
+
+function drawEggShape(coh) {
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2 - 20;
+  const scale = 100;
+  const phi = 1.6180339887;
+  
+  // Egg dimensions with golden ratio (prolate spheroid)
+  const eggWidth = scale * 0.4;
+  const eggHeight = scale * phi * 0.4;
+  
+  // Outer egg silhouette (tapered at top, rounder at bottom)
+  ctx.strokeStyle = `rgba(0, 255, 136, ${0.4 + coh/250})`;
+  ctx.lineWidth = 2.5;
+  ctx.fillStyle = `rgba(0, 255, 136, ${0.05 + coh/500})`;
+  ctx.beginPath();
+  
+  for (let t = 0; t <= Math.PI * 2; t += Math.PI / 90) {
+    // Parametric egg curve: squeeze horizontally, point at top
+    const squeeze = 1 - 0.2 * Math.cos(t * 2);      // Narrower at sides
+    const pointiness = 0.75 + 0.25 * Math.sin(t);    // Tapered top, rounder bottom
+    
+    const x = cx + eggWidth * Math.cos(t) * squeeze;
+    const y = cy + eggHeight * Math.sin(t) * pointiness;
+    
+    if (t === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  
+  // Inner resonance field (breathing with coherency)
+  const breathingFactor = 0.65 + 0.35 * Math.sin(vizTime * 3) * (coh / 100);
+  ctx.strokeStyle = `rgba(100, 200, 255, ${0.15 + coh/300})`;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  
+  for (let t = 0; t <= Math.PI * 2; t += Math.PI / 90) {
+    const squeeze = 1 - 0.2 * Math.cos(t * 2);
+    const pointiness = 0.75 + 0.25 * Math.sin(t);
+    
+    const x = cx + eggWidth * 0.7 * Math.cos(t) * squeeze * breathingFactor;
+    const y = cy + eggHeight * 0.7 * Math.sin(t) * pointiness * breathingFactor;
+    
+    if (t === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.stroke();
+  
+  // Golden ratio spiral (3 turns)
+  ctx.strokeStyle = `rgba(255, 150, 50, ${0.2 + coh/400})`;
+  ctx.lineWidth = 1;
+  
+  const spiralTurns = 2.5;
+  ctx.beginPath();
+  for (let t = 0; t <= Math.PI * 2 * spiralTurns; t += Math.PI / 60) {
+    const b = Math.log(phi) / Math.PI;
+    const r = Math.min(eggWidth, eggHeight) * 0.15 * Math.exp(b * t);
+    const x = cx + r * Math.cos(t);
+    const y = cy + r * Math.sin(t);
+    
+    if (t === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  
+  // Top point indicator (root chakra)
+  ctx.fillStyle = `rgba(0, 255, 136, ${0.3 + coh/300})`;
+  ctx.beginPath();
+  ctx.arc(cx, cy - eggHeight * 0.75, 3 + coh/50, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawFrequencyWaves(coh) {
+  if (!currentModel || !document.getElementById('dimSelector')) return;
+  
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const root = currentModel.rootFreq;
+  const dim = document.getElementById('dimSelector').value;
+  
+  let octave = 0;
+  let ringCount = 4;
+  let ringColor = 'hsla';
+  
+  switch(dim) {
+    case 'physical':
+      octave = 0;
+      ringCount = 4;
+      ringColor = 'hsl(180, 100%, 50%)'; // Cyan for physical
+      break;
+    case 'etheric':
+      octave = 3;
+      ringCount = 5;
+      ringColor = 'hsl(240, 100%, 50%)'; // Blue for etheric
+      break;
+    case 'astral':
+      octave = 6;
+      ringCount = 6;
+      ringColor = 'hsl(280, 100%, 50%)'; // Violet for astral
+      break;
+    case 'cosmic':
+      octave = 9;
+      ringCount = 7;
+      ringColor = 'hsl(320, 100%, 50%)'; // Magenta for cosmic
+      break;
+  }
+  
+  const freq = root * Math.pow(2, octave);
+  
+  // Draw concentric frequency rings (MORE rings in higher realms)
+  for (let ring = 1; ring <= ringCount; ring++) {
+    const radius = 40 + ring * 20;
+    const hue = (ring * 60 + vizTime * 20 + octave * 30) % 360;
+    const amp = Math.sin(vizTime + ring) * 0.3 + 0.7;
+    
+    // Stronger colors in higher realms
+    const alpha = Math.min(1, (coh / 100) * (1 + octave / 10));
+    ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${alpha})`;
+    ctx.lineWidth = 1.5 + octave * 0.2;
+    ctx.beginPath();
+    
+    for (let angle = 0; angle < Math.PI * 2; angle += 0.1) {
+      const wave = Math.sin(angle * 4 + vizTime * 3) * amp * 5;
+      const r = radius + wave;
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      
+      if (angle === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+  
+  // Draw radial spokes (harmonic structure)
+  const spokes = 4 + octave;
+  for (let i = 0; i < spokes; i++) {
+    const angle = (i / spokes) * Math.PI * 2 + vizTime;
+    const x1 = cx + 30 * Math.cos(angle);
+    const y1 = cy + 30 * Math.sin(angle);
+    const x2 = cx + 100 * Math.cos(angle);
+    const y2 = cy + 100 * Math.sin(angle);
+    
+    // Brighter spokes in higher realms
+    const spokeAlpha = 0.2 + (coh / 500) + octave * 0.05;
+    ctx.strokeStyle = `rgba(0, 200, 255, ${spokeAlpha})`;
+    ctx.lineWidth = 1 + octave * 0.1;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+  
+  // Log realm change for debugging (only log when realm actually changes)
+  if (window.lastRealm !== dim) {
+    const realmNames = {
+      'physical': 'PHYSICAL (Audible)',
+      'etheric': 'ETHERIC (Subtle Energy)',
+      'astral': 'ASTRAL (Non-Physical)',
+      'cosmic': 'COSMIC (Unified Field)'
+    };
+    console.log(`
+🌍 REALM SWITCHED: ${realmNames[dim]}
+  ├─ Octave: +${octave}
+  ├─ Frequency: ${freq.toFixed(1)} Hz
+  ├─ Spokes: ${spokes}
+  ├─ Rings: ${ringCount}
+  ├─ Root × 2^${octave} = ${root} × ${Math.pow(2, octave)} = ${freq.toFixed(1)}
+  └─ Coherency: ${((coh / 100) * 100).toFixed(0)}%
+    `);
+    window.lastRealm = dim;
+  }
+}
+
+function drawPhaseIndicator(coh) {
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const phase = currentModel.phase;
+  const phaseColors = [
+    '#ff3333', '#ff8800', '#ffff00', '#00ff88',
+    '#00ffff', '#0088ff', '#ff00ff'
+  ];
+  
+  // Pulsing glow
+  const pulse = Math.sin(vizTime * 3) * 0.3 + 0.7;
+  const color = phaseColors[phase];
+  const alpha = (pulse * 0.5).toFixed(2);
+  
+  // Convert hex to rgba
+  const r = parseInt(color.slice(1,3), 16);
+  const g = parseInt(color.slice(3,5), 16);
+  const b = parseInt(color.slice(5,7), 16);
+  ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 120 + pulse * 10, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Inner circle
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 120, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Phase label
+  const phaseNames = ['Red·Rising', 'Orange·Ascent', 'Yellow·Peak', 'Green·Resonate', 
+                      'Cyan·Threshold', 'Blue·Descent', 'Magenta·Transform'];
+  ctx.fillStyle = color;
+  ctx.font = 'bold 12px Georgia';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(phaseNames[phase], cx, cy - 10);
+  
+  ctx.font = '10px Georgia';
+  ctx.fillStyle = '#aaa';
+  ctx.fillText(`Phase ${phase} · ${(coh)}% coherency`, cx, cy + 10);
+}
+
+function updateVizInfo(coh) {
+  if (!currentModel || !document.getElementById('dimSelector')) return;
+  
+  const dim = document.getElementById('dimSelector').value;
+  const octaves = { 'physical': 0, 'etheric': 3, 'astral': 6, 'cosmic': 9 };
+  const octave = octaves[dim];
+  const freq = currentModel.rootFreq * Math.pow(2, octave);
+  
+  // Format frequency with proper precision
+  let freqDisplay = '';
+  if (freq < 1000) {
+    freqDisplay = freq.toFixed(1) + ' Hz';
+  } else if (freq < 1000000) {
+    freqDisplay = (freq / 1000).toFixed(2) + ' kHz';
+  } else {
+    freqDisplay = (freq / 1000000).toFixed(3) + ' MHz';
+  }
+  
+  document.getElementById('vizPlantName').textContent = currentModel.name;
+  document.getElementById('vizFreq').textContent = freqDisplay;
+  
+  const phaseNames = ['Red·Rising', 'Orange·Ascent', 'Yellow·Peak', 'Green·Resonate', 
+                      'Cyan·Threshold', 'Blue·Descent', 'Magenta·Transform'];
+  
+  const realmFullNames = {
+    'physical': 'Physical (Audible)',
+    'etheric': 'Etheric (Subtle Energy)',
+    'astral': 'Astral (Non-Physical)',
+    'cosmic': 'Cosmic (Unified Field)'
+  };
+  
+  document.getElementById('phaseInfo').textContent = `Phase: ${phaseNames[currentModel.phase]} (${currentModel.phase})`;
+  document.getElementById('realmInfo').textContent = `Realm: ${realmFullNames[dim]} (Oct +${octave})`;
+  document.getElementById('energyInfo').textContent = `Energy: ${((coh / 100) * 100).toFixed(0)}% · Coherency: ${coh}%`;
+}
+
+// Initialize visualization on page load
+
+// ============================================================
+// DEVICE SENSOR BRIDGE FUNCTIONS
+// ============================================================
+
+let deviceSensorBridge = null;
+let lastSensorReading = null;
+
+async function initializeDeviceSensors() {
+  if (!window.DeviceSensorBridge) {
+    showError('Device Sensor Bridge module not loaded');
+    return;
+  }
+  
+  deviceSensorBridge = new DeviceSensorBridge();
+  const success = await deviceSensorBridge.startAllSensors();
+  
+  if (success) {
+    const statusDiv = document.getElementById('deviceSensorStatus');
+    statusDiv.innerHTML = '<span style="color: #00ff88;">✓ Sensors initialized and listening...</span>';
+    console.log('✓ Device sensors ready');
+  } else {
+    showError('Could not initialize sensors. Check device permissions.');
+  }
+}
+
+function readDeviceSensorData() {
+  if (!deviceSensorBridge || !deviceSensorBridge.isListening) {
+    showError('Sensors not initialized. Click "Init Sensors" first.');
+    return;
+  }
+  
+  lastSensorReading = deviceSensorBridge.getBioelectricReading();
+  
+  // Display readings
+  const statusDiv = document.getElementById('deviceSensorStatus');
+  statusDiv.innerHTML = `
+    <strong style="color: #00ff88;">📊 LIVE SENSOR DATA:</strong><br>
+    🔊 Dominant Frequency: <strong style="color: #00ccff;">${lastSensorReading.dominant_frequency_hz} Hz</strong><br>
+    ⚡ Bioelectric Potential: <strong style="color: #00ff88;">${lastSensorReading.bioelectric_potential_mv} mV</strong><br>
+    🌍 Electrode Impedance: <strong style="color: #00ffaa;">${lastSensorReading.electrode_impedance_ohms} Ω</strong><br>
+    💧 Soil Moisture: <strong style="color: #00ccff;">${lastSensorReading.soil_moisture_estimate}%</strong><br>
+    🧬 Plant Coherency: <strong style="color: #ffaa00;">${lastSensorReading.plant_coherency_percent}%</strong><br>
+    📈 Energy Level: <strong style="color: #ff6600;">${lastSensorReading.energy_db} dB</strong><br>
+    ⏱️ Time: <strong style="color: #3a5060;">${new Date(lastSensorReading.timestamp).toLocaleTimeString()}</strong><br>
+    Status: ${lastSensorReading.status}
+  `;
+}
+
+function autoFillPlantFrequency() {
+  if (!lastSensorReading) {
+    readDeviceSensorData();
+    if (!lastSensorReading) {
+      showError('No sensor data available. Read sensors first.');
+      return;
+    }
+  }
+  
+  // Extract frequency from sensor reading
+  const freqHz = parseFloat(lastSensorReading.dominant_frequency_hz);
+  const coherency = parseFloat(lastSensorReading.plant_coherency_percent);
+  
+  // Validate frequency is in range
+  if (freqHz < 54 || freqHz > 1000) {
+    showError(`Frequency ${freqHz.toFixed(1)} Hz out of range (54-1000 Hz). Sensor may need calibration.`);
+    return;
+  }
+  
+  // Fill form fields
+  document.getElementById('rootFreq').value = freqHz.toFixed(1);
+  document.getElementById('coherency').value = Math.round(coherency);
+  
+  // Optional: Try to match to known plant
+  const knownPlants = {
+    '432': 'Wheat',
+    '528': 'Basil',
+    '639': 'Rose',
+    '741': 'Tomato',
+    '852': 'Marigold',
+    '963': 'Lettuce'
+  };
+  
+  let plantGuess = 'Unknown Plant';
+  for (const [knownFreq, plantName] of Object.entries(knownPlants)) {
+    if (Math.abs(freqHz - parseFloat(knownFreq)) < 30) {
+      plantGuess = plantName;
+      break;
+    }
+  }
+  
+  document.getElementById('plantName').value = plantGuess;
+  
+  showSuccess(`✓ Auto-filled form from sensor:\n${plantGuess} @ ${freqHz.toFixed(1)} Hz (${coherency.toFixed(0)}% coherency)`);
+}
+
+function stopDeviceSensors() {
+  if (deviceSensorBridge) {
+    deviceSensorBridge.stopListening();
+    document.getElementById('deviceSensorStatus').innerHTML = '<span style="color: #ff6600;">⏹ Sensors stopped</span>';
+  }
+}
+
+// ============================================================
+
+function initializeApp() {
+  // Initialize library display
+  updateLibrary();
+  
+  // Initialize canvas
+  if (initCanvas()) {
+    // Create a default demo model to show visualization
+    currentModel = {
+      id: 'demo',
+      name: 'Demo: Tomato Plant',
+      rootFreq: 741,
+      coherency: 97,
+      type: 'vegetable',
+      phase: 3,
+      notes: 'Create your first plant model to see live updates',
+      createdAt: new Date().toISOString(),
+      octaves: generateOctaves(741)
+    };
+    
+    vizRunning = true;
+    updateViz();
+  }
+  
+  // Add event listeners
+  const dimSelector = document.getElementById('dimSelector');
+  const cohSlider = document.getElementById('cohSlider');
+  
+  if (dimSelector) {
+    dimSelector.addEventListener('change', function() {
+      console.log('✓ Dimension changed: ' + this.value);
+      if (currentModel) {
+        updateVizInfo(parseInt(cohSlider.value));
+      }
+    });
+  }
+  
+  if (cohSlider) {
+    cohSlider.addEventListener('input', function() {
+      if (currentModel) {
+        document.getElementById('cohLabel').textContent = this.value + '%';
+      }
+    });
+  }
+  
+  console.log('✓ UFT Plant Discovery Model Builder initialized');
+  console.log('✓ Demo model loaded · Create your first plant to begin');
+}
+
+// Wait for DOM to be ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
+}
+</script>
+
+<!-- DEVICE SENSOR BRIDGE SCRIPT -->
+<script src="../modules/device-sensor-bridge.js"></script>
+
+<!-- DISCLAIMER -->
+<div style="text-align: center; font-size: 11px; color: #5a7080; padding: 24px 20px; margin-top: 32px; border-top: 1px solid #182840;">
+  <p style="margin-bottom: 8px;"><strong>⚠️ Test Model Disclaimer</strong></p>
+  <p>This is a research and development test model for the RMTerra project. Results are for demonstration purposes only and should not be used for production agricultural decisions without field validation.</p>
+</div>
+
+</body>
+</html>
