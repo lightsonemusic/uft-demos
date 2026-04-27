@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4a9d7d">
+  <meta name="description" content="Design harmonic forest systems integrating UFT frequencies with syntropic agriculture">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="UFT Syntropic">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231a3a3a' width='100' height='100'/><text x='50' y='75' font-size='70' fill='%234affb1' text-anchor='middle'>🌿</text></svg>">
+  <title>UFT Syntropic Module - Universal Frequency Translator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a3a3a 0%, #2d5a4d 50%, #1a3a3a 100%);
+      color: #e0e0e0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 0;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px 12px 0 0;
+      border: 2px solid #4a9d7d;
+      border-bottom: none;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: #4affb1;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(74, 255, 177, 0.3);
+    }
+
+    .subtitle {
+      font-size: 1.1em;
+      color: #b3b3b3;
+    }
+
+    .page-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      border: 2px solid #4a9d7d;
+      border-top: none;
+    }
+
+    .page-btn {
+      padding: 10px 15px;
+      background: rgba(74, 157, 125, 0.3);
+      border: 2px solid #4a9d7d;
+      color: #4affb1;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .page-btn:hover {
+      background: rgba(74, 255, 177, 0.2);
+      color: #fff;
+    }
+
+    .page-btn.active {
+      background: #4a9d7d;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(74, 255, 177, 0.5);
+    }
+
+    .pages-container {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid #4a9d7d;
+      border-top: none;
+      padding: 30px;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .page-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .page-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .oracle-section {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      color: #4affb1;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #4a9d7d;
+      padding-bottom: 10px;
+    }
+
+    .card {
+      background: rgba(74, 157, 125, 0.1);
+      border: 2px solid #4a9d7d;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .card h3 {
+      color: #4affb1;
+      margin-bottom: 15px;
+    }
+
+    .main-grid {
+      display: grid;
+      gap: 15px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #4affb1;
+    }
+
+    .info-value {
+      color: #e0e0e0;
+    }
+
+    select, input {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid #4a9d7d;
+      color: #e0e0e0;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 1em;
+      margin-bottom: 15px;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(74, 255, 177, 0.3);
+    }
+
+    .legend-section {
+      background: rgba(74, 157, 125, 0.15);
+      border-left: 4px solid #4a9d7d;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+
+    .legend-section h3 {
+      color: #4affb1;
+      margin-bottom: 15px;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .legend-item {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 12px;
+      border-radius: 4px;
+      border-left: 3px solid #4affb1;
+    }
+
+    .harmony-score {
+      font-size: 2em;
+      font-weight: bold;
+      color: #4affb1;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .btn-primary {
+      background: #4a9d7d;
+      border: none;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 10px 0;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: #4affb1;
+      color: #000;
+      box-shadow: 0 0 15px rgba(74, 255, 177, 0.5);
+    }
+
+    .empty-message {
+      color: #999;
+      font-style: italic;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: rgba(74, 157, 125, 0.3);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #4affb1;
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #4affb1;
+      cursor: pointer;
+      border: none;
+    }
+
+    .sensor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .sensor-input {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #4a9d7d;
+    }
+
+    .sensor-input h4 {
+      color: #4affb1;
+      margin-bottom: 10px;
+    }
+
+    .slider-value {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 0.9em;
+      color: #aaa;
+    }
+
+    .diagnosis-box {
+      background: rgba(74, 157, 125, 0.1);
+      border-left: 4px solid #4a9d7d;
+      padding: 15px;
+      margin: 10px 0;
+    }
+
+    .diagnosis-item {
+      padding: 8px;
+      margin: 5px 0;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    .companion-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .companion-item {
+      background: rgba(74, 157, 125, 0.15);
+      padding: 12px;
+      border-radius: 6px;
+      border-left: 3px solid #4affb1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .harmony-bar {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+      height: 8px;
+      margin: 5px 0;
+      overflow: hidden;
+    }
+
+    .harmony-fill {
+      background: linear-gradient(90deg, #4a9d7d, #4affb1);
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    /* ===== MOBILE RESPONSIVENESS ===== */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      .container {
+        max-width: 100%;
+      }
+
+      header {
+        padding: 20px 15px;
+        margin-bottom: 0;
+      }
+
+      h1 {
+        font-size: 1.8em;
+        margin-bottom: 8px;
+      }
+
+      .subtitle {
+        font-size: 0.9em;
+      }
+
+      .page-nav {
+        padding: 10px;
+        gap: 6px;
+      }
+
+      .page-btn {
+        padding: 8px 10px;
+        font-size: 0.75em;
+        flex: 1 1 calc(50% - 3px);
+      }
+
+      .pages-container {
+        padding: 15px;
+        border-radius: 0 0 8px 8px;
+      }
+
+      .card {
+        padding: 12px;
+      }
+
+      .card h3 {
+        font-size: 1.1em;
+      }
+
+      .section-title {
+        font-size: 1.3em;
+      }
+
+      .legend-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .legend-item {
+        padding: 10px;
+      }
+
+      .sensor-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .sensor-input {
+        padding: 12px;
+      }
+
+      select, input {
+        padding: 8px;
+        font-size: 0.95em;
+        margin-bottom: 12px;
+      }
+
+      .btn-primary {
+        padding: 10px 15px;
+        font-size: 0.9em;
+        margin: 8px 0;
+      }
+
+      .companion-item {
+        padding: 10px;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .info-row {
+        padding: 8px;
+        font-size: 0.9em;
+        flex-wrap: wrap;
+      }
+
+      .harmony-score {
+        font-size: 1.5em;
+        margin: 15px 0;
+      }
+
+      svg {
+        width: 100% !important;
+        height: auto !important;
+      }
+
+      svg text {
+        font-size: 8px !important;
+      }
+
+      footer {
+        padding: 15px;
+        font-size: 0.75em;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 8px;
+      }
+
+      header {
+        padding: 15px 10px;
+        border-radius: 8px 8px 0 0;
+      }
+
+      h1 {
+        font-size: 1.4em;
+        margin-bottom: 5px;
+      }
+
+      .subtitle {
+        font-size: 0.8em;
+        display: none;
+      }
+
+      .page-nav {
+        padding: 8px;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+
+      .page-btn {
+        padding: 6px 8px;
+        font-size: 0.65em;
+        flex: 0 1 auto;
+        border-width: 1px;
+      }
+
+      .pages-container {
+        padding: 10px;
+        border-width: 1px;
+      }
+
+      .card {
+        padding: 10px;
+        border-width: 1px;
+      }
+
+      .card h3 {
+        font-size: 0.95em;
+        margin-bottom: 10px;
+      }
+
+      .section-title {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+      }
+
+      .legend-section {
+        padding: 10px;
+        margin: 10px 0;
+      }
+
+      .legend-section h3 {
+        font-size: 1em;
+        margin-bottom: 8px;
+      }
+
+      .legend-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .legend-item {
+        padding: 8px;
+        font-size: 0.85em;
+      }
+
+      .sensor-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .sensor-input {
+        padding: 10px;
+      }
+
+      .sensor-input h4 {
+        font-size: 0.9em;
+      }
+
+      .slider-value {
+        font-size: 0.8em;
+        margin-top: 5px;
+      }
+
+      select, input {
+        padding: 6px;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+        width: 100%;
+      }
+
+      .btn-primary {
+        padding: 8px 12px;
+        font-size: 0.8em;
+        margin: 5px 0;
+        width: 100%;
+      }
+
+      .companion-item {
+        padding: 8px;
+        flex-direction: column;
+        gap: 6px;
+        border-left-width: 2px;
+      }
+
+      .companion-list {
+        gap: 8px;
+      }
+
+      .info-row {
+        padding: 6px;
+        font-size: 0.8em;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .info-label {
+        font-size: 0.85em;
+      }
+
+      .info-value {
+        font-size: 0.8em;
+      }
+
+      .harmony-score {
+        font-size: 1.2em;
+        margin: 10px 0;
+      }
+
+      .diagnosis-box {
+        padding: 10px;
+        margin: 8px 0;
+        border-left-width: 3px;
+      }
+
+      .diagnosis-item {
+        padding: 6px;
+        font-size: 0.85em;
+        margin: 4px 0;
+      }
+
+      svg {
+        width: 100% !important;
+        height: auto !important;
+        margin: 10px 0 !important;
+      }
+
+      svg circle {
+        r: 12 !important;
+      }
+
+      svg text {
+        font-size: 7px !important;
+      }
+
+      svg line {
+        stroke-width: 1px !important;
+      }
+
+      footer {
+        padding: 10px;
+        margin-top: 20px;
+        font-size: 0.7em;
+        border-top-width: 1px;
+      }
+
+      .empty-message {
+        padding: 15px;
+        font-size: 0.85em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🌿 UFT Syntropic Module</h1>
+      <p class="subtitle">Universal Frequency Translator - Design & Monitor Harmonic Forest Systems</p>
+    </header>
+
+    <div class="page-nav">
+      <button class="page-btn active" onclick="showPage('plant-search')">🌿 Plant Search & Companions</button>
+      <button class="page-btn" onclick="showPage('lunar-timing')">🌙 Lunar Timing</button>
+      <button class="page-btn" onclick="showPage('health-healing')">📊 Health & Healing</button>
+      <button class="page-btn" onclick="showPolyculture()">🎵 Polyculture Composer</button>
+      <button class="page-btn" onclick="showPage('forest-design')">🌳 Forest Designer</button>
+      <button class="page-btn" onclick="showPage('mulching')">🍂 Mulching Guide</button>
+      <button class="page-btn" onclick="showPage('guide')">📖 Guide & Reference</button>
+    </div>
+
+    <div class="pages-container">
+      <!-- PAGE 1: Plant Search & Companions -->
+      <div id="plant-search" class="page-content active">
+        <div class="oracle-section">
+          <div class="section-title">🌿 Plant Search & Harmonic Companions</div>
+          
+          <div class="card">
+            <h3>Search Plant</h3>
+            <select id="plant-select" onchange="searchPlant()">
+              <option value="">-- Select a plant (🇵🇹 PT | 🇬🇧 EN | 🌿 Latin) --</option>
+            </select>
+            <div id="plant-details"></div>
+          </div>
+
+          <div class="card">
+            <h3>🎵 Top Companion Plants (Ranked by Harmony)</h3>
+            <div id="companions-list" class="empty-message">Select a plant to see companions</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 2: Lunar Timing -->
+      <div id="lunar-timing" class="page-content">
+        <div class="oracle-section">
+          <div class="section-title">🌙 Lunar Timing Guide</div>
+          
+          <div class="card">
+            <h3>Select Lunar Month</h3>
+            <p style="color: #aaa; margin-bottom: 20px;">Click a lunar month to see optimal planting timing:</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px;">
+              <button class="btn-primary" onclick="selectMonth(1)">1 Birch</button>
+              <button class="btn-primary" onclick="selectMonth(2)">2 Rowan</button>
+              <button class="btn-primary" onclick="selectMonth(3)">3 Ash</button>
+              <button class="btn-primary" onclick="selectMonth(4)">4 Alder</button>
+              <button class="btn-primary" onclick="selectMonth(5)">5 Willow</button>
+              <button class="btn-primary" onclick="selectMonth(6)">6 Hawthorn</button>
+              <button class="btn-primary" onclick="selectMonth(7)">7 Oak ⭐</button>
+              <button class="btn-primary" onclick="selectMonth(8)">8 Holly</button>
+              <button class="btn-primary" onclick="selectMonth(9)">9 Hazel</button>
+              <button class="btn-primary" onclick="selectMonth(10)">10 Vine</button>
+              <button class="btn-primary" onclick="selectMonth(11)">11 Ivy</button>
+              <button class="btn-primary" onclick="selectMonth(12)">12 Reed</button>
+              <button class="btn-primary" onclick="selectMonth(13)">13 Elder</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Timing Information</h3>
+            <div id="lunar-info" class="empty-message">Select a lunar month and plant to view timing</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 3: Health & Healing -->
+      <div id="health-healing" class="page-content">
+        <div class="oracle-section">
+          <div class="section-title">📊 Plant Health Diagnostics & Healing Frequencies</div>
+          
+          <div class="card">
+            <h3>Sensor Input (Adjust to Diagnose)</h3>
+            <div class="sensor-grid">
+              <div class="sensor-input">
+                <h4>💧 Soil Conductivity</h4>
+                <input type="range" id="conductivity" class="slider" min="0" max="100" value="50" oninput="updateDiagnosis()">
+                <div class="slider-value"><span>Low</span><span id="cond-val">50%</span><span>High</span></div>
+              </div>
+              <div class="sensor-input">
+                <h4>🌊 Soil Moisture</h4>
+                <input type="range" id="moisture" class="slider" min="0" max="100" value="50" oninput="updateDiagnosis()">
+                <div class="slider-value"><span>Dry</span><span id="moist-val">50%</span><span>Wet</span></div>
+              </div>
+              <div class="sensor-input">
+                <h4>🌡️ Leaf Temperature</h4>
+                <input type="range" id="temperature" class="slider" min="10" max="40" value="25" oninput="updateDiagnosis()">
+                <div class="slider-value"><span>10°C</span><span id="temp-val">25°C</span><span>40°C</span></div>
+              </div>
+              <div class="sensor-input">
+                <h4>☀️ Photosynthesis</h4>
+                <input type="range" id="photosynthesis" class="slider" min="0" max="100" value="50" oninput="updateDiagnosis()">
+                <div class="slider-value"><span>Low</span><span id="photo-val">50%</span><span>High</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Diagnosis & Healing</h3>
+            <div id="diagnosis-result" class="empty-message">Adjust sensors to see diagnosis</div>
+            <div id="healing-result" style="margin-top: 20px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 4: Polyculture Composer -->
+      <div id="polyculture" class="page-content">
+        <div class="oracle-section">
+          <div class="section-title">🎵 Polyculture Composer - Harmonic Plant Communities</div>
+          
+          <div style="background: rgba(74, 255, 177, 0.1); border-left: 4px solid #4affb1; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+            <p style="color: #4affb1; font-size: 0.9em;">
+              💡 <strong>Tip:</strong> When you navigate here from Plant Search, Plant 1 is automatically pre-filled with your selected plant. Add 1-3 more to create a harmonic chord!
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Select 2-4 Plants for Harmonic Chord</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+              <div>
+                <label style="color: #4affb1;">Plant 1:</label>
+                <select id="poly-plant1" onchange="updatePolyculture()">
+                  <option value="">-- Select --</option>
+                </select>
+              </div>
+              <div>
+                <label style="color: #4affb1;">Plant 2:</label>
+                <select id="poly-plant2" onchange="updatePolyculture()">
+                  <option value="">-- Select --</option>
+                </select>
+              </div>
+              <div>
+                <label style="color: #4affb1;">Plant 3:</label>
+                <select id="poly-plant3" onchange="updatePolyculture()">
+                  <option value="">-- Select --</option>
+                </select>
+              </div>
+              <div>
+                <label style="color: #4affb1;">Plant 4:</label>
+                <select id="poly-plant4" onchange="updatePolyculture()">
+                  <option value="">-- Select --</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Consonance Score</h3>
+            <div id="poly-harmony" class="empty-message">Select plants to calculate harmony</div>
+          </div>
+
+          <div class="card">
+            <h3>Frequencies Selected</h3>
+            <div id="poly-frequencies" class="empty-message">No plants selected</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 5: Forest Designer -->
+      <div id="forest-design" class="page-content">
+        <div class="oracle-section">
+          <div class="section-title">🌳 3-Layer Forest Designer (Syntropic Succession)</div>
+          
+          <div class="legend-section">
+            <h3>Design Your Succession Phases</h3>
+            <p style="margin-bottom: 15px; color: #b3b3b3;">
+              Select one plant for each layer. The system will generate planting recommendations with mulching protocols and harmonic analysis.
+            </p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+              <div>
+                <h4 style="color: #4affb1; margin-bottom: 10px;">🌱 Placenta Phase (1-4 years)</h4>
+                <p style="font-size: 0.85em; color: #999; margin-bottom: 10px;">Pioneer nitrogen-fixers</p>
+                <select id="layer-pioneer" onchange="updateForestDesign()">
+                  <option value="">-- Select pioneer plant --</option>
+                </select>
+              </div>
+              <div>
+                <h4 style="color: #4affb1; margin-bottom: 10px;">🌿 Secundária Phase (5-14 years)</h4>
+                <p style="font-size: 0.85em; color: #999; margin-bottom: 10px;">Mid-stage productive trees</p>
+                <select id="layer-secondary" onchange="updateForestDesign()">
+                  <option value="">-- Select secondary plant --</option>
+                </select>
+              </div>
+              <div>
+                <h4 style="color: #4affb1; margin-bottom: 10px;">🌲 Clímax Phase (15+ years)</h4>
+                <p style="font-size: 0.85em; color: #999; margin-bottom: 10px;">Emergent trees</p>
+                <select id="layer-climax" onchange="updateForestDesign()">
+                  <option value="">-- Select climax plant --</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+              <button class="btn-primary" onclick="exportForestDesign()" style="background: #4a9d7d; border: 2px solid #4affb1; padding: 12px 30px; font-size: 1em;">
+                📥 Export Design as JSON
+              </button>
+              <p style="font-size: 0.85em; color: #999; margin-top: 10px;">Save your forest design for later reference or modification</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Forest Design Recommendations</h3>
+            <div id="forest-recommendations" class="empty-message">Select plants from all three phases to generate recommendations</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 6: Mulching Guide -->
+      <div id="mulching" class="page-content">
+        <div class="oracle-section">
+          <div class="section-title">🍂 Mulching Guide - Integral Syntropic Protocol</div>
+          
+          <div class="legend-section">
+            <h3>What is Mulching in Syntropic Agriculture?</h3>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <strong>🌍 Live Soil Cover</strong><br>
+                10-25cm layer of organic matter (leaves, pruned branches, compost) spread over soil.
+              </div>
+              <div class="legend-item">
+                <strong>🔄 NPK Cycling</strong><br>
+                Mulch decomposes slowly = continuous nutrition. Pruned branches become system's own fertilizer.
+              </div>
+              <div class="legend-item">
+                <strong>💧 Water Conservation</strong><br>
+                Reduces evaporation 50-70%. Keeps soil cool and naturally moist.
+              </div>
+              <div class="legend-item">
+                <strong>🛡️ Soil Protection</strong><br>
+                Prevents compaction, protects microorganisms, suppresses weeds.
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <h3>Types of Mulch Recommended</h3>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <strong>🍂 Dry Leaves</strong><br>
+                Oak, Beech, Chestnut. Decompose quickly. Start with 10-15cm.
+              </div>
+              <div class="legend-item">
+                <strong>🌿 Selective Weeding</strong><br>
+                Spontaneous plants with nutrients. Non-compacting. Add biodiversity.
+              </div>
+              <div class="legend-item">
+                <strong>🪵 Pruned Branches</strong><br>
+                From dynamic pruning. Cut 5-10cm. Decompose in 6-12 months = slow fertilizer.
+              </div>
+              <div class="legend-item">
+                <strong>♻️ Partial Compost</strong><br>
+                Half-fermented residues. Accelerates microbiota. Mix with dry leaves.
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <h3>Mulching Protocol: When & How Much</h3>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <strong>🌱 Step 1: Prepare Soil</strong><br>
+                Dig 40-50cm hole. Add compost base at bottom.
+              </div>
+              <div class="legend-item">
+                <strong>🌿 Step 2: Plant</strong><br>
+                Place plant. Water well. Firm soil.
+              </div>
+              <div class="legend-item">
+                <strong>🍂 Step 3: Mulch Immediately</strong><br>
+                Spread 10-15cm mulch around (leave 5cm from trunk).
+              </div>
+              <div class="legend-item">
+                <strong>🔁 Step 4: Maintenance</strong><br>
+                Every 6 months, add new layer. Mulch decomposes = needs replenishing.
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-section" style="background: rgba(74, 157, 125, 0.15); border-left: 4px solid #4a9d7d;">
+            <h3>📊 Measured Benefits in Syntropic Systems</h3>
+            <p style="margin-bottom: 10px;">
+              <strong>Moisture retention:</strong> +50-70% (reduces watering)<br>
+              <strong>Soil temperature:</strong> 3-5°C cooler on hot days<br>
+              <strong>Microbial activity:</strong> 3-5x more active in year 2<br>
+              <strong>Nutrient cycling:</strong> Reduces external inputs by 80%<br>
+              <strong>Weed suppression:</strong> Reduces weeds 60-80%<br>
+              <strong>Soil structure:</strong> Improves after 2-3 years
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 7: Guide & Reference -->
+      <div id="guide" class="page-content">
+        <div class="oracle-section">
+          <div class="section-title">📖 How to Use This Master Module</div>
+          
+          <div class="legend-section">
+            <h3>Complete Workflow for Syntropic Forest Design</h3>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <strong>Step 1: Search Plants</strong><br>
+                Find your desired plants and see their harmonic companions. Understand frequencies & lunar months.
+              </div>
+              <div class="legend-item">
+                <strong>Step 2: Plan Forest Layers</strong><br>
+                Use Forest Designer to select Pioneer → Secondary → Climax plants with harmonic analysis.
+              </div>
+              <div class="legend-item">
+                <strong>Step 3: Check Lunar Timing</strong><br>
+                Optimal planting aligned with lunar months and sap phases for each plant.
+              </div>
+              <div class="legend-item">
+                <strong>Step 4: Monitor Health</strong><br>
+                Use Health & Healing to diagnose issues and prescribe UFT healing frequencies.
+              </div>
+              <div class="legend-item">
+                <strong>Step 5: Apply Mulching</strong><br>
+                Follow mulching protocols for zero external inputs and continuous soil renewal.
+              </div>
+              <div class="legend-item">
+                <strong>Step 6: Optimize Companions</strong><br>
+                Use Polyculture Composer to create harmonic plant communities (ninhos).
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <h3>Lunar Sap Phases Explained</h3>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <strong>🌱 Awakening (Month 13)</strong><br>
+                New growth energy. Perfect for fresh plantings.
+              </div>
+              <div class="legend-item">
+                <strong>📈 Rising (Months 1-3)</strong><br>
+                Maximum growth. Ideal for vegetative development.
+              </div>
+              <div class="legend-item">
+                <strong>⭐ Peak (Months 4-6)</strong><br>
+                Highest vigor. Flowering, fruit set, production.
+              </div>
+              <div class="legend-item">
+                <strong>⚖️ Zero Point (Month 7)</strong><br>
+                Stillness & balance. Harmonic equilibrium.
+              </div>
+              <div class="legend-item">
+                <strong>📉 Descending (Months 8-10)</strong><br>
+                Ripening & maturation. Harvest window.
+              </div>
+              <div class="legend-item">
+                <strong>💤 Dormant (Months 11-12)</strong><br>
+                Rest period. Root deepening. Nutrient storage.
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <h3>Understanding Consonance Scores</h3>
+            <p style="margin-bottom: 15px;">
+              Consonance measures harmonic relationship between plants based on frequency ratios. Higher scores = better compatibility:
+            </p>
+            <div class="legend-grid">
+              <div class="legend-item">
+                <strong>80-100%: Perfect Harmony</strong><br>
+                Plants naturally cooperate. Shared nutrient uptake, mutual protection.
+              </div>
+              <div class="legend-item">
+                <strong>60-79%: Good Consonance</strong><br>
+                Compatible pairs. Minimal competition. Complementary growth patterns.
+              </div>
+              <div class="legend-item">
+                <strong>40-59%: Neutral</strong><br>
+                Can coexist. No major synergy, but no antagonism either.
+              </div>
+              <div class="legend-item">
+                <strong>0-39%: Dissonance</strong><br>
+                Competition risk. Avoid planting together if possible.
+              </div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <h3>UFT Core Frequencies (13-Note Lunar Nikkal Scale)</h3>
+            <p style="color: #b3b3b3; margin-bottom: 15px;">
+              All 47 plants mapped to these canonical frequencies. Lunar month determines each plant's resonant frequency.
+            </p>
+            <p style="font-family: monospace; font-size: 0.85em; color: #999;">
+              Month 1-13: 261.63 → 293.66 → 349.23 → 277.18 → 311.13 → 329.63 → 297.58 → 523.25 → 391.99 → 587.33 → 622.25 → 659.25 → 698.46 Hz
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== COMPLETE PLANT DATABASE (47 plants) ==========
+    const MULTILINGUAL_PLANTS = [
+      { common_name_pt: 'Carvalho alvarinho', common_name_en: 'Pedunculate Oak', scientific_name: 'Quercus robur', lunar: 7, freq: 297.58, proto: 'NA', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Carvalho americano', common_name_en: 'Red Oak', scientific_name: 'Quercus rubra', lunar: 7, freq: 297.58, proto: 'NA', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Pinheiro bravo', common_name_en: 'Maritime Pine', scientific_name: 'Pinus pinaster', lunar: 11, freq: 466.16, proto: 'EE', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Eucalipto', common_name_en: 'Eucalyptus', scientific_name: 'Eucalyptus globulus', lunar: 8, freq: 349.23, proto: 'HA', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Freixo europeu', common_name_en: 'European Ash', scientific_name: 'Fraxinus excelsior', lunar: 9, freq: 391.99, proto: 'KA', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Castanheiro', common_name_en: 'European Chestnut', scientific_name: 'Castanea sativa', lunar: 6, freq: 329.63, proto: 'DA', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Faia', common_name_en: 'European Beech', scientific_name: 'Fagus sylvatica', lunar: 3, freq: 349.23, proto: 'HA', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Tília', common_name_en: 'Linden Tree', scientific_name: 'Tilia x vulgaris', lunar: 5, freq: 311.13, proto: 'MA', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Plátano', common_name_en: 'Plane Tree', scientific_name: 'Platanus x hispanica', lunar: 4, freq: 277.18, proto: 'SA', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Bétula', common_name_en: 'Birch', scientific_name: 'Betula alba', lunar: 10, freq: 261.63, proto: 'RA', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Nogueira', common_name_en: 'Walnut', scientific_name: 'Juglans regia', lunar: 2, freq: 391.99, proto: 'KA', strato: 'alto', phase: 'climax', fixer: false },
+      { common_name_pt: 'Cerejeira selvagem', common_name_en: 'Wild Cherry', scientific_name: 'Prunus avium', lunar: 2, freq: 391.99, proto: 'KA', strato: 'alto', phase: 'climax', fixer: false },
+      { common_name_pt: 'Sobreiro', common_name_en: 'Cork Oak', scientific_name: 'Quercus suber', lunar: 7, freq: 297.58, proto: 'NA', strato: 'alto', phase: 'climax', fixer: false },
+      { common_name_pt: 'Amoreira Branca', common_name_en: 'White Mulberry', scientific_name: 'Morus alba', lunar: 10, freq: 261.63, proto: 'RA', strato: 'alto', phase: 'climax', fixer: false },
+      { common_name_pt: 'Amoreira Negra', common_name_en: 'Black Mulberry', scientific_name: 'Morus nigra', lunar: 10, freq: 261.63, proto: 'RA', strato: 'alto', phase: 'climax', fixer: false },
+      { common_name_pt: 'Ulmeiro', common_name_en: 'Elm', scientific_name: 'Ulmus minor', lunar: 3, freq: 349.23, proto: 'HA', strato: 'alto', phase: 'climax', fixer: false },
+      { common_name_pt: 'Amendoeira', common_name_en: 'Almond', scientific_name: 'Prunus amygdalus', lunar: 1, freq: 261.63, proto: 'RA', strato: 'alto', phase: 'climax', fixer: false },
+      { common_name_pt: 'Pereira', common_name_en: 'Pear', scientific_name: 'Pyrus communis', lunar: 2, freq: 293.66, proto: 'LA', strato: 'medio', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Macieira Silvestre', common_name_en: 'Wild Apple', scientific_name: 'Malus sylvestris', lunar: 4, freq: 277.18, proto: 'SA', strato: 'medio', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Ameixoeira', common_name_en: 'Plum', scientific_name: 'Prunus domestica', lunar: 1, freq: 261.63, proto: 'RA', strato: 'medio', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Marmelo', common_name_en: 'Quince', scientific_name: 'Cydonia oblonga', lunar: 5, freq: 311.13, proto: 'MA', strato: 'medio', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Néspera', common_name_en: 'Medlar', scientific_name: 'Mespilus germanica', lunar: 6, freq: 329.63, proto: 'DA', strato: 'medio', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Figueira', common_name_en: 'Fig Tree', scientific_name: 'Ficus carica', lunar: 6, freq: 349.23, proto: 'HA', strato: 'medio', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Oliveira', common_name_en: 'Olive Tree', scientific_name: 'Olea europaea', lunar: 11, freq: 466.16, proto: 'EE', strato: 'medio', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Laranjeira', common_name_en: 'Sweet Orange', scientific_name: 'Citrus sinensis', lunar: 5, freq: 329.63, proto: 'DA', strato: 'medio', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Limoeiro', common_name_en: 'Lemon Tree', scientific_name: 'Citrus limon', lunar: 5, freq: 349.23, proto: 'HA', strato: 'medio', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Romãzeira', common_name_en: 'Pomegranate', scientific_name: 'Punica granatum', lunar: 8, freq: 329.63, proto: 'DA', strato: 'medio', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Alfarrobeira', common_name_en: 'Carob Tree', scientific_name: 'Ceratonia siliqua', lunar: 4, freq: 311.13, proto: 'MA', strato: 'medio', phase: 'placenta', fixer: true },
+      { common_name_pt: 'Amieiro Negro', common_name_en: 'Black Alder', scientific_name: 'Frangula alnus', lunar: 4, freq: 329.63, proto: 'DA', strato: 'alto', phase: 'placenta', fixer: true },
+      { common_name_pt: 'Giesta', common_name_en: 'Broom', scientific_name: 'Cytisus scoparius', lunar: 3, freq: 349.23, proto: 'HA', strato: 'bajo', phase: 'placenta', fixer: true },
+      { common_name_pt: 'Tojo', common_name_en: 'Gorse', scientific_name: 'Ulex europaeus', lunar: 1, freq: 261.63, proto: 'RA', strato: 'bajo', phase: 'placenta', fixer: true },
+      { common_name_pt: 'Acácia dealbata', common_name_en: 'Silver Wattle', scientific_name: 'Acacia dealbata', lunar: 2, freq: 293.66, proto: 'LA', strato: 'medio', phase: 'placenta', fixer: true },
+      { common_name_pt: 'Pilriteiro', common_name_en: 'Hawthorn', scientific_name: 'Crataegus monogyna', lunar: 6, freq: 329.63, proto: 'DA', strato: 'bajo', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Rosa Canina', common_name_en: 'Dog Rose', scientific_name: 'Rosa canina', lunar: 10, freq: 277.18, proto: 'SA', strato: 'bajo', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Aveleira', common_name_en: 'Hazel', scientific_name: 'Corylus avellana', lunar: 9, freq: 391.99, proto: 'KA', strato: 'bajo', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Medronheiro', common_name_en: 'Strawberry Tree', scientific_name: 'Arbutus unedo', lunar: 12, freq: 466.16, proto: 'EE', strato: 'bajo', phase: 'secundaria', fixer: false },
+      { common_name_pt: 'Lavanda', common_name_en: 'Lavender', scientific_name: 'Lavandula angustifolia', lunar: 8, freq: 349.23, proto: 'HA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Alecrim', common_name_en: 'Rosemary', scientific_name: 'Rosmarinus officinalis', lunar: 10, freq: 391.99, proto: 'KA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Tomilho', common_name_en: 'Thyme', scientific_name: 'Thymus vulgaris', lunar: 7, freq: 349.23, proto: 'HA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Hortelã', common_name_en: 'Mint', scientific_name: 'Mentha x piperita', lunar: 3, freq: 349.23, proto: 'HA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Sálvia', common_name_en: 'Sage', scientific_name: 'Salvia officinalis', lunar: 8, freq: 261.63, proto: 'RA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Manjerona', common_name_en: 'Marjoram', scientific_name: 'Origanum majorana', lunar: 7, freq: 349.23, proto: 'HA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Orégão', common_name_en: 'Oregano', scientific_name: 'Origanum vulgare', lunar: 7, freq: 349.23, proto: 'HA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Arruda', common_name_en: 'Rue', scientific_name: 'Ruta graveolens', lunar: 9, freq: 391.99, proto: 'KA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Urtiga', common_name_en: 'Nettle', scientific_name: 'Urtica dioica', lunar: 5, freq: 311.13, proto: 'MA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Consólida-maior', common_name_en: 'Comfrey', scientific_name: 'Symphytum officinale', lunar: 4, freq: 277.18, proto: 'SA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Chicória selvagem', common_name_en: 'Wild Chicory', scientific_name: 'Cichorium intybus', lunar: 11, freq: 466.16, proto: 'EE', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Dente-de-leão', common_name_en: 'Dandelion', scientific_name: 'Taraxacum officinale', lunar: 1, freq: 261.63, proto: 'RA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Camomila', common_name_en: 'Chamomile', scientific_name: 'Matricaria chamomilla', lunar: 12, freq: 466.16, proto: 'EE', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Funcho', common_name_en: 'Fennel', scientific_name: 'Foeniculum vulgare', lunar: 6, freq: 329.63, proto: 'DA', strato: 'bajo', phase: 'placenta', fixer: false },
+      { common_name_pt: 'Salgueiro branco', common_name_en: 'White Willow', scientific_name: 'Salix alba', lunar: 9, freq: 391.99, proto: 'KA', strato: 'emergente', phase: 'climax', fixer: false },
+      { common_name_pt: 'Choupo', common_name_en: 'Black Poplar', scientific_name: 'Populus nigra', lunar: 5, freq: 311.13, proto: 'MA', strato: 'emergente', phase: 'climax', fixer: false }
+    ];
+
+    const LUNAR_MONTHS = {
+      1: { name: 'Birch', sap: 'Awakening', freq: 330.00 },
+      2: { name: 'Rowan', sap: 'Rising', freq: 349.23 },
+      3: { name: 'Ash', sap: 'Rising', freq: 369.99 },
+      4: { name: 'Alder', sap: 'Peak', freq: 392.00 },
+      5: { name: 'Willow', sap: 'Peak', freq: 440.00 },
+      6: { name: 'Hawthorn', sap: 'Peak', freq: 466.16 },
+      7: { name: 'Oak', sap: 'Zero Point', freq: 297.58 },
+      8: { name: 'Holly', sap: 'Descending', freq: 523.25 },
+      9: { name: 'Hazel', sap: 'Descending', freq: 554.37 },
+      10: { name: 'Vine', sap: 'Descending', freq: 587.33 },
+      11: { name: 'Ivy', sap: 'Dormant', freq: 622.25 },
+      12: { name: 'Reed', sap: 'Dormant', freq: 659.25 },
+      13: { name: 'Elder', sap: 'Awakening', freq: 698.46 }
+    };
+
+    const CONSONANCE = [100, 83, 67, 100, 83, 100, 0, 100, 83, 67, 83, 100];
+
+    // ========== CORE FUNCTIONS ==========
+    
+    function getConsonance(f1, f2) {
+      const ratio = Math.log2(f2 / f1);
+      const semitones = Math.round(ratio * 12) % 12;
+      return CONSONANCE[Math.abs(semitones)];
+    }
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      // Find and activate the correct button (handles both showPage and showPolyculture)
+      const buttons = document.querySelectorAll('.page-btn');
+      buttons.forEach(b => {
+        if ((pageId === 'polyculture' && b.textContent.includes('Polyculture')) ||
+            (pageId !== 'polyculture' && b.getAttribute('onclick')?.includes(`'${pageId}'`))) {
+          b.classList.add('active');
+        }
+      });
+    }
+
+    function showPolyculture() {
+      showPage('polyculture');
+      // Auto-import selected plant from Plant Search
+      const selectedPlant = document.getElementById('plant-select').value;
+      if (selectedPlant) {
+        document.getElementById('poly-plant1').value = selectedPlant;
+        updatePolyculture();
+      }
+    }
+
+    // ========== PAGE 1: PLANT SEARCH ==========
+    
+    window.addEventListener('DOMContentLoaded', () => {
+      ['plant-select', 'poly-plant1', 'poly-plant2', 'poly-plant3', 'poly-plant4', 'layer-pioneer', 'layer-secondary', 'layer-climax'].forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+          MULTILINGUAL_PLANTS.forEach(plant => {
+            const opt = document.createElement('option');
+            opt.value = plant.common_name_pt;
+            opt.textContent = `${plant.common_name_pt} | ${plant.common_name_en}`;
+            select.appendChild(opt);
+          });
+        }
+      });
+    });
+
+    function searchPlant() {
+      const plantName = document.getElementById('plant-select').value;
+      if (!plantName) {
+        document.getElementById('plant-details').innerHTML = '';
+        document.getElementById('companions-list').innerHTML = '<div class="empty-message">Select a plant to see companions</div>';
+        return;
+      }
+
+      const plant = MULTILINGUAL_PLANTS.find(p => p.common_name_pt === plantName);
+      if (!plant) return;
+
+      const month = LUNAR_MONTHS[plant.lunar];
+      let html = `
+        <div class="info-row"><span class="info-label">🌙 Lunar Month:</span><span class="info-value">${plant.lunar} - ${month.name}</span></div>
+        <div class="info-row"><span class="info-label">📻 Frequency:</span><span class="info-value">${plant.freq.toFixed(2)} Hz</span></div>
+        <div class="info-row"><span class="info-label">🔊 Proto-Word:</span><span class="info-value">${plant.proto}</span></div>
+        <div class="info-row"><span class="info-label">🌱 Sap Phase:</span><span class="info-value">${month.sap}</span></div>
+        <div class="info-row"><span class="info-label">🌍 Layer:</span><span class="info-value">${plant.strato}</span></div>
+        <div class="info-row"><span class="info-label">🤝 N-Fixer:</span><span class="info-value">${plant.fixer ? 'Yes ✓' : 'No'}</span></div>
+      `;
+      document.getElementById('plant-details').innerHTML = html;
+
+      // Get companions with layer diversity scoring
+      const allCompanions = MULTILINGUAL_PLANTS.map(p => {
+        const harmony = getConsonance(plant.freq, p.freq);
+        const stratoBonus = plant.strato !== p.strato ? 15 : 0;
+        const score = Math.min(100, harmony + stratoBonus);
+        
+        return {
+          name: p.common_name_pt,
+          harmony: harmony,
+          strato: p.strato,
+          freq: p.freq,
+          score: score,
+          isDifferentLayer: plant.strato !== p.strato
+        };
+      })
+        .filter(c => c.name !== plantName)
+        .sort((a, b) => b.score - a.score);
+
+      // Ensure stratified diversity: get best from each strato, then fill remaining
+      const stratoBuckets = {
+        'emergente': [],
+        'alto': [],
+        'medio': [],
+        'bajo': []
+      };
+      
+      allCompanions.forEach(c => {
+        if (stratoBuckets[c.strato]) {
+          stratoBuckets[c.strato].push(c);
+        }
+      });
+
+      const companions = [];
+      // Get top 1 from each strato first
+      Object.values(stratoBuckets).forEach(bucket => {
+        if (bucket.length > 0) companions.push(bucket[0]);
+      });
+      
+      // Then fill remaining slots (max 6 total) with best from other strato
+      const remaining = [];
+      Object.values(stratoBuckets).forEach(bucket => {
+        for (let i = 1; i < bucket.length; i++) {
+          remaining.push(bucket[i]);
+        }
+      });
+      remaining.sort((a, b) => b.score - a.score);
+      
+      while (companions.length < 6 && remaining.length > 0) {
+        companions.push(remaining.shift());
+      }
+
+      html = '<div class="companion-list">';
+      companions.forEach(c => {
+        const layerIcon = c.isDifferentLayer ? '🌍' : '➡️';
+        const layerLabel = c.isDifferentLayer ? 'Different Layer (Vertical)' : 'Same Layer';
+        html += `
+          <div class="companion-item">
+            <div>
+              <div style="font-weight: bold;">${c.name}</div>
+              <div style="font-size: 0.8em; color: #999;">${c.freq.toFixed(2)} Hz | ${c.strato} ${layerIcon}</div>
+            </div>
+            <div style="flex-shrink: 0; text-align: right;">
+              <div class="harmony-bar"><div class="harmony-fill" style="width: ${c.score}%"></div></div>
+              <div style="font-size: 0.75em; color: #999; margin-bottom: 3px;">${layerLabel}</div>
+              <div style="font-size: 0.85em; color: #4affb1; font-weight: bold;">${c.score}%</div>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      document.getElementById('companions-list').innerHTML = html;
+    }
+
+    // ========== PAGE 2: LUNAR TIMING ==========
+    
+    let selectedMonth = null;
+
+    function selectMonth(month) {
+      selectedMonth = month;
+      const plantName = document.getElementById('plant-select').value;
+      
+      if (!plantName) {
+        document.getElementById('lunar-info').innerHTML = '<div class="empty-message">Select a plant first in Plant Search tab</div>';
+        return;
+      }
+
+      const plant = MULTILINGUAL_PLANTS.find(p => p.common_name_pt === plantName);
+      if (!plant) return;
+
+      const plantMonth = LUNAR_MONTHS[plant.lunar];
+      const selectedMonthData = LUNAR_MONTHS[month];
+
+      let html = `
+        <div class="info-row"><span class="info-label">🌿 Plant:</span><span class="info-value">${plantName}</span></div>
+        <div class="info-row"><span class="info-label">🌙 Plant's Lunar Month:</span><span class="info-value">Month ${plant.lunar} - ${plantMonth.name} (${plantMonth.sap})</span></div>
+        <div class="info-row"><span class="info-label">📅 Selected Month:</span><span class="info-value">Month ${month} - ${selectedMonthData.name}</span></div>
+        <div class="info-row"><span class="info-label">📻 Frequency Match:</span><span class="info-value">${(plant.freq / selectedMonthData.freq * 100).toFixed(1)}%</span></div>
+        <div style="background: rgba(74, 157, 125, 0.2); padding: 15px; border-radius: 6px; margin-top: 15px;">
+          ${month === plant.lunar ? 
+            '<strong style="color: #4affb1;">✓ OPTIMAL TIMING!</strong> Plant resonates perfectly with this lunar month.' :
+            `<strong>Complementary Energy:</strong> Plant's ideal month is ${plant.lunar}. This month provides alternative frequency support.`}
+        </div>
+      `;
+      
+      document.getElementById('lunar-info').innerHTML = html;
+    }
+
+    // ========== PAGE 3: HEALTH & HEALING ==========
+    
+    function updateDiagnosis() {
+      document.getElementById('cond-val').textContent = document.getElementById('conductivity').value + '%';
+      document.getElementById('moist-val').textContent = document.getElementById('moisture').value + '%';
+      document.getElementById('temp-val').textContent = document.getElementById('temperature').value + '°C';
+      document.getElementById('photo-val').textContent = document.getElementById('photosynthesis').value + '%';
+
+      const cond = parseInt(document.getElementById('conductivity').value);
+      const moist = parseInt(document.getElementById('moisture').value);
+      const temp = parseInt(document.getElementById('temperature').value);
+      const photo = parseInt(document.getElementById('photosynthesis').value);
+
+      let diagnoses = [];
+      let freqs = [];
+
+      if (cond < 30 && moist < 40) {
+        diagnoses.push('🚨 Nutrient Deficiency - Poor soil conductivity and low moisture');
+        freqs.push(256);
+      }
+      if (temp > 28 && photo < 60) {
+        diagnoses.push('🔴 Fungal Infection Risk - High temperature with low photosynthesis');
+        freqs.push(315.5);
+      }
+      if (moist > 75 && cond < 40) {
+        diagnoses.push('💧 Root Stress - Excessive moisture with poor nutrient uptake');
+        freqs.push(298);
+      }
+      if (photo < 30) {
+        diagnoses.push('☀️ Low Light Condition - Insufficient photosynthesis');
+        freqs.push(357.5);
+      }
+
+      if (diagnoses.length === 0) {
+        diagnoses.push('✓ Plant Health Optimal - All indicators normal');
+        freqs.push(426);
+      }
+
+      let html = '<div class="diagnosis-box">';
+      diagnoses.forEach(d => html += `<div class="diagnosis-item">${d}</div>`);
+      html += '</div>';
+
+      document.getElementById('diagnosis-result').innerHTML = html;
+
+      if (freqs.length > 0) {
+        const freq = freqs[0];
+        document.getElementById('healing-result').innerHTML = `
+          <div style="background: rgba(74, 157, 125, 0.2); padding: 15px; border-radius: 6px; text-align: center;">
+            <h4 style="color: #4affb1; margin-bottom: 10px;">🎵 Prescribed Healing Frequency</h4>
+            <div style="font-size: 1.8em; font-weight: bold; color: #4affb1;">${freq.toFixed(2)} Hz</div>
+            <button class="btn-primary" onclick="playFrequency(${freq})">▶️ Play (5 seconds)</button>
+          </div>
+        `;
+      }
+    }
+
+    function playFrequency(freq) {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 5);
+      osc.start(audioContext.currentTime);
+      osc.stop(audioContext.currentTime + 5);
+    }
+
+    // ========== PAGE 4: POLYCULTURE COMPOSER ==========
+    
+    function updatePolyculture() {
+      const plants = [
+        document.getElementById('poly-plant1').value,
+        document.getElementById('poly-plant2').value,
+        document.getElementById('poly-plant3').value,
+        document.getElementById('poly-plant4').value
+      ].filter(p => p);
+
+      if (plants.length < 2) {
+        document.getElementById('poly-harmony').innerHTML = '<div class="empty-message">Select at least 2 plants</div>';
+        document.getElementById('poly-frequencies').innerHTML = '<div class="empty-message">No plants selected</div>';
+        return;
+      }
+
+      const plantData = plants.map(name => MULTILINGUAL_PLANTS.find(p => p.common_name_pt === name));
+      const freqs = plantData.map(p => p.freq);
+
+      let totalHarmony = 0;
+      let pairingCount = 0;
+      for (let i = 0; i < freqs.length; i++) {
+        for (let j = i + 1; j < freqs.length; j++) {
+          totalHarmony += getConsonance(freqs[i], freqs[j]);
+          pairingCount++;
+        }
+      }
+      const avgHarmony = pairingCount > 0 ? Math.round(totalHarmony / pairingCount) : 0;
+
+      const harmonyColor = avgHarmony >= 80 ? '#4affb1' : avgHarmony >= 60 ? '#95ff95' : avgHarmony >= 40 ? '#ffff95' : '#ff6b6b';
+
+      document.getElementById('poly-harmony').innerHTML = `
+        <div style="text-align: center;">
+          <div class="harmony-score" style="color: ${harmonyColor};">${avgHarmony}%</div>
+          <div style="color: #aaa;">Overall Consonance Score</div>
+          <p style="margin-top: 15px; font-size: 0.9em;">
+            ${avgHarmony >= 80 ? '🟢 Perfect Harmony - Excellent plant community!' :
+              avgHarmony >= 60 ? '🟡 Good Consonance - Compatible companions' :
+              avgHarmony >= 40 ? '🟠 Neutral - Can coexist' :
+              '🔴 Dissonance Risk - Avoid planting together'}
+          </p>
+        </div>
+      `;
+
+      let freqHtml = '<div>';
+      plantData.forEach((p, i) => {
+        freqHtml += `<div class="info-row"><span class="info-label">${plants[i]}</span><span class="info-value">${p.freq.toFixed(2)} Hz (${p.proto})</span></div>`;
+      });
+      freqHtml += '</div>';
+      document.getElementById('poly-frequencies').innerHTML = freqHtml;
+    }
+
+    // ========== PAGE 5: FOREST DESIGNER ==========
+    
+    function exportForestDesign() {
+      const pioneer = document.getElementById('layer-pioneer').value;
+      const secondary = document.getElementById('layer-secondary').value;
+      const climax = document.getElementById('layer-climax').value;
+
+      if (!pioneer || !secondary || !climax) {
+        alert('Please select all three plants (Pioneer, Secondary, Climax) before exporting');
+        return;
+      }
+
+      const p1 = MULTILINGUAL_PLANTS.find(p => p.common_name_pt === pioneer);
+      const p2 = MULTILINGUAL_PLANTS.find(p => p.common_name_pt === secondary);
+      const p3 = MULTILINGUAL_PLANTS.find(p => p.common_name_pt === climax);
+
+      const h12 = getConsonance(p1.freq, p2.freq);
+      const h23 = getConsonance(p2.freq, p3.freq);
+      const h13 = getConsonance(p1.freq, p3.freq);
+      const avgHarmony = Math.round((h12 + h23 + h13) / 3);
+
+      const designData = {
+        title: `Syntropic Forest Design - ${new Date().toLocaleDateString('pt-PT')}`,
+        exportDate: new Date().toISOString(),
+        phases: {
+          placenta: {
+            name: pioneer,
+            lunar: p1.lunar,
+            frequency: p1.freq,
+            proto: p1.proto,
+            strato: p1.strato,
+            fixer: p1.fixer
+          },
+          secundaria: {
+            name: secondary,
+            lunar: p2.lunar,
+            frequency: p2.freq,
+            proto: p2.proto,
+            strato: p2.strato,
+            fixer: p2.fixer
+          },
+          climax: {
+            name: climax,
+            lunar: p3.lunar,
+            frequency: p3.freq,
+            proto: p3.proto,
+            strato: p3.strato,
+            fixer: p3.fixer
+          }
+        },
+        harmonicAnalysis: {
+          pioneerSecondary: h12,
+          secondaryClimax: h23,
+          pioneerClimax: h13,
+          overallConsonance: avgHarmony
+        },
+        stratifiedDiversity: {
+          uniqueStrata: new Set([p1.strato, p2.strato, p3.strato]).size,
+          strata: [p1.strato, p2.strato, p3.strato]
+        },
+        timeline: {
+          phase1: '1-4 years (Placenta)',
+          phase2: '5-14 years (Secundária)',
+          phase3: '15+ years (Clímax)'
+        }
+      };
+
+      const jsonString = JSON.stringify(designData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `forest-design-${new Date().getTime()}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      alert('✅ Design exported as JSON! Open it in any text editor to view or modify.');
+    }
+    function generateSyntropicMusicalStaff(p1, p2, p3) {
+      // Generate musical staff showing the syntropic succession as a musical progression
+      // Each plant = a note, height = frequency, progression = time (1-4yrs → 5-14yrs → 15+yrs)
+      
+      // Map frequency to staff position (5-line staff = 9 positions)
+      // Higher frequency = higher on staff
+      const getStaffPosition = (plant) => {
+        const freq = plant.freq;
+        // Map 261.63 Hz (low) to 698.46 Hz (high) onto staff positions 0-8
+        const minFreq = 261.63;
+        const maxFreq = 698.46;
+        const normalizedFreq = (freq - minFreq) / (maxFreq - minFreq);
+        const position = normalizedFreq * 8;
+        return Math.round(position);
+      };
+      
+      const getYCoord = (pos) => {
+        // Staff has 5 lines, positioned at y = 40, 80, 120, 160, 200
+        // Between-line spaces at y = 60, 100, 140, 180
+        const linePositions = [200, 160, 120, 80, 40]; // 5 lines, bottom to top
+        const allPositions = [];
+        for (let i = 0; i < 5; i++) {
+          allPositions.push(linePositions[i]); // line
+          if (i < 4) allPositions.push((linePositions[i] + linePositions[i+1]) / 2); // space
+        }
+        return allPositions[pos] || 40;
+      };
+
+      const svg = `
+        <svg width="100%" viewBox="0 0 800 320" preserveAspectRatio="xMidYMid meet" style="background: rgba(74, 157, 125, 0.05); border-radius: 6px; margin: 20px 0; max-width: 100%; height: auto;">
+          <!-- Musical Staff (5 lines) -->
+          <line x1="40" y1="40" x2="760" y2="40" stroke="#4a9d7d" stroke-width="2"/>
+          <line x1="40" y1="80" x2="760" y2="80" stroke="#4a9d7d" stroke-width="2"/>
+          <line x1="40" y1="120" x2="760" y2="120" stroke="#4a9d7d" stroke-width="2"/>
+          <line x1="40" y1="160" x2="760" y2="160" stroke="#4a9d7d" stroke-width="2"/>
+          <line x1="40" y1="200" x2="760" y2="200" stroke="#4a9d7d" stroke-width="2"/>
+          
+          <!-- Strata Labels on left -->
+          <text x="5" y="45" font-size="12" fill="#999">Emergent</text>
+          <text x="5" y="85" font-size="12" fill="#999">Alto</text>
+          <text x="5" y="125" font-size="12" fill="#999">Medio</text>
+          <text x="5" y="165" font-size="12" fill="#999">Bajo</text>
+          <text x="5" y="205" font-size="12" fill="#999">Ground</text>
+          
+          <!-- Treble Clef symbol (simplified) -->
+          <circle cx="50" cy="120" r="8" fill="none" stroke="#4affb1" stroke-width="1"/>
+          
+          <!-- Plant 1: Pioneer (Placenta) - left position -->
+          <circle cx="150" cy="${getYCoord(getStaffPosition(p1))}" r="18" fill="#90EE90" stroke="#4affb1" stroke-width="2"/>
+          <line x1="168" y1="${getYCoord(getStaffPosition(p1)) - 18}" x2="168" y2="${getYCoord(getStaffPosition(p1)) - 50}" stroke="#4affb1" stroke-width="2"/>
+          <text x="110" y="260" font-size="11" fill="#4affb1" font-weight="bold" text-anchor="middle">🌱 1-4 yrs</text>
+          <text x="110" y="276" font-size="10" fill="#999" text-anchor="middle">${p1.common_name_pt}</text>
+          <text x="110" y="290" font-size="9" fill="#666" text-anchor="middle">${p1.freq.toFixed(0)} Hz</text>
+          
+          <!-- Arrow between p1 and p2 -->
+          <path d="M 200 120 L 260 120" stroke="#4affb1" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+          <text x="230" y="115" font-size="9" fill="#999" text-anchor="middle">5-14 yrs</text>
+          
+          <!-- Plant 2: Secondary - middle position -->
+          <circle cx="320" cy="${getYCoord(getStaffPosition(p2))}" r="18" fill="#FFD700" stroke="#4affb1" stroke-width="2"/>
+          <line x1="338" y1="${getYCoord(getStaffPosition(p2)) - 18}" x2="338" y2="${getYCoord(getStaffPosition(p2)) - 50}" stroke="#4affb1" stroke-width="2"/>
+          <text x="320" y="260" font-size="11" fill="#4affb1" font-weight="bold" text-anchor="middle">🌿 Secundária</text>
+          <text x="320" y="276" font-size="10" fill="#999" text-anchor="middle">${p2.common_name_pt}</text>
+          <text x="320" y="290" font-size="9" fill="#666" text-anchor="middle">${p2.freq.toFixed(0)} Hz</text>
+          
+          <!-- Arrow between p2 and p3 -->
+          <path d="M 370 120 L 430 120" stroke="#4affb1" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+          <text x="400" y="115" font-size="9" fill="#999" text-anchor="middle">15+ yrs</text>
+          
+          <!-- Plant 3: Climax - right position -->
+          <circle cx="490" cy="${getYCoord(getStaffPosition(p3))}" r="18" fill="#8B4513" stroke="#4affb1" stroke-width="2"/>
+          <line x1="508" y1="${getYCoord(getStaffPosition(p3)) - 18}" x2="508" y2="${getYCoord(getStaffPosition(p3)) - 50}" stroke="#4affb1" stroke-width="2"/>
+          <text x="490" y="260" font-size="11" fill="#4affb1" font-weight="bold" text-anchor="middle">🌲 15+ yrs</text>
+          <text x="490" y="276" font-size="10" fill="#999" text-anchor="middle">${p3.common_name_pt}</text>
+          <text x="490" y="290" font-size="9" fill="#666" text-anchor="middle">${p3.freq.toFixed(0)} Hz</text>
+          
+          <!-- Arrow marker definition -->
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <polygon points="0 0, 10 3, 0 6" fill="#4affb1"/>
+            </marker>
+          </defs>
+          
+          <!-- Harmony Intervals Label -->
+          <text x="40" y="20" font-size="13" fill="#4affb1" font-weight="bold">🎵 Syntropic Succession as Musical Progression</text>
+        </svg>
+      `;
+      
+      return svg;
+    }
+    function updateForestDesign() {
+      const pioneer = document.getElementById('layer-pioneer').value;
+      const secondary = document.getElementById('layer-secondary').value;
+      const climax = document.getElementById('layer-climax').value;
+
+      if (!pioneer || !secondary || !climax) {
+        document.getElementById('forest-recommendations').innerHTML = '<div class="empty-message">Select plants from all three phases</div>';
+        return;
+      }
+
+      const p1 = MULTILINGUAL_PLANTS.find(p => p.common_name_pt === pioneer);
+      const p2 = MULTILINGUAL_PLANTS.find(p => p.common_name_pt === secondary);
+      const p3 = MULTILINGUAL_PLANTS.find(p => p.common_name_pt === climax);
+
+      // Harmonic analysis
+      const h12 = getConsonance(p1.freq, p2.freq);
+      const h23 = getConsonance(p2.freq, p3.freq);
+      const h13 = getConsonance(p1.freq, p3.freq);
+      const avg = Math.round((h12 + h23 + h13) / 3);
+
+      // Layer diversity analysis
+      const allStrats = [p1.strato, p2.strato, p3.strato];
+      const uniqueStrats = new Set(allStrats).size;
+      const layerDiversity = uniqueStrats === 3 ? '✓ EXCELLENT - All 3 layers different' : uniqueStrats === 2 ? '⚠️ GOOD - 2 different layers' : '❌ POOR - Same layer plants';
+
+      let html = `
+        <div style="margin-bottom: 20px;">
+          <h4 style="color: #4affb1; margin-bottom: 15px;">� Syntropic Succession as Musical Progression</h4>
+          ${generateSyntropicMusicalStaff(p1, p2, p3)}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <h4 style="color: #4affb1; margin-bottom: 15px;">📋 Your Forest Composition (by Succession Phase)</h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div style="background: rgba(74, 157, 125, 0.2); padding: 15px; border-radius: 6px;">
+              <strong style="color: #4affb1;">🌱 Placenta (Pioneer - 1-4 yrs)</strong><br>
+              ${pioneer}<br>
+              <span style="font-size: 0.85em; color: #aaa;">Month ${p1.lunar} | ${p1.freq.toFixed(2)} Hz | Strato: <strong>${p1.strato}</strong></span>
+            </div>
+            <div style="background: rgba(74, 157, 125, 0.2); padding: 15px; border-radius: 6px;">
+              <strong style="color: #4affb1;">🌿 Secundária (5-14 yrs)</strong><br>
+              ${secondary}<br>
+              <span style="font-size: 0.85em; color: #aaa;">Month ${p2.lunar} | ${p2.freq.toFixed(2)} Hz | Strato: <strong>${p2.strato}</strong></span>
+            </div>
+            <div style="background: rgba(74, 157, 125, 0.2); padding: 15px; border-radius: 6px;">
+              <strong style="color: #4affb1;">🌲 Clímax (15+ yrs)</strong><br>
+              ${climax}<br>
+              <span style="font-size: 0.85em; color: #aaa;">Month ${p3.lunar} | ${p3.freq.toFixed(2)} Hz | Strato: <strong>${p3.strato}</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: rgba(74, 157, 125, 0.15); border-left: 4px solid #4a9d7d; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+          <h4 style="color: #4affb1; margin-bottom: 10px;">🎵 Harmonic Analysis</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <div style="text-align: center;">
+              <div style="font-size: 1.2em; font-weight: bold; color: #4affb1;">${h12}%</div>
+              <div style="font-size: 0.75em; color: #999;">Pioneer ↔ Secondary</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 1.2em; font-weight: bold; color: #4affb1;">${h23}%</div>
+              <div style="font-size: 0.75em; color: #999;">Secondary ↔ Climax</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 1.2em; font-weight: bold; color: #4affb1;">${h13}%</div>
+              <div style="font-size: 0.75em; color: #999;">Pioneer ↔ Climax</div>
+            </div>
+          </div>
+          <div class="harmony-score" style="color: ${avg >= 80 ? '#4affb1' : avg >= 60 ? '#95ff95' : '#ffff95'};">${avg}%</div>
+          <p style="text-align: center; color: #aaa; margin-top: 10px;">Overall Forest Consonance</p>
+        </div>
+
+        <div style="background: rgba(74, 157, 125, 0.15); border-left: 4px solid #4a9d7d; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+          <h4 style="color: #4affb1; margin-bottom: 10px;">🌍 Layer Diversity Analysis</h4>
+          <p style="margin-bottom: 10px; color: #b3b3b3;">
+            <strong>Strato Distribution:</strong> ${layerDiversity}
+          </p>
+          <p style="font-size: 0.9em; color: #999;">
+            Vertical stratification ensures: maximum light capture, soil moisture retention, pest/disease resilience, and efficient nutrient cycling.
+          </p>
+        </div>
+
+        <div style="background: rgba(74, 157, 125, 0.15); border-left: 4px solid #4a9d7d; padding: 15px; border-radius: 6px;">
+          <h4 style="color: #4affb1; margin-bottom: 10px;">📋 Planting Recommendations</h4>
+          <ul style="margin-left: 20px; color: #b3b3b3; line-height: 1.8;">
+            <li><strong>Year 1-4 (Placenta):</strong> Plant ${pioneer} (${p1.strato} layer) at lunar month ${p1.lunar}. Apply 10-15cm mulch immediately. Nitrogen-fixer role: prepares soil.</li>
+            <li><strong>Year 5-9:</strong> Add ${secondary} (${p2.strato} layer) at lunar month ${p2.lunar}. Harmonic resonance: ${h12}%. Continues mulch cycle. Different strato optimizes light + space.</li>
+            <li><strong>Year 15+:</strong> Introduce ${climax} (${p3.strato} layer) at lunar month ${p3.lunar}. Final emergent layer. System reaches climax productivity. Combined consonance with ecosystem: ${avg}%.</li>
+            <li><strong>🍂 Mulching:</strong> Refresh every 6 months. Use pruned branches from all layers = zero external inputs by Year 2.</li>
+            <li><strong>🎵 Healing:</strong> Monitor plant health via diagnostics. UFT frequencies support stress recovery between lunar phases.</li>
+          </ul>
+        </div>
+      `;
+
+      document.getElementById('forest-recommendations').innerHTML = html;
+    }
+
+    // ========== INITIALIZE ==========
+    updateDiagnosis();
+  </script>
+
+  <footer style="background: rgba(0, 0, 0, 0.5); border-top: 2px solid #4a9d7d; padding: 30px; margin-top: 40px; text-align: center; color: #999;">
+    <div style="max-width: 1400px; margin: 0 auto;">
+      <p style="margin-bottom: 10px; font-size: 0.9em;">
+        <strong style="color: #4affb1;">🔬 Test & Prototype</strong> — This system is a proof-of-concept developed to complement the <strong>RMTerra Project</strong>
+      </p>
+      <p style="margin-bottom: 5px; font-size: 0.85em;">
+        🌿 Integrating <strong>UFT (Universal Frequency Translator)</strong> with <strong>Ernst Götsch's Syntropic Agriculture</strong> methodology
+      </p>
+      <p style="font-size: 0.8em; color: #777; margin-top: 15px; border-top: 1px solid rgba(74, 157, 125, 0.3); padding-top: 15px;">
+        © 2026 — Harmonic forest design for regenerative agriculture | <strong style="color: #4affb1;">Educational & Research Use</strong>
+      </p>
+    </div>
+  </footer>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(registration => {
+            console.log('✅ Service Worker registered:', registration);
+          })
+          .catch(error => {
+            console.log('❌ Service Worker registration failed:', error);
+          });
+      });
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      console.log('💾 Install prompt available');
+      
+      // Optionally show install button (can add UI later)
+    });
+
+    window.addEventListener('appinstalled', () => {
+      console.log('✅ PWA installed successfully');
+      deferredPrompt = null;
+    });
+  </script>
+</body>
+</html>
